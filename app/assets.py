@@ -45,3 +45,59 @@ class AssetCollector:
             return await task
         finally:
             self.inflight.pop(url, None)
+
+    async def _fetch(self, client, url, depth):
+        try:
+            async with self.semaphore:
+                # Fresh unauthenticated requests: cookies and auth are never forwarded.
+                for attempt in range(2):
+                    try:
+                        current = url
+                        for _ in range(6):
+                            async with client.stream("GET", current, follow_redirects=False, headers={"Cookie": ""}) as response:
+                                if response.is_redirect:
+                                    current = urljoin(current, response.headers.get("location", ""))
+                                    if not resource_url(current):
+                                        raise ValueError("Unsafe resource redirect")
+                                    continue
+                                response.raise_for_status()
+                                ctype = response.headers.get("content-type", "").split(';')[0].lower()
+                                if not (ctype.startswith(('image/', 'font/')) or ctype in {'text/css', 'application/font-woff', 'application/octet-stream', 'application/vnd.ms-fontobject', 'application/x-font-ttf'}):
+                                    raise ValueError("Unsupported asset type " + ctype)
+                                payload = bytearray()
+                                async for chunk in response.aiter_bytes():
+                                    if self.cancel.is_set():
+                                        return None
+                                    if len(payload) + len(chunk) > self.limit or self.total + len(chunk) > self.total_limit:
+                                        raise ValueError("Asset size budget exceeded")
+                                    payload.extend(chunk)
+                                    self.total += len(chunk)
+                                break
+                        else:
+                            raise ValueError("Too many redirects")
+                        break
+                    except httpx.TransportError:
+                        if attempt:
+                            raise
+                        await asyncio.sleep(.2)
+            ext = Path(unquote(urlsplit(url).path)).suffix.lower()
+            if not re.fullmatch(r"\.[a-z0-9]{1,6}", ext) or ext in {'.html', '.php', '.js'}:
+                ext = mimetypes.guess_extension(ctype) or '.bin'
+            category = 'styles' if ctype == 'text/css' else 'fonts' if ctype.startswith('font/') or ext in {'.woff', '.woff2', '.ttf', '.otf'} else 'images'
+            name = re.sub(r'[^a-zA-Z0-9_-]', '-', Path(unquote(urlsplit(url).path)).stem)[:45] or 'resource'
+            relative = f"assets/{category}/{name}-{hashlib.sha256(url.encode()).hexdigest()[:12]}{ext}"
+            self.mapping[url] = relative
+            if ctype == 'text/css':
+                text = bytes(payload).decode('utf-8', errors='replace')
+                # Mapping already exists, so cyclic imports terminate.
+                text = await self.rewrite_css(client, text, current, depth + 1, css_file=True)
+                payload = text.encode('utf-8')
+            path = self.root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(payload)
+            self.progress("asset", relative)
+            return relative
+        except (httpx.HTTPError, ValueError, OSError) as exc:
+            self.mapping.pop(url, None)
+            self.warnings.append(f"Asset unavailable: {urlsplit(url).hostname}{urlsplit(url).path[:90]} ({type(exc).__name__}: {str(exc)[:100]})")
+            return None
