@@ -30,3 +30,7 @@ class BuildWorker(QThread):
             import logging
             logging.exception('Reconstruction failed')
             self.error.emit(f'Could not save reconstruction: {type(exc).__name__}: {exc}')
+
+
+class ExportWorker(QThread):
+    ready = Signal(str)
