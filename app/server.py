@@ -44,3 +44,8 @@ class PreviewServer:
     def url(self, relative):
         from urllib.parse import quote
         return self.origin + "/" + quote(str(relative).replace("\\", "/"), safe="/")
+
+    def close(self):
+        self.server.shutdown()
+        self.server.server_close()
+        self.thread.join(timeout=2)
