@@ -60,3 +60,26 @@ class BrowserController(QObject):
     error = Signal(str)
     phase = Signal(str)
     navigated = Signal(bool)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.profile = QWebEngineProfile(self)  # Off-the-record, memory-only profile.
+        self.profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.MemoryHttpCache)
+        self.profile.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.NoPersistentCookies)
+        self.profile.downloadRequested.connect(lambda download: download.cancel())
+        self.source = QWebEngineView()
+        self.page = RestrictedPage(self.profile, self.source)
+        self.source.setPage(self.page)
+        self.page.blocked.connect(self.error)
+        self.page.renderProcessTerminated.connect(lambda *_: self.error.emit('Chromium stopped unexpectedly. Reload the website to recover.'))
+        self.source.loadStarted.connect(self._load_started)
+        self.source.loadFinished.connect(self._load_finished)
+        self.timer = QTimer(self)
+        self.timer.setInterval(130)
+        self.timer.timeout.connect(self.poll)
+        self.navigation_timeout = QTimer(self)
+        self.navigation_timeout.setSingleShot(True)
+        self.navigation_timeout.timeout.connect(self._timed_out)
+        self.ready = False
+        self.capturing = False
+        self.generation = 0
