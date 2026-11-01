@@ -13,3 +13,8 @@ class BuildWorker(QThread):
     progress = Signal(str, str)
     ready = Signal(object, object)
     error = Signal(str)
+
+    def __init__(self, capture, root, settings):
+        super().__init__()
+        self.capture, self.root, self.settings = capture, root, settings
+        self.cancel_event = threading.Event()
