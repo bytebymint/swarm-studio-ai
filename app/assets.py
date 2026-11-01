@@ -116,3 +116,22 @@ class AssetCollector:
         css = URL_PATTERN.sub(lambda m: f'url("{replacements.get(m.group(2), m.group(2))}")', css)
         css = IMPORT_PATTERN.sub(lambda m: f'@import url("{replacements.get(m.group(1), m.group(1))}");' if replacements.get(m.group(1), m.group(1)) else '', css)
         return css
+
+    async def collect(self, capture):
+        timeout = httpx.Timeout(12, connect=6)
+        async with httpx.AsyncClient(timeout=timeout, trust_env=False, headers={"User-Agent": "SwarmStudio/0.1 local-reconstruction"}) as client:
+            # Limit task creation as well as network concurrency.
+            resources = capture.get('resources', [])[:1500]
+            if len(capture.get('resources', [])) > 1500:
+                self.warnings.append('Resource list limited to 1,500 entries.')
+            for offset in range(0, len(resources), 24):
+                if self.cancel.is_set():
+                    break
+                await asyncio.gather(*(self.fetch(client, url) for url in resources[offset:offset+24]))
+            sheets = []
+            for sheet in capture.get('sheets', []):
+                if self.cancel.is_set():
+                    break
+                sheets.append(await self.rewrite_css(client, sheet['text'], sheet['base']))
+            computed = await self.rewrite_css(client, capture.get('computedCSS', ''), capture['url'])
+            return '\n'.join(sheets), computed
