@@ -108,3 +108,17 @@ class BrowserController(QObject):
     def navigate(self, url):
         self.ready = False
         self.source.setUrl(QUrl(url))
+
+    def capture(self, settings):
+        if not self.ready:
+            self.error.emit('Load a website successfully before initializing the swarm.')
+            return
+        self.generation += 1
+        self.capturing = True
+        self.settings = settings.copy()
+        self.elapsed = 0
+        script = (WEB / 'capture.js').read_text('utf-8')
+        self.page.runJavaScript(script, WORLD)
+        self.page.runJavaScript('window.StudioCapture.start(' + json.dumps(settings) + '); void 0;', WORLD)
+        self.timer.start()
+        self.phase.emit('Discovering page content…')
