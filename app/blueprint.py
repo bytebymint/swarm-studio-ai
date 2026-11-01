@@ -99,3 +99,7 @@ class DependencyGraph:
         for task in self.tasks.values():
             if task["status"] in {"pending", "active"}:
                 task["status"] = "cancelled"
+
+    @property
+    def complete(self):
+        return all(t["status"] == "complete" for t in self.tasks.values())
