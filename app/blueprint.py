@@ -92,3 +92,10 @@ class DependencyGraph:
                     if task["status"] == "pending" and any(self.tasks[d]["status"] in {"failed", "blocked"} for d in task["dependencies"]):
                         task["status"] = "blocked"
                         changed = True
+
+    def cancel(self):
+        self.cancelled = True
+        self.owners.clear()
+        for task in self.tasks.values():
+            if task["status"] in {"pending", "active"}:
+                task["status"] = "cancelled"
