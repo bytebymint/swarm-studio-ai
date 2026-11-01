@@ -122,3 +122,32 @@ class BrowserController(QObject):
         self.page.runJavaScript('window.StudioCapture.start(' + json.dumps(settings) + '); void 0;', WORLD)
         self.timer.start()
         self.phase.emit('Discovering page content…')
+
+    def poll(self):
+        self.elapsed += self.timer.interval()
+        if self.elapsed > (self.settings.get('timeout', 25) + 5) * 1000:
+            self.cancel()
+            self.error.emit('Capture reached its time limit. Increase the timeout or reduce the element limit.')
+            return
+        generation = self.generation
+        def received(raw):
+            if generation != self.generation or not self.capturing:
+                return
+            if not raw:
+                self.timer.stop()
+                self.capturing = False
+                self.error.emit('Capture script did not respond. Reload the website and retry.')
+                return
+            try:
+                state = json.loads(raw)
+            except (ValueError, TypeError):
+                return
+            if state.get('status') == 'complete':
+                self.timer.stop()
+                self.capturing = False
+                self.capture_ready.emit(state['result'])
+            elif state.get('status') in {'error', 'cancelled'}:
+                self.timer.stop()
+                self.capturing = False
+                self.error.emit(state.get('error', 'Capture cancelled.'))
+        self.page.runJavaScript('JSON.stringify(window.StudioCapture?.state || null)', WORLD, received)
