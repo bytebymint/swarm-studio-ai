@@ -91,3 +91,12 @@ class BrowserController(QObject):
         self.ready = False
         self.navigation_timeout.start(30000)
         self.phase.emit('Loading website…')
+
+    def _load_finished(self, ok):
+        self.navigation_timeout.stop()
+        self.ready = ok
+        self.navigated.emit(ok)
+        if not ok:
+            self.error.emit('The website could not load. Check the address, network and certificate, then reload.')
+        else:
+            self.phase.emit('Website ready. Initialize the swarm when the page looks right.')
