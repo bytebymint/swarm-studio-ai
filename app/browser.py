@@ -151,3 +151,9 @@ class BrowserController(QObject):
                 self.capturing = False
                 self.error.emit(state.get('error', 'Capture cancelled.'))
         self.page.runJavaScript('JSON.stringify(window.StudioCapture?.state || null)', WORLD, received)
+
+    def cancel(self):
+        self.generation += 1
+        self.timer.stop()
+        self.capturing = False
+        self.page.runJavaScript('window.StudioCapture?.cancel()', WORLD)
