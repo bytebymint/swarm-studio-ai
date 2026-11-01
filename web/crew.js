@@ -41,6 +41,26 @@
       const e=this.engine.elements.get(task.element),point=this.engine.choreography.anchor(e,task);
       return this.members.some(a=>a.task&&Math.hypot((a.pose?.x??a.x)-point.x,(a.pose?.y??a.y)-point.y)<42);
     }
+    dispatch() {
+      const engine=this.engine;
+      const available=engine.tasks.filter(t=>engine.ready(t)&&engine.isVisible(engine.elements.get(t.element))&&
+        (t.operation!=='verify'||!engine.settings.auto_tour||engine.camera.atEnd));
+      let active=this.members.filter(a=>a.task).length;
+      while(active<this.capacity) {
+        let pick=null,best=Infinity;
+        for(const task of available) {
+          if(task.status!=='pending'||this.collides(task))continue;
+          for(const agent of this.members) {
+            if(agent.task)continue;
+            const cost=this.cost(agent,task);
+            if(cost<best){best=cost;pick={agent,task};}
+          }
+        }
+        if(!pick)break;
+        engine.assign(pick.agent,pick.task);
+        active++;
+      }
+    }
 
   }
   
