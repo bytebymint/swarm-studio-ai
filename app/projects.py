@@ -36,3 +36,18 @@ class ProjectStore:
 
     def recent(self):
         return self.db.execute("SELECT id,name,url FROM projects ORDER BY opened DESC LIMIT 30").fetchall()
+
+    def load(self, project_id):
+        if not isinstance(project_id, str) or len(project_id) != 32 or not all(c in "0123456789abcdef" for c in project_id):
+            raise ValueError("Invalid project identifier.")
+        path = self.projects / project_id
+        try:
+            data = json.loads((path / "metadata/project.json").read_text("utf-8"))
+            blueprint = json.loads((path / "metadata/blueprint.json").read_text("utf-8"))
+            if not (path / "index.html").is_file() or not isinstance(blueprint["elements"], list):
+                raise ValueError("Missing reconstructed document or blueprint.")
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            raise ValueError("This project is missing files or contains invalid metadata. Recapture the website.") from exc
+        self.db.execute("UPDATE projects SET opened=? WHERE id=?", (datetime.now(timezone.utc).isoformat(), project_id))
+        self.db.commit()
+        return path, data, blueprint
