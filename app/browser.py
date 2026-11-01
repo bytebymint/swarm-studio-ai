@@ -100,3 +100,7 @@ class BrowserController(QObject):
             self.error.emit('The website could not load. Check the address, network and certificate, then reload.')
         else:
             self.phase.emit('Website ready. Initialize the swarm when the page looks right.')
+
+    def _timed_out(self):
+        self.source.stop()
+        self.error.emit('Navigation exceeded 30 seconds. The website may still be loading; reload or try a simpler page.')
