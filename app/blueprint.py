@@ -69,3 +69,6 @@ class DependencyGraph:
             self.tasks[d]["status"] == "complete" or
             self.tasks[d]["status"] == "active" and t.get('dependencyPhases', {}).get(d) == 'frame' and d in self.frames
             for d in t["dependencies"])]
+
+    def mark_frame(self, agent):
+        self.frames.add(self.owners[agent])
