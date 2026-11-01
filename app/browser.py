@@ -35,3 +35,6 @@ class RestrictedPage(QWebEnginePage):
             self.blocked.emit('This URL scheme is not supported in the website viewport.')
             return False
         return True
+
+    def javaScriptConsoleMessage(self, level, message, line, source):
+        logging.info('Chromium %s:%s %s', source, line, message)
