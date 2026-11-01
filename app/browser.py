@@ -9,3 +9,7 @@ from PySide6.QtWebEngineWidgets import QWebEngineView
 from app.config import WEB
 
 WORLD = QWebEngineScript.ScriptWorldId.ApplicationWorld
+
+
+class RestrictedPage(QWebEnginePage):
+    blocked = Signal(str)
