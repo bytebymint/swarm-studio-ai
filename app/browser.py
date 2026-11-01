@@ -53,3 +53,7 @@ class Bridge(QObject):
                 self.received.emit(data)
         except (ValueError, TypeError):
             logging.warning('Invalid playback event')
+
+
+class BrowserController(QObject):
+    capture_ready = Signal(object)
