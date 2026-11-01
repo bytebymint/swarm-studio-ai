@@ -60,7 +60,41 @@
       }
       return null;
     }
-    
+    update(dt) {
+      const e=this.engine;
+      if(!e.settings.auto_tour||e.time<e.introDuration||e.finished||e.time<this.manualUntil)return;
+      if(this.move) {
+        const shot=this.move;
+        shot.elapsed+=dt;
+        const p=clamp(shot.elapsed/shot.duration,0,1);
+        shot.node.scrollTop=shot.from+(shot.to-shot.from)*smooth(p);
+        if(p>=1) {
+          shot.node.scrollTop=shot.to;
+          this.move=null;
+          this.holdUntil=e.time+.45;
+          if(shot.final)this.atEnd=true;
+        }
+        return;
+      }
+      if(e.time<this.holdUntil)return;
+      const visual=e.tasks.filter(task=>task.operation!=='verify'&&['pending','active'].includes(task.status));
+      if(!visual.length) {
+        if(this.primary&&Math.abs(this.primary.scrollTop-this.maximum(this.primary))>=2){this.start(this.primary,this.maximum(this.primary),true);return;}
+        this.atEnd=true;
+        return;
+      }
+      // A final verification task often targets the always-visible body. It is
+      // deliberately excluded from scene pacing, as are blocked descendants.
+      const local=visual.some(task=>(task.status==='active'||e.ready(task))&&e.isVisible(e.elements.get(task.element)));
+      if(local) { this.lastProgress=e.time; return; }
+      const eligible=visual.filter(task=>e.ready(task));
+      for(const task of eligible) {
+        const element=e.elements.get(task.element);
+        if(!element?.node)continue;
+        const next=this.route(element);
+        if(next&&this.start(next.node,next.target))return;
+      }
+    }
   }
   
 })();
