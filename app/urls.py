@@ -22,3 +22,10 @@ def normalize_url(raw):
     if any(SECRET_KEYS.search(k) for k, _ in parse_qsl(parsed.query)):
         raise ValueError("Remove secret or session parameters from the URL before capture.")
     return urlunsplit(parsed)
+
+
+def resource_url(raw):
+    try:
+        return normalize_url(raw)
+    except ValueError:
+        return None
