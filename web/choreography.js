@@ -19,6 +19,16 @@
       this.engine.frame.contentWindow.CSS?.highlights?.delete('swarm-untyped');
       this.effects=[];
     }
+    workRect(element) {
+      const r=this.engine.box(element);
+      let left=Math.max(0,r.x),top=Math.max(0,r.y),right=Math.min(this.engine.width,r.x+r.w),bottom=Math.min(this.engine.height,r.y+r.h);
+      for(let node=element.node?.parentElement;node&&node!==this.engine.doc.body;node=node.parentElement) {
+        const cs=this.engine.frame.contentWindow.getComputedStyle(node);
+        if(/auto|scroll|hidden|clip/.test(cs.overflowY)){const p=node.getBoundingClientRect();top=Math.max(top,p.top);bottom=Math.min(bottom,p.bottom);}
+        if(/auto|scroll|hidden|clip/.test(cs.overflowX)){const p=node.getBoundingClientRect();left=Math.max(left,p.left);right=Math.min(right,p.right);}
+      }
+      return {x:clamp(left,0,this.engine.width-2),y:clamp(top,0,this.engine.height-2),w:Math.max(1,right-left),h:Math.max(1,bottom-top)};
+    }
 
   }
   
