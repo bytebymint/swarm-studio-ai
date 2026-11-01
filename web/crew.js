@@ -23,6 +23,10 @@
       });
       this.lastDispatch=-1;
     }
+    home(id) {
+      const left=id%2===0;
+      return {x:left?-24:this.engine.width+24,y:clamp(70+Math.floor(id/2)*82,40,this.engine.height-40)};
+    }
 
   }
   
