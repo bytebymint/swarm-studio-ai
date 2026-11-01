@@ -1,0 +1,15 @@
+.venv/
+.uv-cache/
+__pycache__/
+.pytest_cache/
+*.pyc
+build/
+dist/
+runtime/
+test-results/
+swarm-cursors-main/
+.env
+.env.*
+!.env.example
+*.partial.mp4
+*.partial.zip
