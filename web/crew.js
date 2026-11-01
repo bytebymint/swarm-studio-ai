@@ -28,6 +28,15 @@
       return {x:left?-24:this.engine.width+24,y:clamp(70+Math.floor(id/2)*82,40,this.engine.height-40)};
     }
     get capacity(){return Math.min(this.members.length,clamp(Math.floor(this.engine.width*this.engine.height/145000),2,8));}
+    cost(agent,task) {
+      const e=this.engine.elements.get(task.element),r=this.engine.choreography.workRect(e);
+      let preference=agent.preferred.includes(task.operation)?0:185;
+      if(agent.id===5&&['a','button','input','select','nav'].includes(e.tag))preference-=130;
+      if(agent.id===7&&r.w*r.h<14000)preference-=60;
+      if(agent.id===6&&r.w*r.h>140000)preference-=65;
+      const distance=Math.hypot(agent.x-r.x,agent.y-r.y);
+      return preference+distance*.12+agent.completed*7+(agent.opacity<.1?25:0);
+    }
 
   }
   
