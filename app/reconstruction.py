@@ -116,3 +116,37 @@ def reconstruct(capture, root, settings, cancel=None, progress=None):
         'Native controls, anchor links and preserved CSS interactions work. Uncaptured links lead to the original site.\n\n'
         'See metadata/capture-report.json and metadata/quality-report.json for measured limitations.\n', 'utf-8')
     return metadata, blueprint
+
+
+def reconstruct_collection(captures, root, settings, cancel=None, progress=None):
+    """Build bounded captured pages and rewrite links only between successful local pages."""
+    from posixpath import relpath
+    from urllib.parse import urldefrag
+    metadata, blueprint = reconstruct(captures[0], root, settings, cancel, progress)
+    pages = {urldefrag(captures[0]['url'])[0]: 'index.html'}
+    for index, capture in enumerate(captures[1:], 2):
+        if cancel and cancel.is_set():
+            raise InterruptedError('Capture cancelled')
+        relative = f'pages/page-{index:03d}/index.html'
+        try:
+            reconstruct(capture, Path(root) / Path(relative).parent, settings, cancel, progress)
+            pages[urldefrag(capture['url'])[0]] = relative
+        except InterruptedError:
+            raise
+        except (OSError, ValueError) as exc:
+            metadata['warnings'].append(f"Linked page {index} could not be saved: {type(exc).__name__}")
+    for url, relative in pages.items():
+        path = Path(root) / relative
+        soup = BeautifulSoup(path.read_text('utf-8'), 'lxml')
+        for anchor in soup.select('a[href]'):
+            raw = anchor['href']
+            if raw.startswith('#'):
+                continue
+            base, fragment = urldefrag(urljoin(url, raw))
+            if base in pages:
+                anchor['href'] = relpath(pages[base], str(Path(relative).parent).replace('\\', '/')) + ('#' + fragment if fragment else '')
+                anchor.attrs.pop('target', None)
+        path.write_text(str(soup), 'utf-8')
+    metadata['pages'] = pages
+    write_json(Path(root) / 'metadata/project.json', metadata)
+    return metadata, blueprint
