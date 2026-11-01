@@ -40,3 +40,7 @@ class PreviewServer:
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
         self.origin = f"http://127.0.0.1:{self.server.server_port}"
+
+    def url(self, relative):
+        from urllib.parse import quote
+        return self.origin + "/" + quote(str(relative).replace("\\", "/"), safe="/")
