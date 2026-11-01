@@ -16,3 +16,21 @@ DEFAULTS = {
     "page_limit": 1, "crawl_depth": 1,
     "viewport_mode": "window",
 }
+
+
+class Settings:
+    def __init__(self, path):
+        self.path = Path(path)
+        self.values = DEFAULTS.copy()
+        try:
+            raw = json.loads(self.path.read_text("utf-8"))
+            for key, value in DEFAULTS.items():
+                if key in raw and type(raw[key]) is type(value):
+                    self.values[key] = raw[key]
+        except (OSError, ValueError, TypeError):
+            pass
+        # Previous versions populated a 24-cursor cloud. Existing settings must
+        # also adopt the smaller adaptive crew instead of retaining that default.
+        if self.values['agents'] > 12:
+            self.values['agents'] = 8
+        self.values['agents'] = max(2, self.values['agents'])
