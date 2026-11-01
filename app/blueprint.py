@@ -36,3 +36,7 @@ def build_blueprint(capture):
     return {"schema": 1, "viewport": capture["viewport"], "height": capture["height"],
             "elements": elements, "tasks": tasks, "fonts": capture.get("fonts", []),
             "warnings": capture.get("warnings", []), "counts": dict(Counter(e["kind"] for e in elements)), "scrollState": capture.get("scrollState", {})}
+
+
+class DependencyGraph:
+    """Small deterministic reference scheduler used for verification and diagnostics."""
