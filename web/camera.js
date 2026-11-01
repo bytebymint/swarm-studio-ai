@@ -28,6 +28,18 @@
       this.manualUntil = this.engine.time + 1.5;
       this.atEnd = false;
     }
+    start(node, target, final = false) {
+      const from = node.scrollTop;
+      const to = clamp(target,0,this.maximum(node));
+      if (Math.abs(to-from) < 2) return false;
+      if(this.engine.director&&!this.engine.director.allowScroll())return false;
+      const height = Math.max(200,this.port(node).height);
+      this.move = {node,from,to,elapsed:0,duration:clamp(.6+Math.abs(to-from)/(height*.62),.85,4),final};
+      this.atEnd = false;
+      this.shots++;
+      this.engine.emit('camera-shot',{shot:this.shots,from,to,scroller:node.getAttribute('data-sw-id')||'document'});
+      return true;
+    }
 
   }
   
