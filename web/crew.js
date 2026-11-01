@@ -10,5 +10,20 @@
     ['Katherine','Type',['type'],'#c1a0da'],['Dennis','Components',['duplicate'],'#d7a378'],
     ['Barbara','Style',['draw','place'],'#82bcae'],['Guido','Layout',['draw'],'#8fa9d4']
   ];
+  class WorkingCrew {
+    constructor(engine) {
+      this.engine=engine;
+      const count=clamp(Number(engine.settings.agents)||8,2,12);
+      this.members=Array.from({length:count},(_,id)=>{
+        const [name,role,preferred,color]=identities[id];
+        const home=this.home(id);
+        return {id,name,role,preferred,color,x:home.x,y:home.y,vx:0,vy:0,opacity:0,
+          completed:0,task:null,phase:'Available',personality:.94+engine.random()*.14,
+          tool:'arrow',lastWorked:-100,focus:null,pose:null,labelBox:null};
+      });
+      this.lastDispatch=-1;
+    }
 
+  }
+  
 })();
