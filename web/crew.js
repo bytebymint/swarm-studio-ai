@@ -94,7 +94,43 @@
       const idle=this.members.filter(a=>!a.task&&a.opacity>.12).sort((a,b)=>b.lastWorked-a.lastWorked);
       if(e.time>=e.introDuration)for(const a of idle.slice(2))a.opacity=Math.min(a.opacity,.08);
     }
-    
+    render(ctx) {
+      const occupied=[];
+      const members=this.members.filter(a=>a.opacity>.035).sort((a,b)=>Number(!!a.task)-Number(!!b.task));
+      for(const a of members) {
+        if(a.x<-22||a.x>this.engine.width+22||a.y<-22||a.y>this.engine.height+22)continue;
+        ctx.save();ctx.globalAlpha=a.opacity;
+        ctx.translate(a.x,a.y);const size=(this.engine.settings.cursor_size||1)*.88;ctx.scale(size,size);
+        ctx.fillStyle=a.color;ctx.strokeStyle='#fff';ctx.lineWidth=1.25;ctx.lineJoin='round';ctx.lineCap='round';
+        ctx.beginPath();
+        if(a.tool==='cross') {
+          ctx.moveTo(-6,0);ctx.lineTo(6,0);ctx.moveTo(0,-6);ctx.lineTo(0,6);ctx.stroke();
+          ctx.strokeStyle=a.color;ctx.lineWidth=1;ctx.stroke();
+        } else if(a.tool==='text') {
+          ctx.moveTo(-3,-7);ctx.lineTo(3,-7);ctx.moveTo(0,-7);ctx.lineTo(0,7);ctx.moveTo(-3,7);ctx.lineTo(3,7);ctx.stroke();
+          ctx.strokeStyle=a.color;ctx.lineWidth=.8;ctx.stroke();
+        } else if(a.tool==='pen') {
+          ctx.moveTo(0,0);ctx.lineTo(11,4);ctx.lineTo(15,10);ctx.lineTo(10,15);ctx.lineTo(4,11);ctx.closePath();ctx.fill();ctx.stroke();
+          ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(7,7);ctx.stroke();
+        } else {
+          if(a.tool==='copy'){ctx.strokeRect(7,11,6,6);ctx.strokeRect(10,14,6,6);}
+          ctx.moveTo(0,0);ctx.lineTo(3.8,15);ctx.lineTo(8,9.5);ctx.lineTo(14,7.5);ctx.closePath();ctx.fill();ctx.stroke();
+        }
+        ctx.restore();
+        if(this.engine.settings.names===false||!a.task)continue;
+        const action=a.phase==='Approaching'?a.role:a.phase;
+        const text=a.name+' · '+action;
+        ctx.save();ctx.globalAlpha=a.opacity*.95;ctx.font='500 10px Segoe UI';
+        const width=ctx.measureText(text).width+16,height=19;
+        const candidates=[{x:a.x+14,y:a.y+15},{x:a.x-width-12,y:a.y+15},{x:a.x+14,y:a.y-28},{x:a.x-width-12,y:a.y-28}];
+        let label=candidates.find(p=>p.x>20&&p.x+width<this.engine.width-8&&p.y>20&&p.y+height<this.engine.height-8&&!occupied.some(b=>p.x<b.x+b.w&&p.x+width>b.x&&p.y<b.y+b.h&&p.y+height>b.y));
+        if(!label){ctx.restore();continue;}
+        occupied.push({x:label.x,y:label.y,w:width,h:height});a.labelBox={...label,w:width,h:height};
+        ctx.fillStyle='#232b35';ctx.beginPath();ctx.roundRect(label.x,label.y,width,height,3);ctx.fill();
+        ctx.fillStyle=a.color;ctx.fillRect(label.x+4,label.y+5,2,9);
+        ctx.fillStyle='#f4f6fb';ctx.fillText(text,label.x+10,label.y+13);ctx.restore();
+      }
+    }
   }
   
 })();
