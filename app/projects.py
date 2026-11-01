@@ -27,3 +27,9 @@ class ProjectStore:
         path = self.projects / project_id
         path.mkdir()
         return project_id, path
+
+    def register(self, project_id, metadata):
+        now = datetime.now(timezone.utc).isoformat()
+        self.db.execute("INSERT OR REPLACE INTO projects VALUES (?, ?, ?, ?, ?)",
+                        (project_id, metadata["name"], metadata["url"], metadata.get("created", now), now))
+        self.db.commit()
