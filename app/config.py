@@ -34,3 +34,9 @@ class Settings:
         if self.values['agents'] > 12:
             self.values['agents'] = 8
         self.values['agents'] = max(2, self.values['agents'])
+
+    def save(self, values):
+        self.values.update({k: v for k, v in values.items() if k in DEFAULTS})
+        tmp = self.path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(self.values, indent=2), "utf-8")
+        tmp.replace(self.path)
