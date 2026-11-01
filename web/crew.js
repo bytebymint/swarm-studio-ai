@@ -37,6 +37,10 @@
       const distance=Math.hypot(agent.x-r.x,agent.y-r.y);
       return preference+distance*.12+agent.completed*7+(agent.opacity<.1?25:0);
     }
+    collides(task) {
+      const e=this.engine.elements.get(task.element),point=this.engine.choreography.anchor(e,task);
+      return this.members.some(a=>a.task&&Math.hypot((a.pose?.x??a.x)-point.x,(a.pose?.y??a.y)-point.y)<42);
+    }
 
   }
   
