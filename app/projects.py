@@ -33,3 +33,6 @@ class ProjectStore:
         self.db.execute("INSERT OR REPLACE INTO projects VALUES (?, ?, ?, ?, ?)",
                         (project_id, metadata["name"], metadata["url"], metadata.get("created", now), now))
         self.db.commit()
+
+    def recent(self):
+        return self.db.execute("SELECT id,name,url FROM projects ORDER BY opened DESC LIMIT 30").fetchall()
