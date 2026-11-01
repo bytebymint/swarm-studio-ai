@@ -34,3 +34,4 @@ class BuildWorker(QThread):
 
 class ExportWorker(QThread):
     ready = Signal(str)
+    error = Signal(str)
