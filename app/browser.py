@@ -83,3 +83,11 @@ class BrowserController(QObject):
         self.ready = False
         self.capturing = False
         self.generation = 0
+
+    def _load_started(self):
+        if self.capturing:
+            self.cancel()
+            self.error.emit('The page navigated during capture. Wait for it to finish, then capture again.')
+        self.ready = False
+        self.navigation_timeout.start(30000)
+        self.phase.emit('Loading website…')
