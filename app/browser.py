@@ -42,3 +42,14 @@ class RestrictedPage(QWebEnginePage):
 
 class Bridge(QObject):
     received = Signal(object)
+
+    @Slot(str)
+    def publish(self, raw):
+        if len(raw) > 65536:
+            return
+        try:
+            data = json.loads(raw)
+            if isinstance(data, dict) and isinstance(data.get('type'), str):
+                self.received.emit(data)
+        except (ValueError, TypeError):
+            logging.warning('Invalid playback event')
