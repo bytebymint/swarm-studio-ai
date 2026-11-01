@@ -157,3 +157,29 @@ class BrowserController(QObject):
         self.timer.stop()
         self.capturing = False
         self.page.runJavaScript('window.StudioCapture?.cancel()', WORLD)
+
+
+def make_player(profile, origin, parent=None):
+    view = QWebEngineView(parent)
+    page = RestrictedPage(profile, view, trusted_origin=origin)
+    page.settings().setAttribute(QWebEngineSettings.WebAttribute.PlaybackRequiresUserGesture, False)
+    view.setPage(page)
+    channel = QWebChannel(page)
+    bridge = Bridge(channel)
+    channel.registerObject('bridge', bridge)
+    page.setWebChannel(channel)
+    # qrc URLs are intentionally not exposed to arbitrary HTTP documents.
+    # Inject Qt's bundled bridge library only into this dedicated trusted page.
+    source = QFile(':/qtwebchannel/qwebchannel.js')
+    if not source.open(QIODevice.OpenModeFlag.ReadOnly):
+        raise RuntimeError('Qt WebChannel JavaScript resource is unavailable.')
+    script = QWebEngineScript()
+    script.setName('trusted-studio-channel')
+    script.setInjectionPoint(QWebEngineScript.InjectionPoint.DocumentCreation)
+    script.setWorldId(QWebEngineScript.ScriptWorldId.MainWorld)
+    script.setRunsOnSubFrames(False)
+    script.setSourceCode(bytes(source.readAll()).decode('utf-8'))
+    source.close()
+    page.scripts().insert(script)
+    view.channel, view.bridge = channel, bridge
+    return view
