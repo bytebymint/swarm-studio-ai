@@ -101,3 +101,18 @@ class AssetCollector:
             self.mapping.pop(url, None)
             self.warnings.append(f"Asset unavailable: {urlsplit(url).hostname}{urlsplit(url).path[:90]} ({type(exc).__name__}: {str(exc)[:100]})")
             return None
+
+    async def rewrite_css(self, client, css, base, depth=0, css_file=False):
+        from posixpath import relpath
+        refs = set(m.group(2) for m in URL_PATTERN.finditer(css)) | set(m.group(1) for m in IMPORT_PATTERN.finditer(css))
+        replacements = {}
+        for ref in refs:
+            if ref.startswith(('data:', '#')):
+                continue
+            absolute = urljoin(base, ref)
+            fragment = urlsplit(absolute).fragment
+            local = await self.fetch(client, absolute, depth)
+            replacements[ref] = (relpath(local, 'assets/styles') if css_file else local) + (('#' + fragment) if fragment else '') if local else ''
+        css = URL_PATTERN.sub(lambda m: f'url("{replacements.get(m.group(2), m.group(2))}")', css)
+        css = IMPORT_PATTERN.sub(lambda m: f'@import url("{replacements.get(m.group(1), m.group(1))}");' if replacements.get(m.group(1), m.group(1)) else '', css)
+        return css
