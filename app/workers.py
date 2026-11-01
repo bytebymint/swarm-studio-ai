@@ -39,3 +39,29 @@ class ExportWorker(QThread):
     def __init__(self, root, destination, settings):
         super().__init__()
         self.root, self.destination, self.settings = Path(root), Path(destination), settings
+
+    def run(self):
+        tmp = self.destination.with_suffix('.partial.zip')
+        try:
+            files = list(self.root.rglob('*'))
+            with zipfile.ZipFile(tmp, 'w', zipfile.ZIP_DEFLATED) as archive:
+                for file in files:
+                    if not file.is_file() or file.is_symlink():
+                        continue
+                    rel = file.relative_to(self.root)
+                    if rel.parts[0] == 'screenshots' and not self.settings.get('include_screenshots', True):
+                        continue
+                    if rel.as_posix() == 'metadata/blueprint.json' and not self.settings.get('include_blueprint', True):
+                        continue
+                    archive.write(file, rel.as_posix())
+            os.replace(tmp, self.destination)
+            history = self.root / 'metadata/export-history.json'
+            from datetime import datetime, timezone
+            from app.projects import write_json
+            entries = json.loads(history.read_text('utf-8')) if history.exists() else []
+            entries.append({'date': datetime.now(timezone.utc).isoformat(), 'filename': self.destination.name})
+            write_json(history, entries)
+            self.ready.emit(str(self.destination))
+        except (OSError, ValueError, zipfile.BadZipFile) as exc:
+            tmp.unlink(missing_ok=True)
+            self.error.emit(f'Export failed: {exc}. Choose a writable folder with enough free space.')
