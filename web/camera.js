@@ -40,7 +40,27 @@
       this.engine.emit('camera-shot',{shot:this.shots,from,to,scroller:node.getAttribute('data-sw-id')||'document'});
       return true;
     }
-
+    route(element) {
+      const chain = [];
+      for(let node=element.node.parentElement;node;node=node.parentElement) {
+        if(this.engine.scrollContainers.includes(node)&&this.maximum(node)>2) chain.push(node);
+      }
+      if(!chain.includes(this.doc.scrollingElement)&&this.maximum(this.doc.scrollingElement)>2)chain.push(this.doc.scrollingElement);
+      chain.reverse();
+      // Reveal an inner scrolling viewport in its outer parent before moving
+      // the inner content. Deep child geometry must not scroll the wrong host.
+      for(let i=0;i<chain.length;i++) {
+        const host=chain[i],port=this.port(host);
+        const rect=(chain[i+1]||element.node).getBoundingClientRect();
+        const focus=port.top+port.height*.26;
+        if(rect.top>port.bottom-port.height*.12||rect.bottom<port.top+port.height*.12) {
+          const target=clamp(host.scrollTop+rect.top-focus,0,this.maximum(host));
+          if(Math.abs(target-host.scrollTop)>2)return {node:host,target};
+        }
+      }
+      return null;
+    }
+    
   }
   
 })();
