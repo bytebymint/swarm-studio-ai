@@ -104,3 +104,7 @@ class BrowserController(QObject):
     def _timed_out(self):
         self.source.stop()
         self.error.emit('Navigation exceeded 30 seconds. The website may still be loading; reload or try a simpler page.')
+
+    def navigate(self, url):
+        self.ready = False
+        self.source.setUrl(QUrl(url))
