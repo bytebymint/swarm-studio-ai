@@ -23,6 +23,11 @@
       const rect = node.getBoundingClientRect();
       return {top:rect.top+node.clientTop,bottom:rect.top+node.clientTop+node.clientHeight,height:node.clientHeight};
     }
+    interrupt() {
+      this.move = null;
+      this.manualUntil = this.engine.time + 1.5;
+      this.atEnd = false;
+    }
 
   }
   
