@@ -40,3 +40,24 @@ def build_blueprint(capture):
 
 class DependencyGraph:
     """Small deterministic reference scheduler used for verification and diagnostics."""
+    def __init__(self, tasks):
+        self.tasks = {t["id"]: dict(t, status="pending") for t in tasks}
+        self.cancelled = False
+        self.owners = {}
+        self.frames = set()
+        for task in self.tasks.values():
+            if any(dep not in self.tasks for dep in task["dependencies"]):
+                raise ValueError("Unknown task dependency")
+        visiting, visited = set(), set()
+        def visit(key):
+            if key in visiting:
+                raise ValueError("Cyclic task dependencies")
+            if key in visited:
+                return
+            visiting.add(key)
+            for dep in self.tasks[key]["dependencies"]:
+                visit(dep)
+            visiting.remove(key)
+            visited.add(key)
+        for key in self.tasks:
+            visit(key)
