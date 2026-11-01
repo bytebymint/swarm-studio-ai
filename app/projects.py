@@ -51,3 +51,6 @@ class ProjectStore:
         self.db.execute("UPDATE projects SET opened=? WHERE id=?", (datetime.now(timezone.utc).isoformat(), project_id))
         self.db.commit()
         return path, data, blueprint
+
+    def close(self):
+        self.db.close()
