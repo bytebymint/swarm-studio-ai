@@ -17,6 +17,7 @@
       const hosts = engine.scrollContainers.filter(node => this.maximum(node) > 2);
       this.primary = this.maximum(root) > 2 ? root : hosts.sort((a,b) => b.clientWidth*b.clientHeight-a.clientWidth*a.clientHeight)[0];
     }
+    maximum(node) { return node ? Math.max(0,node.scrollHeight-node.clientHeight) : 0; }
 
   }
   
