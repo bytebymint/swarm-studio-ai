@@ -29,6 +29,12 @@
       }
       return {x:clamp(left,0,this.engine.width-2),y:clamp(top,0,this.engine.height-2),w:Math.max(1,right-left),h:Math.max(1,bottom-top)};
     }
+    sourceRect(element) {
+      const master=this.engine.elements.get(element.master);
+      if(master?.node&&this.engine.isVisible(master))return this.workRect(master);
+      const r=this.workRect(element);
+      return {...r,x:clamp(r.x-28,0,this.engine.width-r.w),y:clamp(r.y-20,0,this.engine.height-r.h)};
+    }
 
   }
   
