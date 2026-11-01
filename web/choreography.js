@@ -35,6 +35,10 @@
       const r=this.workRect(element);
       return {...r,x:clamp(r.x-28,0,this.engine.width-r.w),y:clamp(r.y-20,0,this.engine.height-r.h)};
     }
+    anchor(element,task) {
+      const r=task.operation==='duplicate'?this.sourceRect(element):this.workRect(element);
+      return task.operation==='verify'?{x:r.x+Math.min(r.w*.5,90),y:r.y+8}:{x:r.x,y:r.y};
+    }
 
   }
   
