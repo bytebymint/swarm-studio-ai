@@ -30,3 +30,13 @@ class PreviewHandler(SimpleHTTPRequestHandler):
 
     def do_HEAD(self):
         self.do_GET()
+
+
+class PreviewServer:
+    def __init__(self, root):
+        self.root = Path(root).resolve()
+        self.server = ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(PreviewHandler, directory=str(self.root)))
+        self.server.daemon_threads = True
+        self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
+        self.thread.start()
+        self.origin = f"http://127.0.0.1:{self.server.server_port}"
