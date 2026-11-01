@@ -24,3 +24,14 @@ class RestrictedPage(QWebEnginePage):
         self.certificateError.connect(lambda error: error.rejectCertificate())
         if hasattr(self, 'permissionRequested'):
             self.permissionRequested.connect(lambda permission: permission.deny())
+
+    def acceptNavigationRequest(self, url, nav_type, is_main):
+        if not is_main:
+            return True
+        if self.trusted_origin and not url.toString().startswith(self.trusted_origin + '/ui/player.html'):
+            self.blocked.emit('Navigation outside the trusted animation page was blocked.')
+            return False
+        if url.scheme() not in {'http', 'https', 'about'}:
+            self.blocked.emit('This URL scheme is not supported in the website viewport.')
+            return False
+        return True
