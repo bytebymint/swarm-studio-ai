@@ -38,3 +38,7 @@ class RestrictedPage(QWebEnginePage):
 
     def javaScriptConsoleMessage(self, level, message, line, source):
         logging.info('Chromium %s:%s %s', source, line, message)
+
+
+class Bridge(QObject):
+    received = Signal(object)
