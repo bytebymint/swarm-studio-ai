@@ -27,6 +27,7 @@
       const left=id%2===0;
       return {x:left?-24:this.engine.width+24,y:clamp(70+Math.floor(id/2)*82,40,this.engine.height-40)};
     }
+    get capacity(){return Math.min(this.members.length,clamp(Math.floor(this.engine.width*this.engine.height/145000),2,8));}
 
   }
   
