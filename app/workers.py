@@ -11,3 +11,4 @@ from app.reconstruction import reconstruct_collection
 
 class BuildWorker(QThread):
     progress = Signal(str, str)
+    ready = Signal(object, object)
