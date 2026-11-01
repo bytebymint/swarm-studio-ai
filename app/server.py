@@ -27,3 +27,6 @@ class PreviewHandler(SimpleHTTPRequestHandler):
             self.send_error(403)
             return
         super().do_GET()
+
+    def do_HEAD(self):
+        self.do_GET()
