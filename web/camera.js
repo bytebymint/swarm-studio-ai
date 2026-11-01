@@ -18,6 +18,11 @@
       this.primary = this.maximum(root) > 2 ? root : hosts.sort((a,b) => b.clientWidth*b.clientHeight-a.clientWidth*a.clientHeight)[0];
     }
     maximum(node) { return node ? Math.max(0,node.scrollHeight-node.clientHeight) : 0; }
+    port(node) {
+      if (node === this.doc.scrollingElement) return {top:0,bottom:this.engine.height,height:this.engine.height};
+      const rect = node.getBoundingClientRect();
+      return {top:rect.top+node.clientTop,bottom:rect.top+node.clientTop+node.clientHeight,height:node.clientHeight};
+    }
 
   }
   
