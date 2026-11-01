@@ -96,5 +96,5 @@
       }
     }
   }
-  
+  window.CinematicTour=CinematicTour;
 })();
