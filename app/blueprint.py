@@ -72,3 +72,11 @@ class DependencyGraph:
 
     def mark_frame(self, agent):
         self.frames.add(self.owners[agent])
+
+    def assign(self, agent):
+        if agent in self.owners or not self.ready():
+            return None
+        task = self.ready()[0]
+        task["status"] = "active"
+        self.owners[agent] = task["id"]
+        return task
