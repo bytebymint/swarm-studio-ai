@@ -35,3 +35,7 @@ class BuildWorker(QThread):
 class ExportWorker(QThread):
     ready = Signal(str)
     error = Signal(str)
+
+    def __init__(self, root, destination, settings):
+        super().__init__()
+        self.root, self.destination, self.settings = Path(root), Path(destination), settings
