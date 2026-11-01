@@ -57,3 +57,4 @@ class Bridge(QObject):
 
 class BrowserController(QObject):
     capture_ready = Signal(object)
+    error = Signal(str)
