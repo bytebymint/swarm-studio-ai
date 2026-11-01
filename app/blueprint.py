@@ -80,3 +80,15 @@ class DependencyGraph:
         task["status"] = "active"
         self.owners[agent] = task["id"]
         return task
+
+    def finish(self, agent, success=True):
+        key = self.owners.pop(agent)
+        self.tasks[key]["status"] = "complete" if success else "failed"
+        if not success:
+            changed = True
+            while changed:
+                changed = False
+                for task in self.tasks.values():
+                    if task["status"] == "pending" and any(self.tasks[d]["status"] in {"failed", "blocked"} for d in task["dependencies"]):
+                        task["status"] = "blocked"
+                        changed = True
