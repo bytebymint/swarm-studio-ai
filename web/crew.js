@@ -132,5 +132,5 @@
       }
     }
   }
-  
+  window.WorkingCrew=WorkingCrew;
 })();
