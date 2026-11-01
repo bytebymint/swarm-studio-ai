@@ -61,7 +61,40 @@
         active++;
       }
     }
-
+    animate(dt) {
+      const e=this.engine;
+      for(const a of this.members) {
+        const oldX=a.x,oldY=a.y;
+        const intro=e.time<e.introDuration&&a.id<Math.min(3,this.members.length)&&e.settings.intro!==false&&!e.settings.reduced_motion;
+        let targetOpacity=0;
+        if(a.task&&a.pose) {
+          // The task trajectory IS the cursor trajectory: no second spring
+          // delays a mouse behind a frame that is already being drawn.
+          a.x=a.pose.x;a.y=a.pose.y;targetOpacity=1;
+        } else if(intro) {
+          const t=clamp(e.time/e.introDuration,0,1),k=smooth(t);
+          const angle=a.id*Math.PI*2/3+e.time*.8;
+          const home=this.home(a.id);
+          a.x=home.x+(e.width*.5+Math.cos(angle)*62-home.x)*k;
+          a.y=home.y+(e.height*.5+Math.sin(angle)*42-home.y)*k;
+          a.tool='arrow';a.phase='Preparing';targetOpacity=Math.min(1,t*5);
+        } else {
+          const elapsed=e.time-a.lastWorked;
+          const linger=elapsed<.22&&!e.finished;
+          // Retire at the release point. Flying idle pointers across the site
+          // was both distracting and much faster than deliberate work motion.
+          if(a.opacity<.02){const home=this.home(a.id);a.x=home.x;a.y=home.y;}
+          targetOpacity=linger?.65:0;
+          a.tool='arrow';a.phase=linger?'Handing off':'Available';
+        }
+        a.opacity+=(targetOpacity-a.opacity)*(1-Math.exp(-dt*(targetOpacity>a.opacity?14:9)));
+        a.vx=(a.x-oldX)/Math.max(dt,.001);a.vy=(a.y-oldY)/Math.max(dt,.001);
+      }
+      // At most two brief handoffs can coexist with the working crew.
+      const idle=this.members.filter(a=>!a.task&&a.opacity>.12).sort((a,b)=>b.lastWorked-a.lastWorked);
+      if(e.time>=e.introDuration)for(const a of idle.slice(2))a.opacity=Math.min(a.opacity,.08);
+    }
+    
   }
   
 })();
