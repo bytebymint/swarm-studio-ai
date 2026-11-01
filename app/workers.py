@@ -18,3 +18,15 @@ class BuildWorker(QThread):
         super().__init__()
         self.capture, self.root, self.settings = capture, root, settings
         self.cancel_event = threading.Event()
+
+    def run(self):
+        try:
+            captures = self.capture if isinstance(self.capture, list) else [self.capture]
+            metadata, blueprint = reconstruct_collection(captures, self.root, self.settings, self.cancel_event, self.progress.emit)
+            self.ready.emit(metadata, blueprint)
+        except InterruptedError:
+            self.error.emit('Capture cancelled. No project was registered.')
+        except Exception as exc:
+            import logging
+            logging.exception('Reconstruction failed')
+            self.error.emit(f'Could not save reconstruction: {type(exc).__name__}: {exc}')
