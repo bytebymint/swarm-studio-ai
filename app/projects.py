@@ -21,3 +21,9 @@ class ProjectStore:
         self.db = sqlite3.connect(self.root / "projects.sqlite")
         self.db.execute("CREATE TABLE IF NOT EXISTS projects (id TEXT PRIMARY KEY, name TEXT, url TEXT, created TEXT, opened TEXT)")
         self.db.commit()
+
+    def allocate(self):
+        project_id = uuid.uuid4().hex
+        path = self.projects / project_id
+        path.mkdir()
+        return project_id, path
