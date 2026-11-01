@@ -14,6 +14,11 @@
       if(this.highlight)win.CSS.highlights.set('swarm-untyped',this.highlight);
       this.segmenter=win.Intl?.Segmenter?new win.Intl.Segmenter(undefined,{granularity:'grapheme'}):null;
     }
+    dispose() {
+      for(const element of this.engine.elements?.values()||[])this.clearText(element);
+      this.engine.frame.contentWindow.CSS?.highlights?.delete('swarm-untyped');
+      this.effects=[];
+    }
 
   }
   
