@@ -61,3 +61,11 @@ class DependencyGraph:
             visited.add(key)
         for key in self.tasks:
             visit(key)
+
+    def ready(self):
+        if self.cancelled:
+            return []
+        return [t for t in self.tasks.values() if t["status"] == "pending" and all(
+            self.tasks[d]["status"] == "complete" or
+            self.tasks[d]["status"] == "active" and t.get('dependencyPhases', {}).get(d) == 'frame' and d in self.frames
+            for d in t["dependencies"])]
