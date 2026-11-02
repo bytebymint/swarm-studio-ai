@@ -17,6 +17,7 @@
       this.enabled=true;this.logicalWidth=width;this.logicalHeight=height;
       Object.assign(this.engine.frame.style,{position:'absolute',left:'0',top:'0',width:width+'px',height:height+'px',transformOrigin:'0 0',willChange:'transform'});
     }
+    disable(){this.enabled=false;this.engine.frame.style.cssText=this.originalStyle;this.engine.boundsCache?.clear();}
 
   }
 
