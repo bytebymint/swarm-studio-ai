@@ -47,6 +47,7 @@
     }
     get width(){return this.presentation?.enabled?this.presentation.logicalWidth:innerWidth;}
     get height(){return this.presentation?.enabled?this.presentation.logicalHeight:innerHeight;}
+    resize(){const dpr=devicePixelRatio||1;this.canvas.width=innerWidth*dpr;this.canvas.height=innerHeight*dpr;this.ctx.setTransform(dpr,0,0,dpr,0,0);}
 
   }
 
