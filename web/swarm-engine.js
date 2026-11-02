@@ -90,6 +90,7 @@
       if(!this.tasks.length)this.finish();
     }
     box(element){if(this.boundsCache?.has(element.id))return this.boundsCache.get(element.id);const rect=element.node?.getBoundingClientRect();const box=rect?{x:rect.x,y:rect.y,w:rect.width,h:rect.height}:element.rect;this.boundsCache?.set(element.id,box);return box;}
+    isVisible(e){if(!e.node)return false;const r=this.box(e);if(r.y+r.h<0||r.y>this.height||r.x+r.w<0||r.x>this.width)return false;let parent=e.node.parentElement;while(parent&&parent!==this.doc.body){const cs=this.frame.contentWindow.getComputedStyle(parent);if(/auto|scroll|hidden|clip/.test(cs.overflowY)){const p=parent.getBoundingClientRect();if(r.y>p.bottom||r.y+r.h<p.top)return false;}parent=parent.parentElement;}return true;}
 
   }
 
