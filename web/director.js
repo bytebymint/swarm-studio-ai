@@ -13,6 +13,10 @@
 
   class MoviePresentation {
     constructor(engine){this.engine=engine;this.enabled=false;this.logicalWidth=0;this.logicalHeight=0;this.originalStyle=engine.frame.style.cssText;}
+    enable(width,height){
+      this.enabled=true;this.logicalWidth=width;this.logicalHeight=height;
+      Object.assign(this.engine.frame.style,{position:'absolute',left:'0',top:'0',width:width+'px',height:height+'px',transformOrigin:'0 0',willChange:'transform'});
+    }
 
   }
 
