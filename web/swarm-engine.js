@@ -146,6 +146,7 @@
       this.director.update(1/fps);this.captureIndex++;if(render)this.draw();
       return {finished:this.director.finished,completed:this.done,total:this.tasks.length,time:this.time,pose:{...this.director.pose},state:this.director.state};
     }
+    endCapture(){this.externalClock=false;this.director=null;this.presentation?.disable();this.freezeStyle?.remove();this.sound.ledger=null;this.prepare();this.draw();}
 
   }
 
