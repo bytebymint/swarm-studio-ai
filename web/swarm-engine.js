@@ -98,6 +98,9 @@
     }
     ready(task){return task.status==='pending'&&task.dependencies.every(id=>{const dep=this.byId.get(id);return dep?.status==='complete'||this.dependencyPhase(task,id)==='frame'&&dep?.scaffolded;});}
     assign(agent,task){this.choreography.begin(agent,task);}
+    tour(dt){
+      this.camera.update(dt);
+    }
 
   }
 
