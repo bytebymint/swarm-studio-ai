@@ -32,4 +32,20 @@
     close(){this.ctx?.close().catch(()=>{});}
   }
 
+  class StudioEngine {
+    constructor(){
+      this.frame=document.querySelector('#site');this.canvas=document.querySelector('#overlay');this.ctx=this.canvas.getContext('2d');
+      this.intro=document.querySelector('#intro');this.completion=document.querySelector('#completion');this.running=false;this.paused=false;
+      this.last=performance.now();this.mouse={x:innerWidth/2,y:innerHeight/2};this.lastReport=0;this.settings={};
+      addEventListener('resize',()=>this.resize());this.resize();
+      addEventListener('mousemove',event=>{this.mouse={x:event.clientX,y:event.clientY};});
+      document.querySelector('#explore').onclick=()=>{this.showClone();this.emit('explore',{});};
+      document.querySelector('#compare').onclick=()=>this.emit('compare',{});
+      document.querySelector('#replay').onclick=()=>this.replay();
+      document.addEventListener('keydown',event=>{if(event.code==='Space'&&event.target===document.body){event.preventDefault();this.pause(!this.paused);}if(event.key==='Escape')this.pause(true);});
+      requestAnimationFrame(time=>this.loop(time));
+    }
+
+  }
+
 })();
