@@ -118,6 +118,14 @@
       this.crew.animate(dt);
     }
     finish(){this.finished=true;this.finishTime=this.time;this.completion.hidden=false;document.querySelector('#completion-detail').textContent=`${this.done} built${this.failed?' · '+this.failed+' failed':''}`;this.sound.play('complete');this.emit('finished',{completed:this.done,failed:this.failed,total:this.tasks.length});}
+    draw(){
+      const ctx=this.ctx;ctx.clearRect(0,0,innerWidth,innerHeight);ctx.lineWidth=1;
+      ctx.save();
+      if(this.presentation?.enabled){const m=this.presentation.apply();ctx.translate(m.x,m.y);ctx.scale(m.scale,m.scale);ctx.beginPath();ctx.rect(0,0,this.width,this.height);ctx.clip();}
+      this.choreography?.render(ctx);
+      this.crew?.render(ctx);
+      ctx.restore();
+    }
 
   }
 
