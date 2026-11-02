@@ -83,7 +83,41 @@
       // deterministic movie pacing; ordinary interactive playback is untouched.
       return this.state==='focus'&&agent.task?.id===this.focus?.id&&this.time-this.focusStarted<1.3?dt*.22:dt;
     }
-    
+    update(dt){
+      this.time+=dt;const e=this.engine;
+      const candidate=this.candidate();
+      if(e.finished){
+        this.finishAt??=this.time;this.target={x:e.width/2,y:e.height/2,zoom:1};this.state='ending';
+      } else if(e.camera.move){
+        this.state='travel';this.target={x:e.width/2,y:e.height/2,zoom:1};this.travelRequested=false;this.focus=null;this.holdUntil=this.time+.65;
+      } else if(this.travelRequested){
+        this.state='pullback';this.target={x:e.width/2,y:e.height/2,zoom:1};
+      } else if(this.state==='pullback'){
+        this.target={x:e.width/2,y:e.height/2,zoom:1};
+        if(this.pose.zoom<1.035){this.state='wide';this.holdUntil=this.time+.3;}
+      } else if(this.time>=this.holdUntil&&candidate){
+        const previous=this.focus&&e.byId.get(this.focus.id);
+        if(!this.focus||previous?.status!=='active'||this.time-this.focusStarted>5.5){
+          if(this.focus&&Math.hypot(this.target.x-this.compose(candidate).x,this.target.y-this.compose(candidate).y)>100){
+            this.pending=candidate;this.state='pullback';this.target={x:e.width/2,y:e.height/2,zoom:1};this.focus=null;
+          }else this.choose(candidate);
+        }
+      }
+      if(this.state==='wide'&&this.pending&&this.time>=this.holdUntil){
+        const pending=e.byId.get(this.pending.id);
+        if(pending?.status==='active')this.choose(this.pending);
+        else if(candidate)this.choose(candidate);
+        this.pending=null;
+      }
+      // Critically damped position and logarithmic zoom retain velocity across
+      // retargets. No shot is a transform jump or a CSS timer detached from tasks.
+      const z=damp(Math.log(this.pose.zoom),Math.log(this.target.zoom),this.velocity.zoom,.72,dt,1.1);
+      const x=damp(this.pose.x,this.target.x,this.velocity.x,.85,dt,240);
+      const y=damp(this.pose.y,this.target.y,this.velocity.y,.85,dt,180);
+      this.pose={x:x.value,y:y.value,zoom:clamp(Math.exp(z.value),1,this.maxZoom)};
+      this.velocity={x:x.velocity,y:y.velocity,zoom:z.velocity};
+      if(e.finished&&this.time-this.finishAt>2.2&&this.pose.zoom<1.015)this.finished=true;
+    }
   }
 
 })();
