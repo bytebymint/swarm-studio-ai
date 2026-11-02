@@ -126,6 +126,7 @@
       this.crew?.render(ctx);
       ctx.restore();
     }
+    report(){if(!this.model)return;this.emit('progress',{time:this.time||0,completed:this.done||0,failed:this.failed||0,total:this.tasks?.length||0,paused:this.paused,finished:this.finished,agents:this.agents?.map(a=>({id:a.id,status:a.phase,completed:a.completed,task:a.task?.id||null}))||[]});}
 
   }
 
