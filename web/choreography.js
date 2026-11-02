@@ -101,6 +101,33 @@
       const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${Math.max(1,box.w)}" height="${Math.max(1,box.h)}">${rects.join('')}</svg>`;
       element.node.style.setProperty('mask-image',`url("data:image/svg+xml,${encodeURIComponent(svg)}")`);
     }
+    type(element,amount,agent) {
+      const typing=element.typing;if(!typing)return;
+      const weight=typing.total*amount;
+      let low=0,high=typing.glyphs.length;
+      while(low<high){const mid=(low+high)>>1;if(typing.glyphs[mid].weight<=weight)low=mid+1;else high=mid;}
+      const index=low-1;
+      if(index!==typing.index) {
+        for(const run of element.typingRuns) {
+          let offset=0;
+          for(let i=Math.max(0,typing.index+1);i<=index;i++)if(typing.glyphs[i].node===run.node)offset=typing.glyphs[i].end;
+          if(index<typing.index)offset=0;
+          if(offset||index<typing.index)run.range.setStart(run.node,offset);
+        }
+        typing.index=index;
+        if(element.typingMask)this.maskTypedText(element);
+        this.engine.sound.play('type',agent.x/this.engine.width);
+      }
+      const glyph=typing.glyphs[Math.max(0,index)];
+      if(glyph) {
+        const caret=this.engine.doc.createRange();
+        caret.setStart(glyph.node,index<0?0:glyph.end);caret.collapse(true);
+        const rect=caret.getBoundingClientRect();
+        if(rect.height)typing.caret={x:rect.x,y:rect.y,h:rect.height};
+      }
+      // Older Chromium without Custom Highlights still preserves DOM layout.
+      if(!this.highlight)this.clip(element,amount,1);
+    }
 
   }
   
