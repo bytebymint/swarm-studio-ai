@@ -21,3 +21,4 @@ QTreeWidget,QListWidget{background:transparent;border:0;outline:0;color:#d9e0eb}
 QTreeWidget::item{padding:5px 0}QTreeWidget::item:selected,QListWidget::item:selected{background:#2c3a4d}
 QListWidget::item{padding:7px 0;border-bottom:1px solid #292f39}
 QHeaderView::section{background:#20252d;border:0;color:#9daabd;padding:5px}
+QTabWidget::pane{border:1px solid #333b48;background:#1a1e25}
