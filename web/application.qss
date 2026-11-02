@@ -6,3 +6,4 @@ QLabel#brand{font-size:14px;font-weight:700;letter-spacing:2px;color:#f0f4fb}
 QLabel#section{font-size:11px;font-weight:600;letter-spacing:1px;color:#aab4c3}
 QLabel#muted{color:#a6b0bf}
 QLabel#hero{font-size:40px;font-weight:600;color:#ecf1fa}
+QLabel#notice{background:#272b34;color:#cbd8ed;border:1px solid #465168;border-radius:4px;padding:7px 12px}
