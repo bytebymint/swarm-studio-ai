@@ -50,6 +50,18 @@
     resize(){const dpr=devicePixelRatio||1;this.canvas.width=innerWidth*dpr;this.canvas.height=innerHeight*dpr;this.ctx.setTransform(dpr,0,0,dpr,0,0);}
     random(){this.seed^=this.seed<<13;this.seed^=this.seed>>>17;this.seed^=this.seed<<5;return(this.seed>>>0)/4294967296;}
     emit(type,data){const event={type,...data};this.events?.push(event);if(this.events?.length>100)this.events.shift();if(!this.seeking)window.studioBridge?.publish(JSON.stringify(event));}
+    async load(project,settings={}){
+      this.settings=settings;this.project=project;this.running=false;this.sound?.close();this.sound=new EventSound(settings);
+      const response=await fetch(project+'metadata/blueprint.json');if(!response.ok)throw new Error('Blueprint could not be loaded.');
+      this.model=await response.json();
+      await new Promise((resolve,reject)=>{const timeout=setTimeout(()=>reject(new Error('Local clone did not load within 15 seconds.')),15000);this.frame.onload=()=>{clearTimeout(timeout);resolve();};this.frame.src=project+'index.html';});
+      await Promise.race([this.frame.contentDocument.fonts.ready,new Promise(r=>setTimeout(r,1200))]);
+      this.frameListeners?.abort();this.frameListeners=new AbortController();
+      this.frame.contentDocument.addEventListener('mousemove',event=>{this.mouse={x:event.clientX,y:event.clientY};},{signal:this.frameListeners.signal});
+      this.frame.contentDocument.addEventListener('pointerdown',()=>this.sound.ctx?.resume().catch(()=>{}),{signal:this.frameListeners.signal});
+      this.frame.contentDocument.addEventListener('wheel',()=>this.camera?.interrupt(),{passive:true,signal:this.frameListeners.signal});
+      this.prepare();this.emit('ready',{total:this.tasks.length});
+    }
 
   }
 
