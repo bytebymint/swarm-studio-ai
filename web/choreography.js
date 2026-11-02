@@ -141,6 +141,71 @@
       this.engine.restoreClip(element);
       this.engine.emit('frame-ready',{agent:agent.id,task:task.id,element:element.id});
     }
+    update(agent,dt) {
+      const task=agent.task,e=this.engine.elements.get(task.element),r=this.workRect(e);
+      task.elapsed+=dt;
+      const arrival=clamp(task.elapsed/task.travel,0,1);
+      if(arrival<1) {
+        const end=this.anchor(e,task),t=ease(arrival),dx=end.x-task.origin.x,dy=end.y-task.origin.y,length=Math.hypot(dx,dy)||1,bend=Math.sin(t*Math.PI)*task.bend;
+        agent.pose={x:task.origin.x+dx*t-dy/length*bend,y:task.origin.y+dy*t+dx/length*bend};
+        agent.focus=end;agent.phase='Approaching';agent.tool='arrow';return;
+      }
+      const p=clamp((task.elapsed-task.travel)/task.build,0,1);
+      task.progress=p;
+      const at=this.anchor(e,task);
+      agent.pose={...at};agent.focus=at;
+      if(!task.pressed) {
+        task.pressed=true;this.effects.push({kind:'press',from:at,color:agent.color,start:this.engine.time,duration:.23});
+        this.engine.sound.play('click',at.x/this.engine.width);
+      }
+      agent.phase=p<.08?'Select':actions[task.operation];agent.tool='arrow';
+      if(task.operation==='verify') {
+        const t=ease(phase(p,.12,.8));
+        agent.pose={x:r.x+lerp(Math.min(90,r.w*.5),Math.min(190,r.w*.75),t),y:r.y+lerp(8,Math.min(r.h*.5,70),t)};
+      } else if(task.operation==='duplicate') {
+        const master=this.sourceRect(e),t=ease(phase(p,.12,.64));
+        task.drawProgress=t;
+        agent.tool=p<.65?'copy':e.textNodes.length?'text':'arrow';
+        if(p>=.08&&p<.64)agent.phase='Alt-drag';
+        agent.pose={x:lerp(master.x,r.x,t),y:lerp(master.y,r.y,t)};
+        if(p>=.6&&!task.paint){e.node.setAttribute('data-sw-state','active');task.paint=true;}
+        if(p<.64)this.clip(e,0,0);
+        else {
+          this.engine.restoreClip(e);
+          if(e.textNodes.length){agent.phase='Type';this.type(e,phase(p,.64,.96),agent);}
+          else if(e.kind==='image')this.clip(e,1,phase(p,.64,.94));
+          if(p>=.7&&e.kind==='container')this.frameReady(agent,task,e);
+        }
+      } else if(task.operation==='type') {
+        const drag=ease(phase(p,.06,.28));task.drawProgress=drag;
+        if(p>=.08&&p<.3)agent.phase='Text frame';
+        agent.tool=p<.3?'cross':'text';
+        // After drawing a text frame, the mouse rests at the release point.
+        // The insertion caret advances independently with actual keyboard input.
+        agent.pose={x:r.x+r.w*drag,y:r.y+r.h*drag};
+        if(p>=.3&&!task.paint){e.node.setAttribute('data-sw-state','active');task.paint=true;this.engine.restoreClip(e);}
+        if(p>=.3)this.type(e,phase(p,.3,.95),agent);
+      } else if(task.operation==='place') {
+        const drag=ease(phase(p,.06,.34)),reveal=ease(phase(p,.4,.92));task.drawProgress=drag;
+        if(p>=.08&&p<.36)agent.phase='Image frame';
+        agent.tool=p<.36?'cross':'arrow';
+        agent.pose={x:r.x+r.w*drag,y:r.y+r.h*drag};
+        if(p>=.36&&!task.paint){e.node.setAttribute('data-sw-state','active');task.paint=true;}
+        if(task.paint)this.clip(e,1,reveal);
+      } else if(task.operation==='stroke') {
+        const t=ease(phase(p,.08,.88));task.drawProgress=t;agent.tool='pen';
+        agent.pose={x:r.x+r.w*t,y:r.y+r.h*t};
+        if(!task.paint){e.node.setAttribute('data-sw-state','active');task.paint=true;}
+        this.clip(e,t,1);
+      } else {
+        const drag=ease(phase(p,.06,.67));task.drawProgress=drag;agent.tool=p<.7?'cross':'arrow';
+        agent.pose={x:r.x+r.w*drag,y:r.y+r.h*drag};
+        if(!task.paint){this.clip(e,0,0);e.node.setAttribute('data-sw-state','active');task.paint=true;}
+        if(p<.67)this.clip(e,drag,drag);
+        else {this.frameReady(agent,task,e);agent.phase=p<.86?'Align':'Release';}
+      }
+      if(p>=1)this.complete(agent,task,e);
+    }
 
   }
   
