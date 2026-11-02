@@ -11,4 +11,9 @@
     return {value:next,velocity:speed};
   };
 
+  class MoviePresentation {
+    constructor(engine){this.engine=engine;this.enabled=false;this.logicalWidth=0;this.logicalHeight=0;this.originalStyle=engine.frame.style.cssText;}
+
+  }
+
 })();
