@@ -119,5 +119,6 @@
       if(e.finished&&this.time-this.finishAt>2.2&&this.pose.zoom<1.015)this.finished=true;
     }
   }
-
+  window.MoviePresentation=MoviePresentation;
+  
 })();
