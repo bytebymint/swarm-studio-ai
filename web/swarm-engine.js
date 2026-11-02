@@ -29,7 +29,7 @@
         }
       } catch (_) { /* Audio must never block playback. */ }
     }
-    
+    close(){this.ctx?.close().catch(()=>{});}
   }
 
 })();
