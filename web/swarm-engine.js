@@ -101,6 +101,22 @@
     tour(dt){
       this.camera.update(dt);
     }
+    tick(dt){
+      this.time+=dt;
+      this.boundsCache?.clear();
+      const introP=clamp(this.time/this.introDuration,0,1);this.intro.style.opacity=String(1-ease(clamp((introP-.55)/.45,0,1)));
+      if(introP>=1)this.intro.style.display='none';
+      if(introP>=1&&!this.finished){
+        // Explicit failure propagation prevents a stalled graph from claiming success.
+        for(const task of this.tasks){if(task.status==='pending'&&(!this.elements.get(task.element)?.node||this.elements.get(task.element)?.validation==='failed'||task.dependencies.some(id=>['failed','blocked'].includes(this.byId.get(id)?.status)))){task.status='blocked';this.failed++;this.emit('task-error',{task:task.id,label:task.label});}}
+        this.tour(dt);
+        this.boundsCache.clear();
+        this.crew.dispatch();
+        for(const agent of this.agents)if(agent.task)this.choreography.update(agent,this.director?this.director.taskDelta(agent,dt):dt);
+        if(this.done+this.failed===this.tasks.length&&!this.agents.some(a=>a.task))this.finish();
+      }
+      this.crew.animate(dt);
+    }
 
   }
 
