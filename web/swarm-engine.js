@@ -139,6 +139,13 @@
       for(const animation of this.doc.getAnimations()){try{animation.pause();animation.currentTime=animation.effect.getTiming().iterations===Infinity?0:animation.effect.getComputedTiming().endTime;}catch(_){}}
       this.draw();return true;
     }
+    advanceCaptureFrame(index,fps=60,speed=1,render=true){
+      if(index!==this.captureIndex)throw new Error('Capture frames must be sequential');
+      const steps=Math.max(1,Math.ceil(speed/fps*60)),dt=speed/fps/steps;
+      for(let i=0;i<steps;i++){this.sound.captureTime=(index+i/steps)/fps;this.tick(dt);}
+      this.director.update(1/fps);this.captureIndex++;if(render)this.draw();
+      return {finished:this.director.finished,completed:this.done,total:this.tasks.length,time:this.time,pose:{...this.director.pose},state:this.director.state};
+    }
 
   }
 
