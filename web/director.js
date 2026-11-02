@@ -41,6 +41,11 @@
       this.state='wide';this.holdUntil=1.7;this.travelRequested=false;
       this.focus=null;this.pending=null;this.focusStarted=0;this.finishAt=null;this.finished=false;this.shots=[];
     }
+    allowScroll(){
+      this.travelRequested=true;
+      this.target.zoom=1;this.state='pullback';
+      return this.pose.zoom<1.025;
+    }
 
   }
 
