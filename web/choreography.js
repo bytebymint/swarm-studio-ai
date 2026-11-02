@@ -206,7 +206,21 @@
       }
       if(p>=1)this.complete(agent,task,e);
     }
-
+    complete(agent,task,element) {
+      agent.x=agent.pose.x;agent.y=agent.pose.y;task.handoffPoint={...agent.pose};
+      if(task.operation==='verify') {
+        const broken=[...this.engine.doc.images].filter(img=>!img.complete||!img.naturalWidth);
+        if(broken.length){task.status='failed';this.engine.failed++;agent.task=null;agent.lastWorked=this.engine.time;this.engine.emit('task-error',{task:task.id,label:`${broken.length} images failed validation`});return;}
+      }
+      this.clearText(element);element.node.removeAttribute('data-sw-state');this.engine.restoreClip(element);
+      task.status='complete';task.completedAt=this.engine.time;this.engine.done++;agent.completed++;
+      agent.task=null;agent.lastWorked=this.engine.time;agent.phase='Handing off';
+      this.engine.history.push({task:task.id,agent:agent.id,start:this.engine.time-task.elapsed,end:this.engine.time});
+      this.effects.push({kind:'settle',rect:this.workRect(element),color:agent.color,start:this.engine.time,duration:.28});
+      this.engine.sound.play(task.operation,agent.x/this.engine.width);
+      this.engine.emit('completed',{agent:agent.id,task:task.id,completed:this.engine.done,total:this.engine.tasks.length,label:task.label});
+    }
+    
   }
   
 })();
