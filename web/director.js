@@ -64,6 +64,15 @@
       }
       return best;
     }
+    compose(focus){
+      const e=this.engine,element=e.elements.get(focus.element),r=e.choreography.workRect(element);
+      const left=Math.max(0,r.x-45);
+      const top=Math.max(0,r.y-55);
+      const right=Math.min(e.width,r.x+r.w+100);
+      const bottom=Math.min(e.height,r.y+r.h+65);
+      const zoom=clamp(Math.min(e.width/Math.max(150,right-left),e.height/Math.max(100,bottom-top))*.94,Math.min(1.2,this.maxZoom),this.maxZoom);
+      return {x:(left+right)/2,y:(top+bottom)/2,zoom};
+    }
 
   }
 
