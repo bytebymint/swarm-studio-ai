@@ -86,6 +86,11 @@
       element.typing={glyphs,total:weight,index:-1,caret:null};
       if(element.typingMask)this.maskTypedText(element);
     }
+    clearText(element) {
+      for(const run of element.typingRuns||[])this.highlight?.delete(run.range);
+      if(element.savedTypingMask){const saved=element.savedTypingMask;if(saved.value)element.node.style.setProperty('mask-image',saved.value,saved.priority);else element.node.style.removeProperty('mask-image');element.savedTypingMask=null;}
+      element.typingRuns=[];element.typing=null;
+    }
 
   }
   
