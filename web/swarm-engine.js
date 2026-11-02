@@ -117,6 +117,7 @@
       }
       this.crew.animate(dt);
     }
+    finish(){this.finished=true;this.finishTime=this.time;this.completion.hidden=false;document.querySelector('#completion-detail').textContent=`${this.done} built${this.failed?' · '+this.failed+' failed':''}`;this.sound.play('complete');this.emit('finished',{completed:this.done,failed:this.failed,total:this.tasks.length});}
 
   }
 
