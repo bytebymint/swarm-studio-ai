@@ -78,7 +78,12 @@
       this.target=this.compose(focus);this.holdUntil=this.time+2.6;
       this.shots.push({time:Number(this.time.toFixed(4)),task:focus.id,zoom:Number(this.target.zoom.toFixed(4)),x:this.target.x,y:this.target.y});
     }
-
+    taskDelta(agent,dt){
+      // Let a selected edit remain legible while the lens arrives. This is
+      // deterministic movie pacing; ordinary interactive playback is untouched.
+      return this.state==='focus'&&agent.task?.id===this.focus?.id&&this.time-this.focusStarted<1.3?dt*.22:dt;
+    }
+    
   }
 
 })();
