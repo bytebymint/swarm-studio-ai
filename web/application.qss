@@ -22,3 +22,4 @@ QTreeWidget::item{padding:5px 0}QTreeWidget::item:selected,QListWidget::item:sel
 QListWidget::item{padding:7px 0;border-bottom:1px solid #292f39}
 QHeaderView::section{background:#20252d;border:0;color:#9daabd;padding:5px}
 QTabWidget::pane{border:1px solid #333b48;background:#1a1e25}QTabBar::tab{background:#20252e;color:#b2bfd0;padding:9px 18px;border:1px solid #333b48}QTabBar::tab:selected{background:#2a3d56;color:#f5f8ff}
+QProgressBar{border:0;border-radius:2px;background:#313844;max-height:4px;min-height:4px;color:transparent}
