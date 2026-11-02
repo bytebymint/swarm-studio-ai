@@ -120,5 +120,5 @@
     }
   }
   window.MoviePresentation=MoviePresentation;
-  
+  window.RecordingDirector=RecordingDirector;
 })();
