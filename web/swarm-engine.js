@@ -160,5 +160,5 @@
   }
   window.Studio=new StudioEngine();
   if(typeof QWebChannel!=='undefined'&&window.qt?.webChannelTransport)new QWebChannel(qt.webChannelTransport,channel=>{window.studioBridge=channel.objects.bridge;window.Studio.emit('bridge-ready',{});});
-  
+  window.addEventListener('error',event=>{window.Studio.emit('error',{message:event.message});});
 })();
