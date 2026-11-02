@@ -96,6 +96,7 @@
       const element=this.elements.get(task.element),parent=this.elements.get(id);
       return id===element?.parent&&id!==element?.master&&parent?.kind==='container'?'frame':'complete';
     }
+    ready(task){return task.status==='pending'&&task.dependencies.every(id=>{const dep=this.byId.get(id);return dep?.status==='complete'||this.dependencyPhase(task,id)==='frame'&&dep?.scaffolded;});}
 
   }
 
