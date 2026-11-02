@@ -4,3 +4,4 @@ QFrame#topbar{background:#1c1f25;border-bottom:1px solid #333842}
 QFrame#panel{background:#1b1e24;border:1px solid #333842;border-radius:7px}
 QLabel#brand{font-size:14px;font-weight:700;letter-spacing:2px;color:#f0f4fb}
 QLabel#section{font-size:11px;font-weight:600;letter-spacing:1px;color:#aab4c3}
+QLabel#muted{color:#a6b0bf}
