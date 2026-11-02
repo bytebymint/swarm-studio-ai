@@ -14,3 +14,4 @@ QPushButton:disabled{color:#88909e;background:#23262d;border-color:#323742}
 QPushButton:focus,QToolButton:focus,QComboBox:focus,QLineEdit:focus,QListWidget:focus{border:1px solid #6ab2ff}
 QPushButton#primary{background:#347bd1;border:1px solid #6da6ee;color:#ffffff;font-weight:600}
 QPushButton#primary:hover{background:#438ce2}
+QPushButton#primary:disabled{background:#273b55;border-color:#394b62;color:#98adc6}
