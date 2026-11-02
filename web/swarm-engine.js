@@ -155,7 +155,8 @@
     replay(){if(this.frame.contentWindow.location.href!==this.project+'index.html'){this.load(this.project,this.settings).catch(error=>this.emit('error',{message:error.message}));return;}this.prepare();this.emit('replayed',{});}
     stop(){this.running=false;this.sound?.close();this.ctx.clearRect(0,0,innerWidth,innerHeight);this.restore();this.intro.style.display='none';this.completion.hidden=true;this.emit('cancelled',{});}
     restoreClip(e){if(!e.node)return;if(e.savedClip?.value)e.node.style.setProperty('clip-path',e.savedClip.value,e.savedClip.priority);else e.node.style.removeProperty('clip-path');}
-
+    restore(){this.choreography?.dispose();this.oldMask?.remove();for(const e of this.elements?.values()||[]){e.node?.removeAttribute('data-sw-state');this.restoreClip(e);for(const [node,text] of e.textNodes||[])node.textContent=text;}}
+    
   }
 
 })();
