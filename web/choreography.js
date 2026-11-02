@@ -91,6 +91,16 @@
       if(element.savedTypingMask){const saved=element.savedTypingMask;if(saved.value)element.node.style.setProperty('mask-image',saved.value,saved.priority);else element.node.style.removeProperty('mask-image');element.savedTypingMask=null;}
       element.typingRuns=[];element.typing=null;
     }
+    maskTypedText(element) {
+      const box=element.node.getBoundingClientRect(),rects=[];
+      for(const run of element.typingRuns||[]) {
+        if(!run.range.startOffset)continue;
+        const range=this.engine.doc.createRange();range.setStart(run.node,0);range.setEnd(run.node,run.range.startOffset);
+        for(const r of range.getClientRects())rects.push(`<rect x="${r.x-box.x-.5}" y="${r.y-box.y-.5}" width="${r.width+1}" height="${r.height+1}" fill="white"/>`);
+      }
+      const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${Math.max(1,box.w)}" height="${Math.max(1,box.h)}">${rects.join('')}</svg>`;
+      element.node.style.setProperty('mask-image',`url("data:image/svg+xml,${encodeURIComponent(svg)}")`);
+    }
 
   }
   
