@@ -152,6 +152,7 @@
     setOptions(options){Object.assign(this.settings,options);}
     step(){this.paused=true;for(let i=0;i<30;i++)this.tick(1/60);this.draw();this.report();}
     back(){const target=Math.max(0,this.time-2);this.seeking=true;this.prepare();for(let i=0;i<Math.floor(target*60);i++)this.tick(1/60);this.seeking=false;this.paused=true;this.draw();this.report();}
+    replay(){if(this.frame.contentWindow.location.href!==this.project+'index.html'){this.load(this.project,this.settings).catch(error=>this.emit('error',{message:error.message}));return;}this.prepare();this.emit('replayed',{});}
 
   }
 
