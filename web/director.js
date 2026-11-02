@@ -33,4 +33,15 @@
     }
   }
 
+  class RecordingDirector {
+    constructor(engine,maxZoom=3){
+      this.engine=engine;this.maxZoom=clamp(maxZoom,1,3);this.time=0;
+      this.pose={x:engine.width/2,y:engine.height/2,zoom:1};
+      this.velocity={x:0,y:0,zoom:0};this.target={...this.pose};
+      this.state='wide';this.holdUntil=1.7;this.travelRequested=false;
+      this.focus=null;this.pending=null;this.focusStarted=0;this.finishAt=null;this.finished=false;this.shots=[];
+    }
+
+  }
+
 })();
