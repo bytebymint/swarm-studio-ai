@@ -127,6 +127,7 @@
       ctx.restore();
     }
     report(){if(!this.model)return;this.emit('progress',{time:this.time||0,completed:this.done||0,failed:this.failed||0,total:this.tasks?.length||0,paused:this.paused,finished:this.finished,agents:this.agents?.map(a=>({id:a.id,status:a.phase,completed:a.completed,task:a.task?.id||null}))||[]});}
+    loop(now){const realDt=Math.min((now-this.last)/1000,.05);this.last=now;if(this.running&&!this.paused&&!this.externalClock){const duration=realDt*(this.settings.speed||1);const steps=Math.max(1,Math.ceil(duration/.016));for(let i=0;i<steps;i++)this.tick(duration/steps);this.director?.update(realDt);this.draw();}if(this.running&&!this.externalClock&&now-this.lastReport>180){this.lastReport=now;this.report();}requestAnimationFrame(t=>this.loop(t));}
 
   }
 
