@@ -150,6 +150,7 @@
     pause(value=true){this.paused=value;this.report();}
     setSpeed(speed){this.settings.speed=clamp(Number(speed)||1,.5,5);}
     setOptions(options){Object.assign(this.settings,options);}
+    step(){this.paused=true;for(let i=0;i<30;i++)this.tick(1/60);this.draw();this.report();}
 
   }
 
