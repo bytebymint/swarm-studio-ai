@@ -49,6 +49,7 @@
     get height(){return this.presentation?.enabled?this.presentation.logicalHeight:innerHeight;}
     resize(){const dpr=devicePixelRatio||1;this.canvas.width=innerWidth*dpr;this.canvas.height=innerHeight*dpr;this.ctx.setTransform(dpr,0,0,dpr,0,0);}
     random(){this.seed^=this.seed<<13;this.seed^=this.seed>>>17;this.seed^=this.seed<<5;return(this.seed>>>0)/4294967296;}
+    emit(type,data){const event={type,...data};this.events?.push(event);if(this.events?.length>100)this.events.shift();if(!this.seeking)window.studioBridge?.publish(JSON.stringify(event));}
 
   }
 
