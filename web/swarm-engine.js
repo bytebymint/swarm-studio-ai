@@ -62,6 +62,33 @@
       this.frame.contentDocument.addEventListener('wheel',()=>this.camera?.interrupt(),{passive:true,signal:this.frameListeners.signal});
       this.prepare();this.emit('ready',{total:this.tasks.length});
     }
+    prepare(){
+      this.restore();
+      this.seed=112358;this.time=0;this.done=0;this.failed=0;this.finished=false;this.paused=false;this.events=[];this.history=[];
+      this.doc=this.frame.contentDocument;
+      this.oldMask?.remove();
+      this.oldMask=this.doc.createElement('style');this.oldMask.textContent='html,[data-sw-id]{scroll-behavior:auto!important;overflow-anchor:none!important}[data-sw-id][data-sw-state="pending"]{visibility:hidden!important}[data-sw-id][data-sw-state="active"]{visibility:visible!important}::highlight(swarm-untyped){color:transparent;text-shadow:none}';this.doc.head.append(this.oldMask);
+      this.textOriginal ||= new Map();
+      for(const [node,text] of this.textOriginal)if(node.isConnected)node.textContent=text;
+      this.textOriginal.clear();
+      this.elements=new Map(this.model.elements.map(e=>[e.id,{...e,node:this.doc.querySelector(`[data-sw-id="${e.id}"]`)}]));
+      for(const e of this.elements.values()){
+        if(!e.node)continue;
+        e.savedClip={value:e.node.style.getPropertyValue('clip-path'),priority:e.node.style.getPropertyPriority('clip-path')};
+        e.node.setAttribute('data-sw-state','pending');
+        e.textNodes=[];for(const node of e.node.childNodes)if(node.nodeType===3&&node.textContent.trim()){e.textNodes.push([node,node.textContent]);this.textOriginal.set(node,node.textContent);}
+      }
+      this.tasks=this.model.tasks.map(t=>({...t,status:'pending',elapsed:0,scaffolded:false}));this.byId=new Map(this.tasks.map(t=>[t.id,t]));
+      this.boundsCache=new Map();
+      this.choreography=new TaskChoreography(this);
+      this.crew=new WorkingCrew(this);this.agents=this.crew.members;
+      this.scrollContainers=[this.doc.scrollingElement,...this.doc.querySelectorAll('[data-sw-id]')].filter(n=>n&&n.scrollHeight>n.clientHeight+30&&(/auto|scroll/.test(this.frame.contentWindow.getComputedStyle(n).overflowY)||n===this.doc.scrollingElement));
+      for(const node of this.scrollContainers)node.scrollTop=0;
+      this.frame.contentWindow.scrollTo(0,0);this.intro.hidden=false;this.intro.style.display='flex';this.intro.style.opacity='1';this.completion.hidden=true;this.canvas.style.display='block';
+      this.canvas.style.opacity=this.settings.overlay_opacity??1;this.running=true;this.introDuration=(this.settings.intro===false||this.settings.reduced_motion) ? .15 : 1.1;
+      this.camera=new CinematicTour(this);
+      if(!this.tasks.length)this.finish();
+    }
 
   }
 
