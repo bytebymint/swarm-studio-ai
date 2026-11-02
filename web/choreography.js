@@ -220,7 +220,55 @@
       this.engine.sound.play(task.operation,agent.x/this.engine.width);
       this.engine.emit('completed',{agent:agent.id,task:task.id,completed:this.engine.done,total:this.engine.tasks.length,label:task.label});
     }
-    
+    render(ctx) {
+      const engine=this.engine,active=engine.agents.filter(a=>a.task);
+      const drawing=active.filter(a=>a.task.progress>0&&a.task.operation!=='verify');
+      if(drawing.length) {
+        ctx.save();ctx.globalAlpha=.65;ctx.fillStyle='#252c35';ctx.fillRect(0,0,engine.width,17);
+        ctx.font='9px Segoe UI';ctx.fillStyle='#b5bfce';ctx.strokeStyle='#7f8b9c';
+        for(let x=50;x<engine.width;x+=50){ctx.beginPath();ctx.moveTo(x,12);ctx.lineTo(x,17);ctx.stroke();ctx.fillText(String(x),x+3,9);}
+        ctx.restore();
+      }
+      let badges=0;
+      for(const a of active) {
+        const t=a.task,p=t.progress||0;if(p<=0)continue;
+        const e=engine.elements.get(t.element),r=this.workRect(e),d=t.drawProgress||0;
+        ctx.save();ctx.strokeStyle=a.color;ctx.lineWidth=.9;ctx.globalAlpha=.85;
+        if(t.operation==='verify') {
+          ctx.setLineDash([3,3]);ctx.strokeRect(r.x,r.y,r.w,r.h);
+        } else if(t.operation==='stroke') {
+          ctx.beginPath();ctx.moveTo(r.x,r.y);ctx.lineTo(a.pose.x,a.pose.y);ctx.stroke();ctx.fillStyle=a.color;ctx.fillRect(r.x-2,r.y-2,4,4);
+        } else {
+          let box={...r,w:r.w*d,h:r.h*d};
+          if(t.operation==='duplicate') {
+            const master=this.sourceRect(e);box={x:lerp(master.x,r.x,d),y:lerp(master.y,r.y,d),w:lerp(master.w,r.w,d),h:lerp(master.h,r.h,d)};
+            ctx.setLineDash([3,3]);ctx.globalAlpha=.24;ctx.strokeRect(master.x,master.y,master.w,master.h);ctx.setLineDash([]);ctx.globalAlpha=.85;
+          }
+          if(t.operation==='place'&&p<.4){ctx.fillStyle='#8993a522';ctx.fillRect(box.x,box.y,box.w,box.h);ctx.beginPath();ctx.moveTo(box.x,box.y);ctx.lineTo(box.x+box.w,box.y+box.h);ctx.moveTo(box.x+box.w,box.y);ctx.lineTo(box.x,box.y+box.h);ctx.stroke();}
+          ctx.strokeRect(box.x,box.y,box.w,box.h);
+          if(p<.75)for(const [x,y] of [[box.x,box.y],[box.x+box.w,box.y],[box.x,box.y+box.h],[box.x+box.w,box.y+box.h]]){ctx.fillStyle='#f2f5fa';ctx.fillRect(x-1.5,y-1.5,3,3);ctx.strokeRect(x-1.5,y-1.5,3,3);}
+          if(p<.68&&badges++<2&&box.w>45&&box.h>12) {
+            const text=`${Math.round(box.w)} × ${Math.round(box.h)}`;ctx.font='10px Segoe UI';const width=ctx.measureText(text).width+10;
+            const x=clamp(box.x+box.w-width,22,engine.width-width-8),y=clamp(box.y+box.h+5,22,engine.height-22);
+            ctx.fillStyle='#232b35';ctx.fillRect(x,y,width,17);ctx.fillStyle='#f3f6fc';ctx.fillText(text,x+5,y+12);
+          }
+        }
+        if(e.typing?.caret&&p>.3) {
+          const caret=e.typing.caret;if(caret.y+caret.h>0&&caret.y<engine.height){ctx.globalAlpha=.9;ctx.beginPath();ctx.moveTo(caret.x,Math.max(0,caret.y));ctx.lineTo(caret.x,Math.min(engine.height,caret.y+caret.h));ctx.stroke();}
+        }
+        // Short, local snapping guides replace full-screen red crosshairs.
+        if((t.operation==='duplicate'||a.phase==='Align')&&p>.7&&p<.92){ctx.globalAlpha=.5;ctx.strokeStyle='#d87973';ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(Math.max(20,r.x-28),r.y);ctx.lineTo(Math.min(engine.width-8,r.x+r.w+28),r.y);ctx.stroke();}
+        ctx.restore();
+      }
+      this.effects=this.effects.filter(effect=>engine.time-effect.start<effect.duration);
+      for(const effect of this.effects) {
+        const p=clamp((engine.time-effect.start)/effect.duration,0,1);ctx.save();ctx.strokeStyle=effect.color;ctx.lineWidth=1;ctx.globalAlpha=(1-p)*.45;
+        if(effect.kind==='press'){ctx.beginPath();ctx.arc(effect.from.x,effect.from.y,3+8*p,0,Math.PI*2);ctx.stroke();}
+        else if(effect.kind==='settle'){const r=effect.rect;ctx.strokeRect(r.x,r.y,r.w,r.h);}
+        else if(effect.kind==='handoff'&&Math.hypot(effect.from.x-effect.to.x,effect.from.y-effect.to.y)<320){ctx.setLineDash([2,4]);ctx.beginPath();ctx.moveTo(effect.from.x,effect.from.y);ctx.lineTo(effect.to.x,effect.to.y);ctx.stroke();}
+        ctx.restore();
+      }
+    }
   }
   
 })();
