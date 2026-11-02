@@ -148,6 +148,7 @@
     }
     endCapture(){this.externalClock=false;this.director=null;this.presentation?.disable();this.freezeStyle?.remove();this.sound.ledger=null;this.prepare();this.draw();}
     pause(value=true){this.paused=value;this.report();}
+    setSpeed(speed){this.settings.speed=clamp(Number(speed)||1,.5,5);}
 
   }
 
