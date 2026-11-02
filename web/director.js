@@ -73,6 +73,11 @@
       const zoom=clamp(Math.min(e.width/Math.max(150,right-left),e.height/Math.max(100,bottom-top))*.94,Math.min(1.2,this.maxZoom),this.maxZoom);
       return {x:(left+right)/2,y:(top+bottom)/2,zoom};
     }
+    choose(focus){
+      this.focus=focus;this.focusStarted=this.time;this.state='focus';
+      this.target=this.compose(focus);this.holdUntil=this.time+2.6;
+      this.shots.push({time:Number(this.time.toFixed(4)),task:focus.id,zoom:Number(this.target.zoom.toFixed(4)),x:this.target.x,y:this.target.y});
+    }
 
   }
 
