@@ -89,6 +89,7 @@
       this.camera=new CinematicTour(this);
       if(!this.tasks.length)this.finish();
     }
+    box(element){if(this.boundsCache?.has(element.id))return this.boundsCache.get(element.id);const rect=element.node?.getBoundingClientRect();const box=rect?{x:rect.x,y:rect.y,w:rect.width,h:rect.height}:element.rect;this.boundsCache?.set(element.id,box);return box;}
 
   }
 
