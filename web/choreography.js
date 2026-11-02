@@ -64,6 +64,28 @@
       }
       this.engine.emit('assigned',{agent:agent.id,name:agent.name,task:task.id,operation:task.operation,label:task.label});
     }
+    prepareText(element) {
+      this.clearText(element);
+      const style=this.engine.frame.contentWindow.getComputedStyle(element.node);
+      element.typingMask=style.backgroundImage!=='none'&&(style.backgroundClip==='text'||style.webkitBackgroundClip==='text');
+      if(element.typingMask){element.savedTypingMask={value:element.node.style.getPropertyValue('mask-image'),priority:element.node.style.getPropertyPriority('mask-image')};}
+      let weight=0;
+      const glyphs=[];
+      for(const [node,text] of element.textNodes) {
+        const range=this.engine.doc.createRange();range.setStart(node,0);range.setEnd(node,text.length);
+        this.highlight?.add(range);
+        const segments=this.segmenter?[...this.segmenter.segment(text)].map(s=>({text:s.segment,end:s.index+s.segment.length})):Array.from(text).map((char,i,all)=>({text:char,end:all.slice(0,i+1).join('').length}));
+        for(const segment of segments) {
+          const punctuation=/[,.!?;:]/.test(segment.text)?1.7:/\s/.test(segment.text)?.42:1;
+          const variation=.88+(segment.text.codePointAt(0)%11)*.024;
+          weight+=punctuation*variation;
+          glyphs.push({node,end:segment.end,weight});
+        }
+        element.typingRuns||=[];element.typingRuns.push({node,text,range});
+      }
+      element.typing={glyphs,total:weight,index:-1,caret:null};
+      if(element.typingMask)this.maskTypedText(element);
+    }
 
   }
   
