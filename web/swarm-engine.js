@@ -45,6 +45,7 @@
       document.addEventListener('keydown',event=>{if(event.code==='Space'&&event.target===document.body){event.preventDefault();this.pause(!this.paused);}if(event.key==='Escape')this.pause(true);});
       requestAnimationFrame(time=>this.loop(time));
     }
+    get width(){return this.presentation?.enabled?this.presentation.logicalWidth:innerWidth;}
 
   }
 
