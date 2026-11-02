@@ -270,5 +270,5 @@
       }
     }
   }
-  
+  window.TaskChoreography=TaskChoreography;
 })();
