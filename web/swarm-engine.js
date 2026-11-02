@@ -128,6 +128,17 @@
     }
     report(){if(!this.model)return;this.emit('progress',{time:this.time||0,completed:this.done||0,failed:this.failed||0,total:this.tasks?.length||0,paused:this.paused,finished:this.finished,agents:this.agents?.map(a=>({id:a.id,status:a.phase,completed:a.completed,task:a.task?.id||null}))||[]});}
     loop(now){const realDt=Math.min((now-this.last)/1000,.05);this.last=now;if(this.running&&!this.paused&&!this.externalClock){const duration=realDt*(this.settings.speed||1);const steps=Math.max(1,Math.ceil(duration/.016));for(let i=0;i<steps;i++)this.tick(duration/steps);this.director?.update(realDt);this.draw();}if(this.running&&!this.externalClock&&now-this.lastReport>180){this.lastReport=now;this.report();}requestAnimationFrame(t=>this.loop(t));}
+    startCapture(options={}){
+      this.presentation??=new MoviePresentation(this);
+      this.presentation.enable(options.width||innerWidth,options.height||innerHeight);
+      this.settings.auto_tour=true;this.externalClock=true;this.prepare();this.paused=true;
+      this.director=new RecordingDirector(this,options.zoom||3);
+      this.sound.ledger=[];this.sound.last=-100;this.captureIndex=0;
+      this.freezeStyle?.remove();this.freezeStyle=this.doc.createElement('style');
+      this.freezeStyle.textContent='*,*::before,*::after{transition:none!important;animation-play-state:paused!important;caret-color:transparent!important}';this.doc.head.append(this.freezeStyle);
+      for(const animation of this.doc.getAnimations()){try{animation.pause();animation.currentTime=animation.effect.getTiming().iterations===Infinity?0:animation.effect.getComputedTiming().endTime;}catch(_){}}
+      this.draw();return true;
+    }
 
   }
 
