@@ -26,7 +26,11 @@
       const y=halfH>=e.height/2?e.height/2:clamp(pose.y,halfH,e.height-halfH);
       return {scale,x:innerWidth/2-x*scale,y:innerHeight/2-y*scale,centerX:x,centerY:y,zoom:pose.zoom};
     }
-    
+    apply(){
+      const m=this.matrix();
+      this.engine.frame.style.transform=`matrix(${m.scale.toFixed(7)},0,0,${m.scale.toFixed(7)},${m.x.toFixed(5)},${m.y.toFixed(5)})`;
+      return m;
+    }
   }
 
 })();
