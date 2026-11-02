@@ -134,6 +134,13 @@
       const right=Math.max(0,full.w-left-r.w*xProgress),bottom=Math.max(0,full.h-top-r.h*yProgress);
       element.node.style.clipPath=`inset(${top}px ${right}px ${bottom}px ${left}px)`;
     }
+    frameReady(agent,task,element) {
+      if(task.scaffolded)return;
+      task.scaffolded=true;task.frameReadyAt=this.engine.time;
+      task.handoffPoint={...agent.pose};
+      this.engine.restoreClip(element);
+      this.engine.emit('frame-ready',{agent:agent.id,task:task.id,element:element.id});
+    }
 
   }
   
