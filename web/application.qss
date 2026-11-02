@@ -24,4 +24,4 @@ QHeaderView::section{background:#20252d;border:0;color:#9daabd;padding:5px}
 QTabWidget::pane{border:1px solid #333b48;background:#1a1e25}QTabBar::tab{background:#20252e;color:#b2bfd0;padding:9px 18px;border:1px solid #333b48}QTabBar::tab:selected{background:#2a3d56;color:#f5f8ff}
 QProgressBar{border:0;border-radius:2px;background:#313844;max-height:4px;min-height:4px;color:transparent}QProgressBar::chunk{background:#61a8ff;border-radius:2px}
 QScrollArea{border:0;background:#111318}QScrollBar:vertical{background:#1d222b;width:8px}QScrollBar::handle:vertical{background:#4c5667;min-height:30px;border-radius:4px}QScrollBar::add-line:vertical,QScrollBar::sub-line:vertical{height:0}QSplitter::handle{background:#15171c;width:7px}
-QCheckBox{spacing:8px}QCheckBox::indicator{width:15px;height:15px;border:1px solid #6e7d92;border-radius:3px;background:#202631}
+QCheckBox{spacing:8px}QCheckBox::indicator{width:15px;height:15px;border:1px solid #6e7d92;border-radius:3px;background:#202631}QCheckBox::indicator:checked{background:#4b91e6;border-color:#91beff}
