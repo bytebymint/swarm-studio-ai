@@ -128,6 +128,12 @@
       // Older Chromium without Custom Highlights still preserves DOM layout.
       if(!this.highlight)this.clip(element,amount,1);
     }
+    clip(element,xProgress,yProgress) {
+      const full=this.engine.box(element),r=this.workRect(element);
+      const left=Math.max(0,r.x-full.x),top=Math.max(0,r.y-full.y);
+      const right=Math.max(0,full.w-left-r.w*xProgress),bottom=Math.max(0,full.h-top-r.h*yProgress);
+      element.node.style.clipPath=`inset(${top}px ${right}px ${bottom}px ${left}px)`;
+    }
 
   }
   
