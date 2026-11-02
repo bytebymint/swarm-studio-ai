@@ -9,3 +9,4 @@ QLabel#hero{font-size:40px;font-weight:600;color:#ecf1fa}
 QLabel#notice{background:#272b34;color:#cbd8ed;border:1px solid #465168;border-radius:4px;padding:7px 12px}
 QPushButton,QToolButton{background:#292e38;color:#e8edf5;border:1px solid #404856;border-radius:5px;padding:7px 11px;font-weight:500;min-height:17px}
 QPushButton:hover,QToolButton:hover{background:#364152;border-color:#63748e}
+QPushButton:pressed,QToolButton:pressed{background:#202631}
