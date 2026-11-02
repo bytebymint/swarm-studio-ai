@@ -46,6 +46,7 @@
       requestAnimationFrame(time=>this.loop(time));
     }
     get width(){return this.presentation?.enabled?this.presentation.logicalWidth:innerWidth;}
+    get height(){return this.presentation?.enabled?this.presentation.logicalHeight:innerHeight;}
 
   }
 
