@@ -159,5 +159,6 @@
     showClone(){this.running=false;this.restore();this.boundsCache?.clear();this.canvas.style.display='none';this.intro.style.display='none';this.completion.hidden=true;const state=this.model?.scrollState;if(state){for(const[id,position]of Object.entries(state.nodes||{})){const node=this.frame.contentDocument.querySelector(`[data-sw-id="${id}"]`);if(node)node.scrollTo({top:position.top,left:position.left,behavior:'instant'});}if(state.window)this.frame.contentWindow.scrollTo({left:state.window.x,top:state.window.y,behavior:'instant'});}}
   }
   window.Studio=new StudioEngine();
-
+  if(typeof QWebChannel!=='undefined'&&window.qt?.webChannelTransport)new QWebChannel(qt.webChannelTransport,channel=>{window.studioBridge=channel.objects.bridge;window.Studio.emit('bridge-ready',{});});
+  
 })();
