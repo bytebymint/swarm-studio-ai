@@ -16,3 +16,4 @@ QPushButton#primary{background:#347bd1;border:1px solid #6da6ee;color:#ffffff;fo
 QPushButton#primary:hover{background:#438ce2}
 QPushButton#primary:disabled{background:#273b55;border-color:#394b62;color:#98adc6}
 QLineEdit,QComboBox,QSpinBox,QDoubleSpinBox{background:#11151b;border:1px solid #424b5b;border-radius:5px;padding:7px;color:#edf2fb;selection-background-color:#345d90}
+QComboBox::drop-down{border:0;width:20px}
