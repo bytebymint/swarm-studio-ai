@@ -156,7 +156,7 @@
     stop(){this.running=false;this.sound?.close();this.ctx.clearRect(0,0,innerWidth,innerHeight);this.restore();this.intro.style.display='none';this.completion.hidden=true;this.emit('cancelled',{});}
     restoreClip(e){if(!e.node)return;if(e.savedClip?.value)e.node.style.setProperty('clip-path',e.savedClip.value,e.savedClip.priority);else e.node.style.removeProperty('clip-path');}
     restore(){this.choreography?.dispose();this.oldMask?.remove();for(const e of this.elements?.values()||[]){e.node?.removeAttribute('data-sw-state');this.restoreClip(e);for(const [node,text] of e.textNodes||[])node.textContent=text;}}
-    
+    showClone(){this.running=false;this.restore();this.boundsCache?.clear();this.canvas.style.display='none';this.intro.style.display='none';this.completion.hidden=true;const state=this.model?.scrollState;if(state){for(const[id,position]of Object.entries(state.nodes||{})){const node=this.frame.contentDocument.querySelector(`[data-sw-id="${id}"]`);if(node)node.scrollTo({top:position.top,left:position.left,behavior:'instant'});}if(state.window)this.frame.contentWindow.scrollTo({left:state.window.x,top:state.window.y,behavior:'instant'});}}
   }
 
 })();
