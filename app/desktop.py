@@ -718,3 +718,18 @@ class MainWindow(QMainWindow):
         self.export_button.setEnabled(False);self.compare_button.setEnabled(False);self.tabs.setCurrentIndex(0);self.stack.setCurrentWidget(self.welcome);self.url.clear();self.url.setFocus();self.populate_agents()
         for control in [self.play_button,self.replay_button,self.step_back,self.step_forward]:control.setEnabled(False)
         self.notice.setText('Enter a website URL or try the bundled offline demo. Capture only material you have permission to reproduce.')
+
+    def run_comparison(self):
+        if not self.project or self.compare_busy:return
+        if not self.engine_ready:
+            self.pending_comparison=True
+            self.status('Waiting for the reconstructed document before comparison…')
+            return
+        self.compare_busy=True
+        self.comparison_viewport=True
+        self.resize_canvases()
+        self.compare_button.setEnabled(False)
+        self.tabs.setCurrentIndex(2);self.stack.setCurrentWidget(self.player_area)
+        self.js('showClone()')
+        self.status('Rendering the local clone at the capture viewport…')
+        QTimer.singleShot(650,self.take_comparison)
