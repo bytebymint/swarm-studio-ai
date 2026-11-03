@@ -378,3 +378,7 @@ class MainWindow(QMainWindow):
             item.setToolTip(0,'Waiting for capture')
             self.agents.addTopLevelItem(item)
         self.agent_summary.setText(f'{count} simulated agents · waiting')
+
+    def shortcuts(self):
+        for key,callback in [('Ctrl+L',lambda:self.url.setFocus()),('Ctrl+N',self.new_project),('Ctrl+O',self.open_project),('Ctrl+E',self.export_project),('F11',self.toggle_presentation)]:
+            action=QAction(self);action.setShortcut(QKeySequence(key));action.triggered.connect(callback);self.addAction(action)
