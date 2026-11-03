@@ -710,3 +710,11 @@ class MainWindow(QMainWindow):
         self.project_id=project_id;self.update_stats();self.export_button.setEnabled(True);self.compare_button.setEnabled(True);self.cancel_button.setEnabled(True)
         self.url.setText(self.metadata['url']);self.notice.setText('Saved project opened without recapture. Original tab retains the last live website; comparison uses the saved baseline.')
         self.pending_load=True;self.load_player()
+
+    def new_project(self):
+        if self.busy:return
+        self.js('stop()');self.project=None;self.metadata=None;self.blueprint=None;self.feed.clear();self.timeline.reset();self.progress.setValue(0)
+        self.record_button.setEnabled(False)
+        self.export_button.setEnabled(False);self.compare_button.setEnabled(False);self.tabs.setCurrentIndex(0);self.stack.setCurrentWidget(self.welcome);self.url.clear();self.url.setFocus();self.populate_agents()
+        for control in [self.play_button,self.replay_button,self.step_back,self.step_forward]:control.setEnabled(False)
+        self.notice.setText('Enter a website URL or try the bundled offline demo. Capture only material you have permission to reproduce.')
