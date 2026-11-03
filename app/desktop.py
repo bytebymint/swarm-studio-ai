@@ -35,3 +35,7 @@ def button(text, callback, tooltip=None, primary=False):
         control.setObjectName('primary')
     control.clicked.connect(callback)
     return control
+
+
+class NoticeLabel(QLabel):
+    message = Signal(str)
