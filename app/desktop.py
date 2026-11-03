@@ -703,3 +703,10 @@ class MainWindow(QMainWindow):
         listing.itemDoubleClicked.connect(choose)
         layout.addWidget(button('Open selected project',choose,primary=True));layout.addWidget(button('Close',dialog.reject))
         dialog.exec()
+
+    def load_project(self,project_id):
+        try:self.project,self.metadata,self.blueprint=self.store.load(project_id)
+        except ValueError as exc:self.fail(str(exc));return
+        self.project_id=project_id;self.update_stats();self.export_button.setEnabled(True);self.compare_button.setEnabled(True);self.cancel_button.setEnabled(True)
+        self.url.setText(self.metadata['url']);self.notice.setText('Saved project opened without recapture. Original tab retains the last live website; comparison uses the saved baseline.')
+        self.pending_load=True;self.load_player()
