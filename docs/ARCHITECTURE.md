@@ -48,3 +48,11 @@ velocity through retargets, caps zoom at 3× and asks Auto Tour to wait until wi
 before scrolling. A selected edit briefly slows while the camera arrives.
 Decorative source animations are paused during recording.
 
+An external fixed-step clock plans the movie and repeats the same simulation for
+rendering. CDP captures each composited frame; PyAV encodes H.264 and optional
+48 kHz stereo AAC, with agent sound events synthesized on the same movie clock.
+No microphone, desktop pixels, user browser profile or app chrome is recorded.
+The renderer permits only local saved assets and has a ten-minute movie cap.
+One frame and short audio blocks are retained at a time. Output is atomically
+replaced only after full task completion and an end hold; cancellation removes
+the unique partial movie and preserves an existing destination.
