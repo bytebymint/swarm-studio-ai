@@ -23,3 +23,15 @@ from app.timeline import Timeline
 from app.urls import normalize_url
 from app.validation import quality_report
 from app.workers import BuildWorker, ExportWorker
+
+
+def button(text, callback, tooltip=None, primary=False):
+    control = QPushButton(text)
+    control.setCursor(Qt.CursorShape.PointingHandCursor)
+    control.setAccessibleName(tooltip or text)
+    if tooltip:
+        control.setToolTip(tooltip)
+    if primary:
+        control.setObjectName('primary')
+    control.clicked.connect(callback)
+    return control
