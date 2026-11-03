@@ -135,3 +135,7 @@ def render_movie(player_url, project_url, destination, settings, options, cancel
             return {'path':str(destination),'frames':total,'fps':fps,'width':width,'height':height,'duration':total/fps,'shots':planned_shots,'camera':camera_samples,'audio_events':len(events),'completed':state['completed'],'total':state['total']}
     finally:
         tmp.unlink(missing_ok=True)
+
+
+class RecordingWorker(QThread):
+    progress=Signal(int,str)
