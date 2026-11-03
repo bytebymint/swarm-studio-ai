@@ -67,3 +67,8 @@ class RecordingDialog(QDialog):
     def complete(self,path,result):
         self.saved=Path(path);self.message.setText(f'Saved {result["duration"]:.1f}s · {result["fps"]} fps · {result["width"]} × {result["height"]}\n{path}')
         self.studio.status('Cinematic recording saved: '+path)
+
+    def finished_render(self):
+        for control in [self.record,self.resolution,self.fps,self.zoom,self.speed,self.sound]:control.setEnabled(True)
+        self.open.setEnabled(self.saved is not None);self.cancel.setEnabled(True);self.cancel.setText('Close')
+        if self.pending_close:self.close()
