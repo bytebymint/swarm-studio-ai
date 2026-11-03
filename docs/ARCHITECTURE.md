@@ -40,3 +40,11 @@ Segoe UI follows Windows typography; compact measured panels give the actual
 website most of the window. Motion is confined to construction and its controls.
 The cursor shape and transient dimension labels repeat the design-tool motif.
 
+Recording uses a separate QThread and a fresh, headless installed Edge/Chrome
+session through Playwright. The saved DOM keeps its captured CSS viewport.
+`MoviePresentation` transforms that iframe and applies the identical matrix to
+the vector overlay. `RecordingDirector` chooses active edits, retains camera
+velocity through retargets, caps zoom at 3× and asks Auto Tour to wait until wide
+before scrolling. A selected edit briefly slows while the camera arrives.
+Decorative source animations are paused during recording.
+
