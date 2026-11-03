@@ -466,3 +466,19 @@ class MainWindow(QMainWindow):
         self.crawl_seen={urldefrag(self.source.url().toString())[0]}
         self.notice.setText('Capturing rendered DOM and discovering lazy content. Cancel stops the current operation.')
         self.browser.capture(self.settings.values)
+
+    def captured(self,capture):
+        if not self.crawling:return
+        if not self.captures:self.root_shot=self.source.grab()
+        self.captures.append(capture)
+        values=self.settings.values
+        if self.crawl_depth < values['crawl_depth']:
+            for raw in capture.get('links',[]):
+                url=urldefrag(raw)[0]
+                parts=urlsplit(url)
+                if (parts.scheme,parts.netloc) != self.crawl_origin or url in self.crawl_seen or re.search(r'login|logout|sign.?in|sign.?out|checkout|payment|delete|remove|unsubscribe|account|oauth|auth/',parts.path,re.I):continue
+                try:normalize_url(url)
+                except ValueError:continue
+                if len(self.crawl_seen)>=values['page_limit']:break
+                self.crawl_seen.add(url);self.crawl_queue.append((url,self.crawl_depth+1))
+        self.next_capture()
