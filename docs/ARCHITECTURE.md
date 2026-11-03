@@ -34,3 +34,9 @@ viewport and zoom, normalizes device pixel dimensions, reports mean absolute
 RGB difference and writes a heatmap. A separate DOM check measures bounding boxes,
 missing images and text presence. Pixel metrics do not prove backend fidelity.
 
+Design: graphite panels reduce distraction around arbitrary websites. Blue marks
+the main reconstruction action. Agent colors are identities, not status claims.
+Segoe UI follows Windows typography; compact measured panels give the actual
+website most of the window. Motion is confined to construction and its controls.
+The cursor shape and transient dimension labels repeat the design-tool motif.
+
