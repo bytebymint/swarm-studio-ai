@@ -444,3 +444,8 @@ class MainWindow(QMainWindow):
             return
         self.initialize.setEnabled(ok and not self.busy)
         if ok:self.notice.setText('Website loaded. Initialize Swarm captures this page without copying scripts or form values.')
+
+    def open_demo(self):
+        if self.busy:return
+        self.url.setText(self.server.url('ui/demo/index.html'))
+        self.navigate()
