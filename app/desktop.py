@@ -404,3 +404,12 @@ class MainWindow(QMainWindow):
         self.set_busy(False)
         if self.compare_busy:
             self.compare_busy=False
+
+    def browser_error(self,message):
+        if self.crawling and self.captures:
+            self.captures[0]['warnings'].append('Linked page skipped: '+message)
+            self.log('Linked page skipped: '+message,'#e9be83')
+            QTimer.singleShot(0,self.next_capture)
+        else:
+            self.crawling=False
+            self.fail(message)
