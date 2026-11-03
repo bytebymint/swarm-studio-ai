@@ -76,3 +76,7 @@ class ComparisonPanel(QWidget):
         self.canvas.mode = text
         self.slider.setEnabled(text == 'Before / after slider')
         self.canvas.update()
+
+    def change_split(self, value):
+        self.canvas.split = value/100
+        self.canvas.update()
