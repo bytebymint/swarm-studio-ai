@@ -21,3 +21,18 @@ class Timeline(QWidget):
         self.agents.clear()
         self.time = 0
         self.update()
+
+    def record_event(self, data):
+        if data['type'] == 'assigned':
+            self.agents[data['agent']] = data['name']
+            self.setMinimumHeight(max(95, 26 + len(self.agents) * 15))
+            self.active[data['task']] = (data['agent'], self.time)
+        if data['type'] == 'completed' and data['task'] in self.active:
+            agent, started = self.active.pop(data['task'])
+            self.events.append((agent, started, max(self.time, started + .15)))
+        if data['type'] == 'progress':
+            if data['time'] < self.time:
+                self.events = [e for e in self.events if e[2] <= data['time']]
+                self.active.clear()
+            self.time = data['time']
+        self.update()
