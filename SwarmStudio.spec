@@ -8,3 +8,5 @@ root = Path(SPECPATH)
 python_root = Path(sys.base_prefix)
 site_root = root / '.venv' / 'Lib' / 'site-packages'
 windows_root = Path(os.environ.get('SystemRoot', 'C:/Windows'))
+os.environ['PATH'] = os.pathsep.join(map(str, [python_root, python_root/'DLLs',
+    site_root/'PySide6', site_root/'shiboken6', windows_root/'System32', windows_root]))
