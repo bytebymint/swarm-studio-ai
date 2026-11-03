@@ -41,3 +41,9 @@ class SettingsDialog(QDialog):
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
+
+    def values(self):
+        result={}
+        for key,field in self.fields.items():
+            result[key]=field.isChecked() if isinstance(field,QCheckBox) else field.value() if isinstance(field,(QSpinBox,QDoubleSpinBox)) else field.text()
+        return result
