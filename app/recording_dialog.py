@@ -6,3 +6,36 @@ from PySide6.QtWidgets import (QCheckBox,QComboBox,QDialog,QFileDialog,QFormLayo
     QHBoxLayout,QLabel,QProgressBar,QPushButton,QVBoxLayout)
 
 from app.recording import RecordingWorker
+
+
+class RecordingDialog(QDialog):
+    def __init__(self, studio):
+        super().__init__(studio)
+        self.studio=studio
+        self.project=studio.project
+        self.viewport=studio.metadata['viewport'].copy()
+        self.settings=studio.settings.values.copy()
+        self.worker=None;self.pending_close=False;self.saved=None
+        self.setWindowTitle('Cinematic recording')
+        self.resize(490,380)
+        layout=QVBoxLayout(self)
+        description=QLabel('Follow the agents as they build. The camera eases into details, pulls back, and glides to the next section.')
+        description.setWordWrap(True);layout.addWidget(description)
+        form=QFormLayout()
+        self.resolution=QComboBox();self.resolution.addItem('1080p · 1920 × 1080',(1920,1080));self.resolution.addItem('720p · 1280 × 720',(1280,720))
+        self.fps=QComboBox();self.fps.addItem('60 fps · smoothest',60);self.fps.addItem('30 fps · faster export',30)
+        self.zoom=QComboBox();self.zoom.addItem('Up to 3× · cinematic',3);self.zoom.addItem('Up to 2× · gentle',2);self.zoom.addItem('Wide view',1)
+        self.speed=QComboBox()
+        for speed in (.5,1,2,3,5):self.speed.addItem(f'{speed:g}×',speed)
+        self.speed.setCurrentIndex(1)
+        self.sound=QCheckBox('Include agent sounds');self.sound.setChecked(studio.audio.isChecked())
+        for label,control in [('Video',self.resolution),('Frame rate',self.fps),('Camera zoom',self.zoom),('Build speed',self.speed),('',self.sound)]:form.addRow(label,control)
+        layout.addLayout(form)
+        self.message=QLabel('Exports only the canvas as an MP4. Each frame is rendered individually; export can take longer than playback.')
+        self.message.setWordWrap(True);layout.addWidget(self.message)
+        self.progress=QProgressBar();self.progress.setRange(0,100);layout.addWidget(self.progress)
+        actions=QHBoxLayout()
+        self.record=QPushButton('Save MP4…');self.record.setObjectName('primary');self.record.clicked.connect(self.choose)
+        self.open=QPushButton('Play video');self.open.setEnabled(False);self.open.clicked.connect(lambda:QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.saved))))
+        self.cancel=QPushButton('Close');self.cancel.clicked.connect(self.cancel_or_close)
+        actions.addWidget(self.record);actions.addWidget(self.open);actions.addStretch();actions.addWidget(self.cancel);layout.addLayout(actions)
