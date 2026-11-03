@@ -760,3 +760,12 @@ class MainWindow(QMainWindow):
         directory=self.settings.values['export_directory'] or str(Path.home()/'Desktop')
         destination,_=QFileDialog.getSaveFileName(self,'Export reconstruction',str(Path(directory)/'swarm-project.zip'),'ZIP archive (*.zip)')
         if destination:self.export_to(destination)
+
+    def show_recording(self):
+        if not self.project or self.busy:
+            self.status('Build or open a saved project before recording.');return
+        if getattr(self,'recording_dialog',None) and self.recording_dialog.isVisible():
+            self.recording_dialog.raise_();self.recording_dialog.activateWindow();return
+        from app.recording_dialog import RecordingDialog
+        self.recording_dialog=RecordingDialog(self)
+        self.recording_dialog.show()
