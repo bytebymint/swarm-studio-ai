@@ -39,3 +39,7 @@ class RecordingDialog(QDialog):
         self.open=QPushButton('Play video');self.open.setEnabled(False);self.open.clicked.connect(lambda:QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.saved))))
         self.cancel=QPushButton('Close');self.cancel.clicked.connect(self.cancel_or_close)
         actions.addWidget(self.record);actions.addWidget(self.open);actions.addStretch();actions.addWidget(self.cancel);layout.addLayout(actions)
+
+    def choose(self):
+        destination,_=QFileDialog.getSaveFileName(self,'Save cinematic recording',str(Path.home()/'Videos'/'swarm-recording.mp4'),'MP4 video (*.mp4)')
+        if destination:self.start(destination)
