@@ -14,3 +14,11 @@ An asynchronous bounded asset collector rewrites CSS URLs recursively. Build and
 export execute on QThreads. Project metadata lives in SQLite; project artifacts
 are portable directories, served by a GET/HEAD-only loopback server.
 
+The independently written JavaScript engine builds local HTML with real captured
+nodes. `crew.js` keeps a small roster and assigns only the workers required by
+visible tasks. `choreography.js` drives both cursor positions and drawing progress
+from the same minimum-jerk trajectories. Inactive cursors fade instead of circling
+the page. The task DAG distinguishes parent frame readiness from final completion:
+content can start after its parent frame is placed; duplicates still wait for a
+completed master. These milestones emit real handoff events.
+
