@@ -388,3 +388,10 @@ class MainWindow(QMainWindow):
         if hasattr(self, 'status_text'):
             self.status_text.setText(text)
             self.status_text.setToolTip(text)
+
+    def log(self,text,color=None):
+        item=QListWidgetItem(text)
+        if color:item.setForeground(QColor(color))
+        self.feed.addItem(item)
+        while self.feed.count()>150:self.feed.takeItem(0)
+        self.feed.scrollToBottom()
