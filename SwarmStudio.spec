@@ -22,3 +22,6 @@ for destination, source, kind in a.binaries:
 # resolve from System32, never a renamed third-party ICU build on PATH.
 a.binaries = [entry for entry in a.binaries if Path(entry[0]).name.lower() not in {'icuuc.dll','icuin.dll','icu.dll'} and not Path(entry[0]).name.lower().startswith('icudt')]
 pyz = PYZ(a.pure)
+exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name='SwarmStudio',
+          debug=False, bootloader_ignore_signals=False, strip=False, upx=False,
+          console=False, disable_windowed_traceback=False, icon=str(root/'assets/studio.ico'))
