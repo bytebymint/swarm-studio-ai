@@ -519,3 +519,8 @@ class MainWindow(QMainWindow):
         for warning in metadata['warnings']:self.log(warning,'#e9be83')
         self.pending_load=True
         self.load_player()
+
+    def update_stats(self):
+        if not self.blueprint:return
+        values={'Elements captured':len(self.blueprint['elements']),'Images / media':self.blueprint['counts'].get('image',0),'Fonts detected':len(self.blueprint.get('fonts',[])),'Assets saved':self.metadata['assets'],'Style rules':(self.project/'styles/reconstructed.css').read_text('utf-8').count('{'),'Reconstruction tasks':len(self.blueprint['tasks']),'Capture warnings':len(self.metadata.get('warnings',[]))}
+        for key,value in values.items():self.stat_items[key].setText(1,str(value))
