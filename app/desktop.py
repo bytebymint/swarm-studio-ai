@@ -425,3 +425,10 @@ class MainWindow(QMainWindow):
         self.viewport.setEnabled(not value)
         self.export_button.setEnabled(not value and self.project is not None)
         self.record_button.setEnabled(not value and self.project is not None)
+
+    def navigate(self):
+        if self.busy:return
+        try:url=normalize_url(self.url.text())
+        except ValueError as exc:self.fail(str(exc));return
+        self.tabs.setCurrentIndex(0);self.stack.setCurrentWidget(self.source_area)
+        self.browser.navigate(url)
