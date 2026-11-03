@@ -733,3 +733,24 @@ class MainWindow(QMainWindow):
         self.js('showClone()')
         self.status('Rendering the local clone at the capture viewport…')
         QTimer.singleShot(650,self.take_comparison)
+
+    def take_comparison(self):
+        if not self.project:self.compare_busy=False;return
+        self.player.grab().save(str(self.project/'screenshots/reconstructed.png'))
+        script='''(()=>{const studio=window.Studio,d=studio.frame.contentDocument;let boxes=[],missing=[];for(const e of studio.model.elements){const n=d.querySelector('[data-sw-id="'+e.id+'"]');if(!n){missing.push(e.id);continue;}const r=n.getBoundingClientRect(),o=e.originalBox;const delta=Math.max(Math.abs(r.x-o.x),Math.abs(r.y-o.y),Math.abs(r.width-o.w),Math.abs(r.height-o.h));if(delta>2)boxes.push({id:e.id,maximum_delta_px:Math.round(delta*10)/10});}return JSON.stringify({nodes:d.querySelectorAll('[data-sw-id]').length,selectable_text_characters:d.body.innerText.length,missing_elements:missing,bounding_box_mismatches:boxes.slice(0,100),broken_images:[...d.images].filter(i=>!i.complete||i.naturalWidth===0).map(i=>i.getAttribute('data-sw-id')),viewport:{width:studio.frame.contentWindow.innerWidth,height:studio.frame.contentWindow.innerHeight}});})()'''
+        def finished(raw):
+            try:
+                dom=json.loads(raw) if raw else {'error':'DOM validation did not respond'}
+                report=quality_report(self.project,dom)
+                self.comparison.load(self.project,report)
+                self.quality_label.setText(f"Mean RGB difference: {report['mean_absolute_rgb_difference']:.2f}/255\n{len(dom.get('broken_images',[]))} broken images · {len(dom.get('bounding_box_mismatches',[]))} geometry mismatches")
+                self.log('Comparison saved with pixel heatmap and DOM diagnostics.')
+                self.tabs.setCurrentIndex(3);self.stack.setCurrentWidget(self.comparison)
+                self.notice.setText('Comparison measures the captured viewport. Pixel similarity does not prove functional or backend equivalence.')
+            except Exception as exc:self.fail(f'Comparison could not finish: {exc}')
+            finally:
+                self.compare_busy=False
+                self.comparison_viewport=False
+                self.compare_button.setEnabled(True)
+                self.resize_canvases()
+        self.player.page().runJavaScript(script,finished)
