@@ -647,3 +647,8 @@ class MainWindow(QMainWindow):
             view.setFixedSize(round(width*scale),round(height*scale))
             view.setZoomFactor(scale)
         self.dimensions.setText(f'{width} × {height}  ·  {round(scale*100)}%')
+
+    def eventFilter(self, watched, event):
+        if watched is getattr(self, 'stack', None) and event.type()==QEvent.Type.Resize:
+            QTimer.singleShot(0,self.resize_canvases)
+        return super().eventFilter(watched,event)
