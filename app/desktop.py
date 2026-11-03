@@ -754,3 +754,9 @@ class MainWindow(QMainWindow):
                 self.compare_button.setEnabled(True)
                 self.resize_canvases()
         self.player.page().runJavaScript(script,finished)
+
+    def export_project(self):
+        if not self.project or self.busy or self.export_worker and self.export_worker.isRunning():return
+        directory=self.settings.values['export_directory'] or str(Path.home()/'Desktop')
+        destination,_=QFileDialog.getSaveFileName(self,'Export reconstruction',str(Path(directory)/'swarm-project.zip'),'ZIP archive (*.zip)')
+        if destination:self.export_to(destination)
