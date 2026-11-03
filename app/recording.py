@@ -140,3 +140,4 @@ def render_movie(player_url, project_url, destination, settings, options, cancel
 class RecordingWorker(QThread):
     progress=Signal(int,str)
     ready=Signal(str,dict)
+    error=Signal(str)
