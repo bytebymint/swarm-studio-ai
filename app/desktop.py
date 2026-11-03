@@ -612,3 +612,6 @@ class MainWindow(QMainWindow):
         if not self.project:return
         self.timeline.reset()
         self.tabs.setCurrentIndex(1);self.stack.setCurrentWidget(self.player_area);self.js('replay()')
+
+    def speed_changed(self,text):
+        self.js('setSpeed('+text.replace('×','')+')')
