@@ -625,3 +625,25 @@ class MainWindow(QMainWindow):
         else:self.set_busy(False)
         self.js('stop()')
         self.status('Stopped. Replay a saved capture or initialize again.')
+
+    def resize_canvases(self,*_):
+        if not hasattr(self,'zoom'):return
+        values=self.settings.values
+        width,height=values['width'],values['height']
+        # Hidden QScrollAreas retain stale viewport sizes. Always size from the
+        # live canvas stack, which is shared by Original and Swarm modes.
+        available=self.stack.contentsRect().size()
+        available_width=max(1,available.width())
+        available_height=max(1,available.height())
+        if values['viewport_mode']=='window' and not self.comparison_viewport:
+            width,height=available_width,available_height
+        elif self.project and self.metadata:
+            width,height=self.metadata['viewport']['width'],self.metadata['viewport']['height']
+        text=self.zoom.currentText()
+        if text=='Fit':
+            scale=max(.1,min(available_width/width,available_height/height))
+        else:scale=float(text.replace('%',''))/100
+        for view in [self.source,self.player]:
+            view.setFixedSize(round(width*scale),round(height*scale))
+            view.setZoomFactor(scale)
+        self.dimensions.setText(f'{width} × {height}  ·  {round(scale*100)}%')
