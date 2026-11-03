@@ -146,3 +146,13 @@ class RecordingWorker(QThread):
         super().__init__(parent)
         self.args=(player_url,project_url,destination,settings,options)
         self.cancel_event=threading.Event()
+
+    def run(self):
+        try:
+            result=render_movie(*self.args,cancel=self.cancel_event,progress=self.progress.emit)
+            self.ready.emit(result['path'],result)
+        except InterruptedError as exc:self.error.emit(str(exc))
+        except Exception as exc:
+            import logging
+            logging.exception('Movie export failed')
+            self.error.emit(f'Recording failed: {exc}')
