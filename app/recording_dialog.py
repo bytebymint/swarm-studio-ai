@@ -43,3 +43,20 @@ class RecordingDialog(QDialog):
     def choose(self):
         destination,_=QFileDialog.getSaveFileName(self,'Save cinematic recording',str(Path.home()/'Videos'/'swarm-recording.mp4'),'MP4 video (*.mp4)')
         if destination:self.start(destination)
+
+    def start(self,destination):
+        if self.worker and self.worker.isRunning():return
+        destination=Path(destination)
+        if destination.suffix.lower()!='.mp4':destination=destination.with_suffix('.mp4')
+        width,height=self.resolution.currentData()
+        options=dict(output_width=width,output_height=height,fps=self.fps.currentData(),zoom=self.zoom.currentData(),speed=self.speed.currentData(),sound=self.sound.isChecked(),**self.viewport)
+        project_url=self.studio.server.url(self.project.relative_to(self.studio.root).as_posix())+'/'
+        self.worker=RecordingWorker(self.studio.server.url('ui/player.html'),project_url,destination,self.settings.copy(),options,self)
+        self.studio.recording_worker=self.worker
+        self.worker.progress.connect(self.update_progress)
+        self.worker.ready.connect(self.complete)
+        self.worker.error.connect(self.message.setText)
+        self.worker.finished.connect(self.finished_render)
+        for control in [self.record,self.open,self.resolution,self.fps,self.zoom,self.speed,self.sound]:control.setEnabled(False)
+        self.progress.setValue(0);self.message.setText('Opening the local movie renderer…');self.cancel.setText('Cancel render')
+        self.worker.start()
