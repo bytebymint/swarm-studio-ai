@@ -529,3 +529,23 @@ class MainWindow(QMainWindow):
         self.player_ready=ok
         if ok and self.pending_load:self.load_player()
         elif not ok:self.fail('The local playback document failed to load.')
+
+    def load_player(self):
+        if not self.project:return
+        self.record_button.setEnabled(True)
+        if not self.player_ready:
+            self.pending_load=True
+            if self.player.url().isEmpty():self.player.setUrl(QUrl(self.server.url('ui/player.html')))
+            return
+        self.pending_load=False
+        self.loading_player=True
+        self.engine_ready=False
+        self.compare_button.setEnabled(False)
+        self.timeline.reset();self.progress.setValue(0);self.paused=False;self.play_button.setText('Pause')
+        self.resize_canvases()
+        self.tabs.setCurrentIndex(1);self.stack.setCurrentWidget(self.player_area)
+        url=self.server.url(self.project.relative_to(self.root).as_posix())+'/'
+        options=dict(self.settings.values,auto_tour=self.tour.isChecked(),sound=self.audio.isChecked(),speed=float(self.speed.currentText().replace('×','')))
+        code='window.Studio.load('+json.dumps(url)+','+json.dumps(options)+').catch(error=>window.Studio.emit("error",{message:error.message}));'
+        self.player.page().runJavaScript(code)
+        for control in [self.play_button,self.replay_button,self.step_back,self.step_forward]:control.setEnabled(True)
