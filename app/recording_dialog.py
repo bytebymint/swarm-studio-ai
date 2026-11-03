@@ -79,3 +79,8 @@ class RecordingDialog(QDialog):
         else:self.close()
 
     def reject(self):self.close()
+
+    def closeEvent(self,event):
+        if self.worker and self.worker.isRunning():
+            self.pending_close=True;self.cancel_or_close();event.ignore()
+        else:event.accept()
