@@ -70,3 +70,7 @@ def main():
         timer.timeout.connect(smoke)
         timer.start(1000)
     return app.exec()
+
+
+if __name__ == "__main__":
+    sys.exit(main())
