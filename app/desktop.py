@@ -382,3 +382,9 @@ class MainWindow(QMainWindow):
     def shortcuts(self):
         for key,callback in [('Ctrl+L',lambda:self.url.setFocus()),('Ctrl+N',self.new_project),('Ctrl+O',self.open_project),('Ctrl+E',self.export_project),('F11',self.toggle_presentation)]:
             action=QAction(self);action.setShortcut(QKeySequence(key));action.triggered.connect(callback);self.addAction(action)
+
+    def status(self,text):
+        self.statusBar().showMessage(text)
+        if hasattr(self, 'status_text'):
+            self.status_text.setText(text)
+            self.status_text.setToolTip(text)
