@@ -30,3 +30,4 @@ QFrame#focusdock{background:#1c2028;border-top:1px solid #3a4351}
 QFrame#focusdock QPushButton,QFrame#focusdock QComboBox,QFrame#focusdock QLineEdit{padding:5px 8px;min-height:17px}
 QFrame#focusdock QLabel{font-size:11px}
 QMenu{background:#242a34;color:#edf2fb;border:1px solid #4a5668;padding:5px}
+QMenu::item{padding:8px 22px}
