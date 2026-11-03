@@ -552,3 +552,38 @@ class MainWindow(QMainWindow):
 
     def js(self,call):
         if self.player_ready:self.player.page().runJavaScript('window.Studio?.'+call+';')
+
+    def engine_event(self,data):
+        kind=data['type']
+        self.timeline.record_event(data)
+        if kind=='ready':
+            self.loading_player=False
+            self.engine_ready=True
+            self.compare_button.setEnabled(True)
+            if self.pending_comparison:
+                self.pending_comparison=False
+                QTimer.singleShot(0,self.run_comparison)
+        elif kind=='assigned':self.log(f"[{data['name']}] {data['label']}",COLORS[data['agent']%len(COLORS)])
+        elif kind=='task-error':self.log(f"Task blocked: {data.get('label',data.get('task'))}",'#f3aa9d')
+        elif kind=='progress':
+            total=data['total'];completed=data['completed'];failed=data.get('failed',0)
+            self.progress.setValue(int((completed+failed)/max(1,total)*1000))
+            sec=int(data['time']);self.position.setText(f'{sec//60:02}:{sec%60:02}  ·  {completed} / {total} tasks')
+            active=sum(1 for agent in data['agents'] if agent['task'])
+            self.agent_summary.setText(f"{len(data['agents'])} simulated agents · {active} active")
+            for key,value in [('Active agents',active),('Completed tasks',completed),('Pending tasks',max(0,total-completed-failed-active))]:self.stat_items[key].setText(1,str(value))
+            for agent in data['agents']:
+                item=self.agents.topLevelItem(agent['id'])
+                if item:
+                    name=NAMES[agent['id']%len(NAMES)]
+                    item.setText(0,f"● {name}\n{agent['status']}")
+                    item.setText(1,str(agent['completed']))
+                    item.setToolTip(0,f"{ROLES[agent['id']%len(ROLES)]}: {agent['status']}")
+            self.paused=data['paused'];self.play_button.setText('Resume' if self.paused else 'Pause')
+        elif kind=='finished':
+            text=f"Reconstruction finished: {data['completed']} tasks complete, {data['failed']} failed. Explore the clone or run a comparison."
+            self.notice.setText(text);self.log(text);self.status(text)
+        elif kind=='error':self.fail(data.get('message','Animation failed.'))
+        elif kind=='compare':self.run_comparison()
+        elif kind=='explore':self.tabs.setCurrentIndex(2)
+        elif kind=='replayed':self.timeline.reset()
