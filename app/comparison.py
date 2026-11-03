@@ -80,3 +80,11 @@ class ComparisonPanel(QWidget):
     def change_split(self, value):
         self.canvas.split = value/100
         self.canvas.update()
+
+    def load(self, root, report):
+        folder = Path(root) / 'screenshots'
+        self.canvas.original = QPixmap(str(folder / 'original.png'))
+        self.canvas.clone = QPixmap(str(folder / 'reconstructed.png'))
+        self.canvas.diff = QPixmap(str(folder / 'difference.png'))
+        self.label.setText(f"Mean RGB difference: {report['mean_absolute_rgb_difference']:.2f} / 255  ·  Appearance at the captured viewport")
+        self.canvas.update()
