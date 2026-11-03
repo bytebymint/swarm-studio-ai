@@ -22,3 +22,10 @@ the page. The task DAG distinguishes parent frame readiness from final completio
 content can start after its parent frame is placed; duplicates still wait for a
 completed master. These milestones emit real handoff events.
 
+Typing leaves the full original text in the DOM. Custom Highlights conceal only
+the untyped ranges, and DOM Range measures the insertion caret, preserving line
+breaks and glyph spacing. Gradient text uses an SVG mask built from those same
+range rectangles. Temporary masks and highlight registries are removed on stop,
+completion and replay. Simulation time drives tasks, cursor paths, effects and
+camera together, so pause, speed and stepping remain coherent.
+
