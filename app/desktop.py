@@ -682,3 +682,7 @@ class MainWindow(QMainWindow):
                 self.viewport.setCurrentIndex(4)
             self.settings.save(values);self.populate_agents();self.tour.setChecked(values['auto_tour']);self.audio.setChecked(values['sound']);self.speed.setCurrentText(f"{values['speed']:g}×")
             self.js('setOptions('+json.dumps(values)+')');self.resize_canvases();self.status('Settings saved. Agent count and capture settings apply on the next reconstruction.')
+
+    def load_recent(self):
+        self.recents.clear();self.recents.addItem('Recent projects',None)
+        for project_id,name,url in self.store.recent():self.recents.addItem(name,project_id)
