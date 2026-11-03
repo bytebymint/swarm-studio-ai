@@ -71,3 +71,8 @@ class ComparisonPanel(QWidget):
         layout.addWidget(self.slider)
         self.mode.currentTextChanged.connect(self.change_mode)
         self.slider.valueChanged.connect(self.change_split)
+
+    def change_mode(self, text):
+        self.canvas.mode = text
+        self.slider.setEnabled(text == 'Before / after slider')
+        self.canvas.update()
