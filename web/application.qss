@@ -27,3 +27,4 @@ QScrollArea{border:0;background:#111318}QScrollBar:vertical{background:#1d222b;w
 QCheckBox{spacing:8px}QCheckBox::indicator{width:15px;height:15px;border:1px solid #6e7d92;border-radius:3px;background:#202631}QCheckBox::indicator:checked{background:#4b91e6;border-color:#91beff}
 QStatusBar{background:#1b2028;color:#adbbcd}QToolTip{background:#303a49;color:#f2f6fd;border:1px solid #667a97;padding:5px}
 QFrame#focusdock{background:#1c2028;border-top:1px solid #3a4351}
+QFrame#focusdock QPushButton,QFrame#focusdock QComboBox,QFrame#focusdock QLineEdit{padding:5px 8px;min-height:17px}
