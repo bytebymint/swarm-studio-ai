@@ -604,3 +604,6 @@ class MainWindow(QMainWindow):
         else:
             self.stack.setCurrentWidget(self.comparison)
             self.js('pause(true)')
+
+    def toggle_pause(self):
+        if self.project:self.js('pause('+('false' if self.paused else 'true')+')')
