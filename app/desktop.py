@@ -785,3 +785,16 @@ class MainWindow(QMainWindow):
         if present:self.showFullScreen();self.presentation.setText('Exit presentation')
         else:self.showMaximized();self.presentation.setText('Present')
         QTimer.singleShot(0,self.resize_canvases)
+
+    def closeEvent(self,event):
+        self.browser.cancel()
+        active=[worker for worker in [self.worker,self.export_worker,self.recording_worker] if worker and worker.isRunning()]
+        if active:
+            if self.worker:self.worker.cancel_event.set()
+            if self.recording_worker:self.recording_worker.cancel_event.set()
+            self.closing=True;self.status('Finishing background file operations before closing…');event.ignore();QTimer.singleShot(250,self.close);return
+        self.js('stop()')
+        self.browser.navigation_timeout.stop()
+        self.source.stop();self.player.stop()
+        self.server.close();self.store.close()
+        event.accept()
