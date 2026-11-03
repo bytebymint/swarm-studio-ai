@@ -607,3 +607,8 @@ class MainWindow(QMainWindow):
 
     def toggle_pause(self):
         if self.project:self.js('pause('+('false' if self.paused else 'true')+')')
+
+    def replay(self):
+        if not self.project:return
+        self.timeline.reset()
+        self.tabs.setCurrentIndex(1);self.stack.setCurrentWidget(self.player_area);self.js('replay()')
