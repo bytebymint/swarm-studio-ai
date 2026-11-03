@@ -686,3 +686,7 @@ class MainWindow(QMainWindow):
     def load_recent(self):
         self.recents.clear();self.recents.addItem('Recent projects',None)
         for project_id,name,url in self.store.recent():self.recents.addItem(name,project_id)
+
+    def recent_selected(self,index):
+        project_id=self.recents.itemData(index)
+        if project_id and not self.busy:self.load_project(project_id)
