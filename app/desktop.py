@@ -367,3 +367,14 @@ class MainWindow(QMainWindow):
     def wrap_view(self,view):
         area=QScrollArea();area.setWidgetResizable(False);area.setAlignment(Qt.AlignmentFlag.AlignCenter);area.setWidget(view)
         return area
+
+    def populate_agents(self):
+        self.agents.clear()
+        count=self.settings.values['agents']
+        for i in range(count):
+            name=NAMES[i%len(NAMES)]+(f' {i+1}' if i>=len(NAMES) else '')
+            item=QTreeWidgetItem([f'● {name}\n{ROLES[i%len(ROLES)]}', '0'])
+            item.setForeground(0,QColor(COLORS[i%len(COLORS)]))
+            item.setToolTip(0,'Waiting for capture')
+            self.agents.addTopLevelItem(item)
+        self.agent_summary.setText(f'{count} simulated agents · waiting')
