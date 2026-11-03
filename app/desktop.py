@@ -672,3 +672,13 @@ class MainWindow(QMainWindow):
             self.settings.save({'width':width,'height':height,'viewport_mode':'fixed'})
         self.viewport.setCurrentIndex(index)
         self.resize_canvases()
+
+    def show_settings(self):
+        dialog=SettingsDialog(self.settings.values,self)
+        if dialog.exec()==QDialog.DialogCode.Accepted:
+            values=dialog.values()
+            if (values['width'],values['height']) != (self.settings.values['width'],self.settings.values['height']):
+                values['viewport_mode']='fixed'
+                self.viewport.setCurrentIndex(4)
+            self.settings.save(values);self.populate_agents();self.tour.setChecked(values['auto_tour']);self.audio.setChecked(values['sound']);self.speed.setCurrentText(f"{values['speed']:g}×")
+            self.js('setOptions('+json.dumps(values)+')');self.resize_canvases();self.status('Settings saved. Agent count and capture settings apply on the next reconstruction.')
