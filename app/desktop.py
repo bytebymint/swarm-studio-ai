@@ -482,3 +482,14 @@ class MainWindow(QMainWindow):
                 if len(self.crawl_seen)>=values['page_limit']:break
                 self.crawl_seen.add(url);self.crawl_queue.append((url,self.crawl_depth+1))
         self.next_capture()
+
+    def next_capture(self):
+        if not self.crawling:return
+        if self.crawl_queue and len(self.captures)<self.settings.values['page_limit']:
+            url,self.crawl_depth=self.crawl_queue.pop(0)
+            self.crawl_target=url
+            self.log(f'Capturing linked page {len(self.captures)+1} at depth {self.crawl_depth}.')
+            self.browser.navigate(url)
+            return
+        self.crawling=False
+        self.finish_captures()
