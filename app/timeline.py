@@ -14,3 +14,10 @@ class Timeline(QWidget):
         self.time = 0
         self.active = {}
         self.agents = {}
+
+    def reset(self):
+        self.events.clear()
+        self.active.clear()
+        self.agents.clear()
+        self.time = 0
+        self.update()
