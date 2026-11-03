@@ -11,3 +11,7 @@ packages and Windows system directories, rejects binaries resolved from the Code
 host runtime, and excludes app-local ICU facades. Windows 11 supplies the required
 system interface. This changes no machine-wide PATH or installed Windows DLL.
 
+The PyInstaller project documents how unrelated DLLs on PATH can produce this
+class of Qt import failure: https://github.com/pyinstaller/pyinstaller/issues/6297 .
+Our specific diagnosis comes from the local import/export tables and build TOC.
+
