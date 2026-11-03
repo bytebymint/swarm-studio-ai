@@ -2,3 +2,4 @@
 from pathlib import Path
 import os
 import sys
+root = Path(SPECPATH)
