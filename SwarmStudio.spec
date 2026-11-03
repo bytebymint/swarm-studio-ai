@@ -15,3 +15,6 @@ a = Analysis([str(root / 'main.py')], pathex=[str(root)],
              hiddenimports=['PySide6.QtWebEngineCore','PySide6.QtWebEngineWidgets','PySide6.QtWebChannel'],
              excludes=['pytest','tkinter','PySide6.QtPdf','PySide6.QtPdfWidgets'],
              noarchive=False)
+for destination, source, kind in a.binaries:
+    if 'OpenAI.Codex' in source:
+        raise RuntimeError('Build rejected unrelated host runtime DLL: ' + source)
