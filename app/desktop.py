@@ -413,3 +413,15 @@ class MainWindow(QMainWindow):
         else:
             self.crawling=False
             self.fail(message)
+
+    def set_busy(self,value):
+        self.busy=value
+        self.initialize.setEnabled(not value and self.browser.ready)
+        self.cancel_button.setEnabled(value or self.project is not None)
+        self.go.setEnabled(not value)
+        self.back.setEnabled(not value)
+        self.forward.setEnabled(not value)
+        self.reload.setEnabled(not value)
+        self.viewport.setEnabled(not value)
+        self.export_button.setEnabled(not value and self.project is not None)
+        self.record_button.setEnabled(not value and self.project is not None)
