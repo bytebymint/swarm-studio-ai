@@ -549,3 +549,6 @@ class MainWindow(QMainWindow):
         code='window.Studio.load('+json.dumps(url)+','+json.dumps(options)+').catch(error=>window.Studio.emit("error",{message:error.message}));'
         self.player.page().runJavaScript(code)
         for control in [self.play_button,self.replay_button,self.step_back,self.step_forward]:control.setEnabled(True)
+
+    def js(self,call):
+        if self.player_ready:self.player.page().runJavaScript('window.Studio?.'+call+';')
