@@ -506,3 +506,16 @@ class MainWindow(QMainWindow):
         self.worker.error.connect(self.fail)
         self.worker.ready.connect(self.built)
         self.worker.start()
+
+    def built(self,metadata,blueprint):
+        self.project=self.pending_path;self.metadata=metadata;self.blueprint=blueprint
+        self.store.register(self.project_id,metadata)
+        self.load_recent()
+        self.update_stats()
+        self.set_busy(False)
+        self.initialize.setEnabled(self.browser.ready)
+        self.compare_button.setEnabled(True)
+        self.notice.setText(f"Local reconstruction saved. {len(metadata['warnings'])} capture warnings. Simulated agents follow {len(blueprint['tasks'])} discovered tasks.")
+        for warning in metadata['warnings']:self.log(warning,'#e9be83')
+        self.pending_load=True
+        self.load_player()
