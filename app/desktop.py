@@ -353,3 +353,13 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage('Ready. Open your website or try the offline demo.')
         self.runtime_label=QLabel('LOCAL ENGINE  ·  NO AI API');self.runtime_label.setObjectName('muted');self.statusBar().addPermanentWidget(self.runtime_label)
         QTimer.singleShot(0,self.resize_canvases)
+
+    def make_welcome(self):
+        widget=QWidget();layout=QVBoxLayout(widget);layout.setContentsMargins(60,50,60,50);layout.addStretch()
+        eyebrow=QLabel('THE RECONSTRUCTION DESK');eyebrow.setObjectName('section');layout.addWidget(eyebrow)
+        title=QLabel('One website.\nA whole swarm.');title.setObjectName('hero');layout.addWidget(title)
+        description=QLabel('Open a page you have permission to reproduce.\nWatch named cursors build a real local copy from its rendered DOM.');description.setObjectName('muted');description.setWordWrap(True);layout.addWidget(description)
+        row=QHBoxLayout();row.addWidget(button('Try offline demo',self.open_demo,primary=True));row.addWidget(button('Focus website URL',lambda:self.url.setFocus()));row.addStretch();layout.addLayout(row)
+        layout.addSpacing(20)
+        note=QLabel('Captured HTML + CSS + assets\nTask-driven motion · Replayable projects · Visual comparison');note.setObjectName('muted');layout.addWidget(note);layout.addStretch()
+        return widget
