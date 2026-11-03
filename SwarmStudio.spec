@@ -18,3 +18,6 @@ a = Analysis([str(root / 'main.py')], pathex=[str(root)],
 for destination, source, kind in a.binaries:
     if 'OpenAI.Codex' in source:
         raise RuntimeError('Build rejected unrelated host runtime DLL: ' + source)
+# Windows 11 supplies the unversioned ICU facade required by QtCore. It must
+# resolve from System32, never a renamed third-party ICU build on PATH.
+a.binaries = [entry for entry in a.binaries if Path(entry[0]).name.lower() not in {'icuuc.dll','icuin.dll','icu.dll'} and not Path(entry[0]).name.lower().startswith('icudt')]
