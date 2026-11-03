@@ -60,3 +60,6 @@ class RecordingDialog(QDialog):
         for control in [self.record,self.open,self.resolution,self.fps,self.zoom,self.speed,self.sound]:control.setEnabled(False)
         self.progress.setValue(0);self.message.setText('Opening the local movie renderer…');self.cancel.setText('Cancel render')
         self.worker.start()
+
+    def update_progress(self,value,message):
+        self.progress.setValue(value);self.message.setText(message)
