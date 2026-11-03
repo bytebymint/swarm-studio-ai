@@ -77,3 +77,5 @@ class RecordingDialog(QDialog):
         if self.worker and self.worker.isRunning():
             self.worker.cancel_event.set();self.message.setText('Cancelling and cleaning up the partial movie…');self.cancel.setEnabled(False)
         else:self.close()
+
+    def reject(self):self.close()
