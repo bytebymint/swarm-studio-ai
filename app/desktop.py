@@ -395,3 +395,12 @@ class MainWindow(QMainWindow):
         self.feed.addItem(item)
         while self.feed.count()>150:self.feed.takeItem(0)
         self.feed.scrollToBottom()
+
+    def fail(self,message):
+        logging.error(message)
+        self.notice.setText(message)
+        self.status(message)
+        self.log(message,'#f3aa9d')
+        self.set_busy(False)
+        if self.compare_busy:
+            self.compare_busy=False
