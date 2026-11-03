@@ -587,3 +587,20 @@ class MainWindow(QMainWindow):
         elif kind=='compare':self.run_comparison()
         elif kind=='explore':self.tabs.setCurrentIndex(2)
         elif kind=='replayed':self.timeline.reset()
+
+    def switch_tab(self,index):
+        if index==0:
+            self.stack.setCurrentWidget(self.source_area if self.browser.ready or not self.source.url().isEmpty() else self.welcome)
+            if self.project:self.js('pause(true)')
+        elif index==1:
+            if self.project:
+                self.stack.setCurrentWidget(self.player_area)
+                self.js('pause(false)')
+                if not self.loading_player:self.player.page().runJavaScript('if(window.Studio?.model&&!window.Studio.running)window.Studio.replay();')
+            else:self.stack.setCurrentWidget(self.welcome)
+        elif index==2:
+            if self.project:self.stack.setCurrentWidget(self.player_area);self.js('showClone()')
+            else:self.stack.setCurrentWidget(self.welcome)
+        else:
+            self.stack.setCurrentWidget(self.comparison)
+            self.js('pause(true)')
