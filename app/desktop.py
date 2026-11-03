@@ -206,3 +206,7 @@ class MainWindow(QMainWindow):
         self.notice.hide()
         self.statusBar().hide()
         QTimer.singleShot(0, self.resize_canvases)
+
+    def toggle_timeline(self, visible):
+        self.timeline.setVisible(visible)
+        QTimer.singleShot(0, self.resize_canvases)
