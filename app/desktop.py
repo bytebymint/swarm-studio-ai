@@ -493,3 +493,16 @@ class MainWindow(QMainWindow):
             return
         self.crawling=False
         self.finish_captures()
+
+    def finish_captures(self):
+        capture=self.captures[0]
+        self.project_id,self.pending_path=self.store.allocate()
+        (self.pending_path/'screenshots').mkdir()
+        self.root_shot.save(str(self.pending_path/'screenshots/original.png'))
+        self.log(f"Captured {len(capture['elements'])} elements at {capture['viewport']['width']} × {capture['viewport']['height']}.")
+        self.notice.setText('Saving semantic HTML, styles and local assets…')
+        self.worker=BuildWorker(self.captures,self.pending_path,self.settings.values.copy())
+        self.worker.progress.connect(lambda kind,path:self.log(f'Saved {path}'))
+        self.worker.error.connect(self.fail)
+        self.worker.ready.connect(self.built)
+        self.worker.start()
