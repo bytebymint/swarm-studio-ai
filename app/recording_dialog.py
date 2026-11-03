@@ -63,3 +63,7 @@ class RecordingDialog(QDialog):
 
     def update_progress(self,value,message):
         self.progress.setValue(value);self.message.setText(message)
+
+    def complete(self,path,result):
+        self.saved=Path(path);self.message.setText(f'Saved {result["duration"]:.1f}s · {result["fps"]} fps · {result["width"]} × {result["height"]}\n{path}')
+        self.studio.status('Cinematic recording saved: '+path)
