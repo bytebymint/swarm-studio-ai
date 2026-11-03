@@ -29,3 +29,8 @@ range rectangles. Temporary masks and highlight registries are removed on stop,
 completion and replay. Simulation time drives tasks, cursor paths, effects and
 camera together, so pause, speed and stepping remain coherent.
 
+Validation compares source and reconstructed widget screenshots at the same
+viewport and zoom, normalizes device pixel dimensions, reports mean absolute
+RGB difference and writes a heatmap. A separate DOM check measures bounding boxes,
+missing images and text presence. Pixel metrics do not prove backend fidelity.
+
