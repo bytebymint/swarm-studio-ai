@@ -615,3 +615,13 @@ class MainWindow(QMainWindow):
 
     def speed_changed(self,text):
         self.js('setSpeed('+text.replace('×','')+')')
+
+    def cancel(self):
+        self.crawling=False
+        self.browser.cancel()
+        if self.worker and self.worker.isRunning():
+            self.worker.cancel_event.set()
+            self.notice.setText('Cancelling asset work. Waiting for active bounded requests to stop…')
+        else:self.set_busy(False)
+        self.js('stop()')
+        self.status('Stopped. Replay a saved capture or initialize again.')
