@@ -48,3 +48,26 @@ class ComparisonCanvas(QWidget):
             painter.restore()
             painter.setPen(QPen(QColor('#60acff'), 2))
             painter.drawLine(int(self.width()*self.split),0,int(self.width()*self.split),self.height())
+
+
+class ComparisonPanel(QWidget):
+    def __init__(self):
+        super().__init__()
+        layout = QVBoxLayout(self)
+        top = QHBoxLayout()
+        self.mode = QComboBox()
+        self.mode.addItems(['Before / after slider', 'Side by side', 'Original', 'Reconstruction', 'Difference heatmap'])
+        self.mode.setAccessibleName('Comparison mode')
+        self.label = QLabel('Same-viewport screenshot comparison')
+        top.addWidget(self.mode)
+        top.addWidget(self.label, 1)
+        layout.addLayout(top)
+        self.canvas = ComparisonCanvas()
+        layout.addWidget(self.canvas, 1)
+        self.slider = QSlider(Qt.Orientation.Horizontal)
+        self.slider.setRange(0,100)
+        self.slider.setValue(50)
+        self.slider.setAccessibleName('Before and after split position')
+        layout.addWidget(self.slider)
+        self.mode.currentTextChanged.connect(self.change_mode)
+        self.slider.valueChanged.connect(self.change_split)
