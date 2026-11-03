@@ -779,3 +779,9 @@ class MainWindow(QMainWindow):
         self.export_worker.ready.connect(done)
         self.export_worker.error.connect(lambda message:(self.export_button.setEnabled(True),self.fail(message)))
         self.export_worker.start()
+
+    def toggle_presentation(self):
+        present=not self.isFullScreen()
+        if present:self.showFullScreen();self.presentation.setText('Exit presentation')
+        else:self.showMaximized();self.presentation.setText('Present')
+        QTimer.singleShot(0,self.resize_canvases)
