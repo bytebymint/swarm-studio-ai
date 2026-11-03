@@ -652,3 +652,7 @@ class MainWindow(QMainWindow):
         if watched is getattr(self, 'stack', None) and event.type()==QEvent.Type.Resize:
             QTimer.singleShot(0,self.resize_canvases)
         return super().eventFilter(watched,event)
+
+    def resizeEvent(self,event):
+        super().resizeEvent(event)
+        if hasattr(self,'zoom'):QTimer.singleShot(0,self.resize_canvases)
