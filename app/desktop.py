@@ -769,3 +769,13 @@ class MainWindow(QMainWindow):
         from app.recording_dialog import RecordingDialog
         self.recording_dialog=RecordingDialog(self)
         self.recording_dialog.show()
+
+    def export_to(self,destination):
+        self.export_button.setEnabled(False)
+        self.export_worker=ExportWorker(self.project,destination,self.settings.values.copy())
+        def done(path):
+            self.export_button.setEnabled(True);self.notice.setText('Export saved: '+path);self.log('Export saved: '+path)
+            if self.settings.values['open_export']:QDesktopServices.openUrl(QUrl.fromLocalFile(str(Path(path).parent)))
+        self.export_worker.ready.connect(done)
+        self.export_worker.error.connect(lambda message:(self.export_button.setEnabled(True),self.fail(message)))
+        self.export_worker.start()
