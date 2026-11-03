@@ -72,3 +72,8 @@ class RecordingDialog(QDialog):
         for control in [self.record,self.resolution,self.fps,self.zoom,self.speed,self.sound]:control.setEnabled(True)
         self.open.setEnabled(self.saved is not None);self.cancel.setEnabled(True);self.cancel.setText('Close')
         if self.pending_close:self.close()
+
+    def cancel_or_close(self):
+        if self.worker and self.worker.isRunning():
+            self.worker.cancel_event.set();self.message.setText('Cancelling and cleaning up the partial movie…');self.cancel.setEnabled(False)
+        else:self.close()
