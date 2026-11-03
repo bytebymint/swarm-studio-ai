@@ -432,3 +432,15 @@ class MainWindow(QMainWindow):
         except ValueError as exc:self.fail(str(exc));return
         self.tabs.setCurrentIndex(0);self.stack.setCurrentWidget(self.source_area)
         self.browser.navigate(url)
+
+    def navigation_finished(self,ok):
+        if ok and self.crawling and self.crawl_target:
+            redirected=urlsplit(self.source.url().toString())
+            if (redirected.scheme,redirected.netloc) != self.crawl_origin:
+                self.browser_error('Linked page redirected outside the capture origin.')
+                return
+            self.crawl_target=None
+            QTimer.singleShot(180,lambda:self.browser.capture(self.settings.values) if self.crawling else None)
+            return
+        self.initialize.setEnabled(ok and not self.busy)
+        if ok:self.notice.setText('Website loaded. Initialize Swarm captures this page without copying scripts or form values.')
