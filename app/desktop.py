@@ -363,3 +363,7 @@ class MainWindow(QMainWindow):
         layout.addSpacing(20)
         note=QLabel('Captured HTML + CSS + assets\nTask-driven motion · Replayable projects · Visual comparison');note.setObjectName('muted');layout.addWidget(note);layout.addStretch()
         return widget
+
+    def wrap_view(self,view):
+        area=QScrollArea();area.setWidgetResizable(False);area.setAlignment(Qt.AlignmentFlag.AlignCenter);area.setWidget(view)
+        return area
