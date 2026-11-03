@@ -19,3 +19,9 @@ The final executable must pass `--smoke-report PATH` after each build, and a cle
 second-machine Windows 11 check remains a release step. Never mark a successful
 PyInstaller command alone as a verified desktop distribution.
 
+Cinematic recording bundles Playwright's driver, PyAV/FFmpeg and NumPy through
+their PyInstaller hooks. Browser binaries are not bundled: an installed Edge or
+Chrome is used with a fresh context. Package notices include these dependencies.
+Use `--smoke-report PATH --smoke-recording` to run the native capture/comparison/
+ZIP workflow and encode an actual MP4 from the frozen executable. The report
+includes movie dimensions, frame count, camera shots and audio events.
