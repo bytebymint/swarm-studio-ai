@@ -656,3 +656,19 @@ class MainWindow(QMainWindow):
     def resizeEvent(self,event):
         super().resizeEvent(event)
         if hasattr(self,'zoom'):QTimer.singleShot(0,self.resize_canvases)
+
+    def change_viewport(self,index):
+        presets=[(1280,800),(1440,900),(768,1024),(390,844)]
+        if index==4:self.show_settings();return
+        if self.project:
+            self.notice.setText('Viewport changed for the next capture. Current project playback keeps its captured viewport.')
+            self.project=None;self.blueprint=None;self.metadata=None;self.export_button.setEnabled(False)
+            self.js('stop()');self.tabs.setCurrentIndex(0)
+        if index==5:
+            self.settings.save({'viewport_mode':'window'})
+            self.zoom.setCurrentText('Fit')
+        else:
+            width,height=presets[index]
+            self.settings.save({'width':width,'height':height,'viewport_mode':'fixed'})
+        self.viewport.setCurrentIndex(index)
+        self.resize_canvases()
