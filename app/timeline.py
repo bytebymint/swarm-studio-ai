@@ -36,3 +36,27 @@ class Timeline(QWidget):
                 self.active.clear()
             self.time = data['time']
         self.update()
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.fillRect(self.rect(), QColor('#191c22'))
+        width = self.width() - 95
+        extent = max(30, self.time + 10)
+        scale = width / extent
+        painter.setPen(QColor('#a6afbd'))
+        tracks = sorted(self.agents)
+        row_by_agent = {agent: row for row, agent in enumerate(tracks)}
+        for i, agent in enumerate(tracks):
+            name = self.agents[agent]
+            painter.drawText(10, 35 + i * 15, name)
+            painter.setPen(QColor('#2b313a'))
+            painter.drawLine(85, 30 + i * 15, self.width() - 5, 30 + i * 15)
+            painter.setPen(QColor('#a6afbd'))
+        for sec in range(0, int(extent), 5):
+            x = int(85 + sec * scale)
+            painter.drawText(x, 14, f'{sec}s')
+        for agent, start, end in self.events + [(a, s, self.time) for a, s in self.active.values()]:
+            painter.fillRect(QRectF(85 + start * scale, 24 + row_by_agent.get(agent, 0) * 15, max(3, (end-start)*scale), 10), QColor(COLORS[agent % len(COLORS)]))
+        painter.setPen(QPen(QColor('#d9e4f5'), 1))
+        x = int(85 + self.time * scale)
+        painter.drawLine(x, 19, x, self.height())
