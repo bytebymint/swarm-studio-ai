@@ -39,3 +39,7 @@ def button(text, callback, tooltip=None, primary=False):
 
 class NoticeLabel(QLabel):
     message = Signal(str)
+
+    def setText(self, text):
+        super().setText(text)
+        self.message.emit(text)
