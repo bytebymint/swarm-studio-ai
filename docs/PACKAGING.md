@@ -15,3 +15,7 @@ The PyInstaller project documents how unrelated DLLs on PATH can produce this
 class of Qt import failure: https://github.com/pyinstaller/pyinstaller/issues/6297 .
 Our specific diagnosis comes from the local import/export tables and build TOC.
 
+The final executable must pass `--smoke-report PATH` after each build, and a clean
+second-machine Windows 11 check remains a release step. Never mark a successful
+PyInstaller command alone as a verified desktop distribution.
+
