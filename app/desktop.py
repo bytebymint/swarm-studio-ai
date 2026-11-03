@@ -449,3 +449,20 @@ class MainWindow(QMainWindow):
         if self.busy:return
         self.url.setText(self.server.url('ui/demo/index.html'))
         self.navigate()
+
+    def start_capture(self):
+        if self.busy:return
+        self.project=None;self.metadata=None;self.blueprint=None
+        self.engine_ready=False;self.pending_comparison=False
+        self.resize_canvases()
+        self.js('stop()')
+        self.feed.clear();self.timeline.reset();self.progress.setValue(0)
+        self.populate_agents()
+        self.tabs.setCurrentIndex(0);self.stack.setCurrentWidget(self.source_area)
+        self.set_busy(True)
+        self.crawling=True;self.captures=[];self.crawl_queue=[];self.crawl_depth=0;self.crawl_target=None
+        original=urlsplit(self.source.url().toString())
+        self.crawl_origin=(original.scheme,original.netloc)
+        self.crawl_seen={urldefrag(self.source.url().toString())[0]}
+        self.notice.setText('Capturing rendered DOM and discovering lazy content. Cancel stops the current operation.')
+        self.browser.capture(self.settings.values)
