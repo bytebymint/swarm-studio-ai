@@ -141,3 +141,8 @@ class RecordingWorker(QThread):
     progress=Signal(int,str)
     ready=Signal(str,dict)
     error=Signal(str)
+
+    def __init__(self, player_url, project_url, destination, settings, options, parent=None):
+        super().__init__(parent)
+        self.args=(player_url,project_url,destination,settings,options)
+        self.cancel_event=threading.Event()
