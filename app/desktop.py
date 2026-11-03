@@ -690,3 +690,16 @@ class MainWindow(QMainWindow):
     def recent_selected(self,index):
         project_id=self.recents.itemData(index)
         if project_id and not self.busy:self.load_project(project_id)
+
+    def open_project(self):
+        if self.busy:return
+        dialog=QDialog(self);dialog.setWindowTitle('Open a saved reconstruction');dialog.resize(650,420)
+        layout=QVBoxLayout(dialog);listing=QListWidget();layout.addWidget(listing)
+        for project_id,name,url in self.store.recent():
+            item=QListWidgetItem(name+'\n'+url);item.setData(Qt.ItemDataRole.UserRole,project_id);listing.addItem(item)
+        if not listing.count():layout.addWidget(QLabel('No saved projects yet. Capture a page or try the offline demo.'))
+        def choose():
+            if listing.currentItem():self.load_project(listing.currentItem().data(Qt.ItemDataRole.UserRole));dialog.accept()
+        listing.itemDoubleClicked.connect(choose)
+        layout.addWidget(button('Open selected project',choose,primary=True));layout.addWidget(button('Close',dialog.reject))
+        dialog.exec()
