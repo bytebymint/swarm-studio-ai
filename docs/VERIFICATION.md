@@ -24,3 +24,10 @@ These are fixture measurements, not a general frame-rate or quality guarantee.
 Evidence and screenshots are in `test-results/crew/`.
 The same test also replayed an older blueprint without explicit frame milestones.
 
+The native Qt test also confirmed Custom Highlight support, the smaller crew,
+the 90% canvas, tour, replay controls and zero demo screenshot difference.
+Core tests now include crew-settings migration and parent-frame handoff ordering.
+The rebuilt Windows executable passed capture, all 66 demo tasks, comparison and
+ZIP export with exit code 0; the demo difference remained 0 / 255. Evidence is
+in `test-results/crew-package.json` and its associated screenshot and ZIP.
+
