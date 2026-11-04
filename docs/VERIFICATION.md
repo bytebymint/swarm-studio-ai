@@ -129,3 +129,7 @@ The current-user installer is provided but has not been run against the user's
 Programs/Start menu folders. The executable is unsigned. Code signing, installer
 deployment and validation on a clean second Windows machine remain release steps.
 
+Raw evidence is in `test-results/desktop-results.json`,
+`test-results/browser/results.json`, `test-results/public/result.json`,
+`test-results/packaged-final.json` and their associated screenshots/exports.
+
