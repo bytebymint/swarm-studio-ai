@@ -78,3 +78,12 @@ known pixel differences, asset/CSS/font rewriting, input redaction, source-scrip
 removal, loopback serving and reconstruction cancellation.
 The final resource-path regression run (`unit-css-final`) also passed all five tests.
 
+## Native desktop integration
+
+`python scripts/test_desktop.py`: **15 workflow checks passed**. A real Qt window
+and Chromium views exercised demo navigation, DOM capture, local image saving,
+task metadata, pause, resume, forward/backward stepping, 5× completion, replay,
+independent clone DOM, comparison, export, SQLite reopening, settings persistence,
+the supplied reference demo, two-page bounded crawl, local link rewriting,
+settings dialog, mobile viewport, zoom, presentation and cancellation/errors.
+
