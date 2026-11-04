@@ -28,3 +28,4 @@ for name in names:
 python_license=Path(sys.base_prefix)/'LICENSE.txt'
 if python_license.exists():shutil.copyfile(python_license,destination/'Python-LICENSE.txt')
 (destination/'PACKAGES.txt').write_text('\n'.join(catalog),'utf-8')
+print('Dependency notices saved:',destination)
