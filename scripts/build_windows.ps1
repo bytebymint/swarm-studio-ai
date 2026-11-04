@@ -12,3 +12,4 @@ if (-not $SkipTests) {
     if ($LASTEXITCODE -ne 0) { throw 'Tests failed.' }
 }
 & $pythonPath scripts/make_icon.py
+if ($LASTEXITCODE -ne 0) { throw 'Icon generation failed.' }
