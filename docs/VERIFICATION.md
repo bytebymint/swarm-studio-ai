@@ -112,3 +112,7 @@ no missing captured elements, no broken images and selectable text. At the teste
 was approximately **0.003 / 255**. The bundled demo measured **0 / 255** on the
 same machine. These are narrow fixture measurements, not a universal fidelity claim.
 
+A comparison readiness bug was found by inspecting public-page results. Native
+comparison now waits for the local document to finish loading and preparing;
+the public test asserts text presence and low pixel difference, not just node IDs.
+
