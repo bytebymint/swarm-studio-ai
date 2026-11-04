@@ -72,3 +72,18 @@ def make_gif(source,destination,start=0,duration=10,fps=20,width=800,colors=128)
                 'fps':fps,'bytes':destination.stat().st_size}
     print(json.dumps(result,indent=2))
     return result
+
+
+if __name__=='__main__':
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--input',type=Path,required=True)
+    parser.add_argument('--output',type=Path,default=Path('docs/media/swarm-studio-demo.gif'))
+    parser.add_argument('--start',type=float,default=0)
+    parser.add_argument('--duration',type=float,default=10)
+    parser.add_argument('--fps',type=int,default=20)
+    parser.add_argument('--width',type=int,default=800)
+    parser.add_argument('--colors',type=int,default=128)
+    parser.add_argument('--contact-sheet',type=Path)
+    args=parser.parse_args()
+    if args.contact_sheet:contact_sheet(args.input,args.contact_sheet)
+    else:make_gif(args.input,args.output,args.start,args.duration,args.fps,args.width,args.colors)
