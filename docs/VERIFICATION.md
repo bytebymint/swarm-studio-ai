@@ -64,3 +64,7 @@ The rebuilt executable passed the complete capture / 66-task playback / comparis
 ZIP export smoke test and exited with code 0. Its report and screenshot are in
 `test-results/canvas-update-package.json` and `test-results/canvas-update-package.png`.
 
+Verified on this Windows 11 machine on 4 November 2026, with CPython 3.12.14,
+PySide6 6.12.0, Qt WebEngine 6.12.0.140 and PyInstaller 6.22.3.
+`requirements-lock.txt` records the complete tested environment.
+
