@@ -11,3 +11,4 @@ root=Path(__file__).resolve().parent.parent
 image=QImage(256,256,QImage.Format.Format_ARGB32)
 image.fill(Qt.GlobalColor.transparent)
 painter=QPainter(image)
+QSvgRenderer(str(root/'web/studio.svg')).render(painter)
