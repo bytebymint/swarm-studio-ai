@@ -9,3 +9,4 @@ from PIL import Image
 root=Path(__file__).resolve().parent.parent
 (root/'assets').mkdir(exist_ok=True)
 image=QImage(256,256,QImage.Format.Format_ARGB32)
+image.fill(Qt.GlobalColor.transparent)
