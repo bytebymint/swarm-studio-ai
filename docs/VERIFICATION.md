@@ -68,3 +68,13 @@ Verified on this Windows 11 machine on 4 November 2026, with CPython 3.12.14,
 PySide6 6.12.0, Qt WebEngine 6.12.0.140 and PyInstaller 6.22.3.
 `requirements-lock.txt` records the complete tested environment.
 
+## Core tests
+
+`python -m pytest -q --basetemp=test-results/unit-release`: **5 passed**.
+Tests cover URL normalization and secret/scheme rejection, dependency ordering,
+allocation, cycles, missing dependencies, failure propagation, cancellation,
+empty graphs, project save/reopen/corruption handling, settings persistence,
+known pixel differences, asset/CSS/font rewriting, input redaction, source-script
+removal, loopback serving and reconstruction cancellation.
+The final resource-path regression run (`unit-css-final`) also passed all five tests.
+
