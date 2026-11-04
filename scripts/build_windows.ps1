@@ -14,3 +14,4 @@ if (-not $SkipTests) {
 & $pythonPath scripts/make_icon.py
 if ($LASTEXITCODE -ne 0) { throw 'Icon generation failed.' }
 & $pythonPath -m PyInstaller --noconfirm SwarmStudio.spec
+if ($LASTEXITCODE -ne 0) { throw 'PyInstaller failed.' }
