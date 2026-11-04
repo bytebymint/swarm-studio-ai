@@ -13,3 +13,4 @@ $shell = New-Object -ComObject WScript.Shell
 $shortcut = $shell.CreateShortcut((Join-Path $shortcutRoot 'Swarm Studio.lnk'))
 $shortcut.TargetPath = Join-Path $destinationPath 'SwarmStudio.exe'
 $shortcut.WorkingDirectory = $destinationPath
+$shortcut.Description = 'Swarm Studio website reconstruction desk'
