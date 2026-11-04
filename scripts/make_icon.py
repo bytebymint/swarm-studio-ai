@@ -7,3 +7,4 @@ from PySide6.QtSvg import QSvgRenderer
 from PIL import Image
 
 root=Path(__file__).resolve().parent.parent
+(root/'assets').mkdir(exist_ok=True)
