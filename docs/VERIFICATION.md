@@ -133,3 +133,14 @@ Raw evidence is in `test-results/desktop-results.json`,
 `test-results/browser/results.json`, `test-results/public/result.json`,
 `test-results/packaged-final.json` and their associated screenshots/exports.
 
+## Cinematic recording
+
+`scripts/test_recording.py` captures the offline demo, exercises the director at
+60 fixed steps per second, repeats the plan deterministically, then encodes and
+decodes a real 720p/30 MP4 with stereo audio. All 66 tasks finish. The camera
+reaches 2.989× with a 3× cap, moves fewer than 5 logical pixels per 60 Hz step,
+returns below 1.02× at the end, and scroll travel starts below 1.04×. The movie
+contains 1,573 video frames (52.43 seconds) and 423 sound events. Audio/video
+duration differs by less than 80 ms. Cancellation preserves an existing output
+and leaves no partial movie. Representative decoded frames were visually checked.
+
