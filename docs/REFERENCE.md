@@ -24,3 +24,8 @@ QWebChannel, and widget screenshots for comparison. Remote documents never get
 the native bridge. The engine here was written separately; no extension adapter
 silently loads the reference engine.
 
+The reference demo stresses inner scrolling, floats, rich inline text, masks,
+repeated cards, native controls, a 2D canvas and an iframe. Tests exercise that
+page locally without copying it into the application. The supplied GIF and MP4
+files remain reference-only. Their visual language informs crosshair drags,
+measurement tags, selection boxes, text carets, duplication guides and flocking.
