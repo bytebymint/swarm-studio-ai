@@ -144,3 +144,8 @@ contains 1,573 video frames (52.43 seconds) and 423 sound events. Audio/video
 duration differs by less than 80 ms. Cancellation preserves an existing output
 and leaves no partial movie. Representative decoded frames were visually checked.
 
+`scripts/test_recording_hd.py` also encodes the full demo at 1920 × 1080 and 60 fps
+at 2× build speed: 1,619 frames / 26.98 seconds, all 66 tasks complete. Decoding
+verifies monotonic timestamps and the exact frame count. Evidence and both MP4s
+are in `test-results/recording/`.
+
