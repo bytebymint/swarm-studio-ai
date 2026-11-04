@@ -22,3 +22,4 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'LICENSE') -Destination $appFolde
 Copy-Item -LiteralPath (Join-Path $projectRoot 'THIRD_PARTY_NOTICES.md') -Destination $appFolder
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs') -Destination $appFolder -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'requirements-lock.txt') -Destination $appFolder
+& $pythonPath scripts/collect_licenses.py
