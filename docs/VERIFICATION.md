@@ -31,3 +31,14 @@ The rebuilt Windows executable passed capture, all 66 demo tasks, comparison and
 ZIP export with exit code 0; the demo difference remained 0 / 255. Evidence is
 in `test-results/crew-package.json` and its associated screenshot and ZIP.
 
+## Canvas-first layout and cinematic Auto Tour update
+
+`scripts/test_focus_layout.py` verified a maximized window with **90.14%** of its
+client height occupied by the website canvas and only a compact bottom dock.
+The actual browser viewport was 1280 × 585 CSS pixels, with no default zoom-down.
+Side panels, permanent top bars and timeline were absent from the main view.
+Diagnostics and timeline toggles, fullscreen return, playback and comparison were
+checked. The demo screenshot comparison remained 0 mean RGB difference.
+Window mode also fills the canvas when replaying an older capture with a different
+height; comparison temporarily restores the saved capture viewport for measurement.
+
