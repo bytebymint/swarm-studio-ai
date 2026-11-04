@@ -28,3 +28,4 @@ source_server=PreviewServer(source)
 output=root/'output';output.mkdir(exist_ok=True)
 shutil.copytree(WEB,output/'ui',dirs_exist_ok=True)
 output_server=PreviewServer(output)
+results=[]
