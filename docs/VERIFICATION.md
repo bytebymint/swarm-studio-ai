@@ -42,3 +42,8 @@ checked. The demo screenshot comparison remained 0 mean RGB difference.
 Window mode also fills the canvas when replaying an older capture with a different
 height; comparison temporarily restores the saved capture viewport for measurement.
 
+`scripts/test_camera.py` verified real animation-frame movement, pause and manual
+control on long-document and inner-scrolling fixtures. Both completed six smooth
+shots, reached their scrolling limits and assigned no offscreen construction.
+The largest per-simulation-frame movement was 10 pixels at 1× speed.
+
