@@ -15,3 +15,4 @@ $shortcut.TargetPath = Join-Path $destinationPath 'SwarmStudio.exe'
 $shortcut.WorkingDirectory = $destinationPath
 $shortcut.Description = 'Swarm Studio website reconstruction desk'
 $shortcut.Save()
+Write-Host "Installed Swarm Studio at $destinationPath"
