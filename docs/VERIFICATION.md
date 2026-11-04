@@ -47,3 +47,7 @@ control on long-document and inner-scrolling fixtures. Both completed six smooth
 shots, reached their scrolling limits and assigned no offscreen construction.
 The largest per-simulation-frame movement was 10 pixels at 1× speed.
 
+`scripts/test_site_tour.py` captured the public Huzera page used in the reported
+issue: **224 / 224 tasks**, **0 failures**, **12 camera shots**, ending at its
+5514-pixel scroll limit. Evidence is in `test-results/site-tour/results.json`.
+
