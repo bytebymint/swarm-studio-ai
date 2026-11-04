@@ -20,3 +20,4 @@ Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'install_windows.ps1') -Destinat
 Copy-Item -LiteralPath (Join-Path $projectRoot 'README.md') -Destination $appFolder
 Copy-Item -LiteralPath (Join-Path $projectRoot 'LICENSE') -Destination $appFolder
 Copy-Item -LiteralPath (Join-Path $projectRoot 'THIRD_PARTY_NOTICES.md') -Destination $appFolder
+Copy-Item -LiteralPath (Join-Path $projectRoot 'docs') -Destination $appFolder -Recurse -Force
