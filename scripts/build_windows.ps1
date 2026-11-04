@@ -25,3 +25,4 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'requirements-lock.txt') -Destina
 & $pythonPath scripts/collect_licenses.py
 if ($LASTEXITCODE -ne 0) { throw 'Could not collect dependency notices.' }
 Write-Host "Built $appFolder\SwarmStudio.exe"
+Write-Host 'Run install_windows.ps1 inside that folder to install for the current user.'
