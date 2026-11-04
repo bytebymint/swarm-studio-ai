@@ -16,3 +16,4 @@ if ($LASTEXITCODE -ne 0) { throw 'Icon generation failed.' }
 & $pythonPath -m PyInstaller --noconfirm SwarmStudio.spec
 if ($LASTEXITCODE -ne 0) { throw 'PyInstaller failed.' }
 $appFolder = Join-Path $projectRoot 'dist\SwarmStudio'
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'install_windows.ps1') -Destination $appFolder
