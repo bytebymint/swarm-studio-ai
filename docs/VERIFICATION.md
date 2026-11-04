@@ -91,3 +91,15 @@ The supplied reference demo was served from its original directory. It was not
 bundled into the new application. Its inner scroll container, floats, canvas image
 fallback, input redaction and iframe diagnostic passed capture and playback.
 
+## Independent browser verification
+
+`python scripts/test_browser.py`: **6 workflow checks passed** in installed Chrome.
+An inaccessible cross-origin stylesheet exercised computed fallback and local CSS
+recovery. Two pages were captured, then both original HTTP servers were stopped.
+The exported HTML still rendered its image, selectable text, native accordion and
+local navigation. Event assertions verified that every task dependency completed
+before child assignment. Replay, cleanup, zero tasks and failed-node diagnostics
+were checked. Both supplied MP4 recordings were inspected locally.
+Every generated stylesheet URL is resolved relative to that stylesheet's actual
+directory and checked for an existing local file, including imported CSS and fonts.
+
