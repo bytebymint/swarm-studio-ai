@@ -17,3 +17,4 @@ if ($LASTEXITCODE -ne 0) { throw 'Icon generation failed.' }
 if ($LASTEXITCODE -ne 0) { throw 'PyInstaller failed.' }
 $appFolder = Join-Path $projectRoot 'dist\SwarmStudio'
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'install_windows.ps1') -Destination $appFolder
+Copy-Item -LiteralPath (Join-Path $projectRoot 'README.md') -Destination $appFolder
