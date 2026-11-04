@@ -6,3 +6,4 @@ if (-not (Test-Path -LiteralPath (Join-Path $source 'SwarmStudio.exe'))) {
 }
 $destinationPath = [System.IO.Path]::GetFullPath($Destination)
 if ($destinationPath -eq $source) { throw 'Choose an install folder different from the distribution folder.' }
+New-Item -ItemType Directory -Path $destinationPath -Force | Out-Null
