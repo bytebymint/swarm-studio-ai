@@ -11,3 +11,4 @@ if (-not $SkipTests) {
     & $pythonPath -m pytest -q --basetemp $testTemp
     if ($LASTEXITCODE -ne 0) { throw 'Tests failed.' }
 }
+& $pythonPath scripts/make_icon.py
