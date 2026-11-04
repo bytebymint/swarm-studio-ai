@@ -10,3 +10,4 @@ New-Item -ItemType Directory -Path $destinationPath -Force | Out-Null
 Get-ChildItem -LiteralPath $source | Copy-Item -Destination $destinationPath -Recurse -Force
 $shortcutRoot = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs'
 $shell = New-Object -ComObject WScript.Shell
+$shortcut = $shell.CreateShortcut((Join-Path $shortcutRoot 'Swarm Studio.lnk'))
