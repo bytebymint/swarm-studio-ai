@@ -17,3 +17,10 @@ component duplication, pen strokes and verification on a captured page. It check
 - Real frame-readiness and completion events before dependent assignments.
 - Progressive gradient-text paint and removal of all temporary masks/highlights.
 
+The recorded fixture completed 67 tasks with no failures, published 23 frame
+milestones, and performed dozens of dependency-driven handoffs. The largest sampled
+cursor step at 1× was approximately 34.4 pixels per 1/60 simulation second.
+These are fixture measurements, not a general frame-rate or quality guarantee.
+Evidence and screenshots are in `test-results/crew/`.
+The same test also replayed an older blueprint without explicit frame milestones.
+
