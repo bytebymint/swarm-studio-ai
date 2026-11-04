@@ -149,3 +149,12 @@ at 2× build speed: 1,619 frames / 26.98 seconds, all 66 tasks complete. Decodin
 verifies monotonic timestamps and the exact frame count. Evidence and both MP4s
 are in `test-results/recording/`.
 
+The rebuilt executable passed `--smoke-report test-results/recording-package.json
+--smoke-recording`: native capture, animation, comparison, ZIP export and actual
+H.264/AAC encoding through bundled Playwright/PyAV. The packaged movie contains
+546 frames at 30 fps, 18.2 seconds, all 66 tasks and 175 sound events. No QtCore
+DLL failure or stderr output occurred. The native layout test verifies the new
+dialog defaults (1080p, 60 fps, 3× cap) and retains a 90.14% canvas height.
+Occluded QtWebEngine views on this host throttle RAF and can retain stale widget
+screenshots; native comparison RGB results vary under occlusion. The DOM geometry
+checks pass, and movie export uses a separate browser compositor and fixed clock.
