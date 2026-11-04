@@ -15,3 +15,4 @@ if (-not $SkipTests) {
 if ($LASTEXITCODE -ne 0) { throw 'Icon generation failed.' }
 & $pythonPath -m PyInstaller --noconfirm SwarmStudio.spec
 if ($LASTEXITCODE -ne 0) { throw 'PyInstaller failed.' }
+$appFolder = Join-Path $projectRoot 'dist\SwarmStudio'
