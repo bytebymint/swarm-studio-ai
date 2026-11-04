@@ -5,3 +5,4 @@ import sys
 from pathlib import Path
 
 root=Path(__file__).resolve().parent.parent
+destination=root/'dist/SwarmStudio/Notices'
