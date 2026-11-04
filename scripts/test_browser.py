@@ -16,3 +16,4 @@ from app.validation import compare_images
 
 root=Path('test-results/browser').resolve();root.mkdir(parents=True,exist_ok=True)
 source=root/'source';source.mkdir(exist_ok=True)
+asset=root/'remote-css';asset.mkdir(exist_ok=True)
