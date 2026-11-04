@@ -13,3 +13,5 @@ from app.config import WEB
 from app.reconstruction import reconstruct_collection
 from app.server import PreviewServer
 from app.validation import compare_images
+
+root=Path('test-results/browser').resolve();root.mkdir(parents=True,exist_ok=True)
