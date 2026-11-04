@@ -24,3 +24,4 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'docs') -Destination $appFolder -
 Copy-Item -LiteralPath (Join-Path $projectRoot 'requirements-lock.txt') -Destination $appFolder
 & $pythonPath scripts/collect_licenses.py
 if ($LASTEXITCODE -ne 0) { throw 'Could not collect dependency notices.' }
+Write-Host "Built $appFolder\SwarmStudio.exe"
