@@ -16,3 +16,11 @@ flocking. `Sound` synthesizes per-event clicks, keyboard noise, spatial notes an
 transition chords. `App` coordinates preparation, capture, playback and teardown.
 `window.__swarmRebuild` exposes start/stop/restart and debugging.
 
+`background.js` uses chrome.scripting to inject, chrome.tabs.captureVisibleTab for
+otherwise inaccessible media pixels, and chrome.runtime to restore hidden media.
+Those APIs cannot run in Qt. The new app uses QWebEnginePage.runJavaScript in
+ApplicationWorld for read-only inspection, a private local playback document with
+QWebChannel, and widget screenshots for comparison. Remote documents never get
+the native bridge. The engine here was written separately; no extension adapter
+silently loads the reference engine.
+
