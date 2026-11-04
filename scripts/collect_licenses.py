@@ -26,3 +26,4 @@ for name in names:
             target.parent.mkdir(parents=True,exist_ok=True)
             shutil.copyfile(source,target)
 python_license=Path(sys.base_prefix)/'LICENSE.txt'
+if python_license.exists():shutil.copyfile(python_license,destination/'Python-LICENSE.txt')
