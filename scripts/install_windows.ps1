@@ -16,3 +16,4 @@ $shortcut.WorkingDirectory = $destinationPath
 $shortcut.Description = 'Swarm Studio website reconstruction desk'
 $shortcut.Save()
 Write-Host "Installed Swarm Studio at $destinationPath"
+Write-Host 'Uninstall by deleting this application folder and the Swarm Studio Start menu shortcut. Captures remain in LocalAppData\SwarmStudio.'
