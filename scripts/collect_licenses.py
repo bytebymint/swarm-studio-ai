@@ -6,3 +6,4 @@ from pathlib import Path
 
 root=Path(__file__).resolve().parent.parent
 destination=root/'dist/SwarmStudio/Notices'
+destination.mkdir(parents=True,exist_ok=True)
