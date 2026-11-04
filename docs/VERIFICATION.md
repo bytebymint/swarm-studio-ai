@@ -116,3 +116,12 @@ A comparison readiness bug was found by inspecting public-page results. Native
 comparison now waits for the local document to finish loading and preparing;
 the public test asserts text presence and low pixel difference, not just node IDs.
 
+## Windows distribution
+
+The initial executable exposed a real DLL conflict, documented in PACKAGING.md.
+An unrelated Poppler ICU library was removed from the build search path. A
+packaged launch then passed native-window, demo, playback-resource and frozen
+runtime checks. The final release smoke report and screenshot are stored under
+`test-results/packaged-final.*`; the full smoke workflow captures, animates,
+compares and exports the bundled demo from the executable.
+
