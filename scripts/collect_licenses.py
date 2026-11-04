@@ -10,3 +10,4 @@ destination.mkdir(parents=True,exist_ok=True)
 names=['PySide6','PySide6_Essentials','PySide6_Addons','PySide6_WebEngine','shiboken6',
        'httpx','httpcore','anyio','h11','idna','certifi','beautifulsoup4','soupsieve',
        'lxml','Pillow','typing_extensions','pyinstaller','playwright','pyee','greenlet','av','numpy']
+catalog=[]
