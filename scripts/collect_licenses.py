@@ -27,3 +27,4 @@ for name in names:
             shutil.copyfile(source,target)
 python_license=Path(sys.base_prefix)/'LICENSE.txt'
 if python_license.exists():shutil.copyfile(python_license,destination/'Python-LICENSE.txt')
+(destination/'PACKAGES.txt').write_text('\n'.join(catalog),'utf-8')
