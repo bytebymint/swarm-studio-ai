@@ -103,3 +103,12 @@ were checked. Both supplied MP4 recordings were inspected locally.
 Every generated stylesheet URL is resolved relative to that stylesheet's actual
 directory and checked for an existing local file, including imported CSS and fonts.
 
+## Public URL
+
+`python scripts/test_public.py`: **passed** against https://example.com/ . The
+saved page contained actual source text, nine visual nodes plus final validation,
+no missing captured elements, no broken images and selectable text. At the tested
+1280 × 800 CSS viewport and fit screenshot scale, mean absolute RGB difference
+was approximately **0.003 / 255**. The bundled demo measured **0 / 255** on the
+same machine. These are narrow fixture measurements, not a universal fidelity claim.
+
