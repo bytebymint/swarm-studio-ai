@@ -51,3 +51,9 @@ The largest per-simulation-frame movement was 10 pixels at 1× speed.
 issue: **224 / 224 tasks**, **0 failures**, **12 camera shots**, ending at its
 5514-pixel scroll limit. Evidence is in `test-results/site-tour/results.json`.
 
+The old algorithm allowed offscreen assignment and counted the always-visible
+final body-validation task as pending visible work. As a result, all work could
+finish without the camera moving. Visible-only assignment and a separate camera
+controller now sequence eased shots through unfinished sections, including nested
+scroll panes, and finish the tour before final validation.
+
