@@ -87,3 +87,7 @@ independent clone DOM, comparison, export, SQLite reopening, settings persistenc
 the supplied reference demo, two-page bounded crawl, local link rewriting,
 settings dialog, mobile viewport, zoom, presentation and cancellation/errors.
 
+The supplied reference demo was served from its original directory. It was not
+bundled into the new application. Its inner scroll container, floats, canvas image
+fallback, input redaction and iframe diagnostic passed capture and playback.
+
