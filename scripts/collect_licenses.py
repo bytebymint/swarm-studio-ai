@@ -11,3 +11,17 @@ names=['PySide6','PySide6_Essentials','PySide6_Addons','PySide6_WebEngine','shib
        'httpx','httpcore','anyio','h11','idna','certifi','beautifulsoup4','soupsieve',
        'lxml','Pillow','typing_extensions','pyinstaller','playwright','pyee','greenlet','av','numpy']
 catalog=[]
+for name in names:
+    dist=importlib.metadata.distribution(name)
+    license_name=dist.metadata.get('License-Expression') or dist.metadata.get('License') or 'See bundled package notices'
+    catalog.append(f'{dist.metadata["Name"]} {dist.version}\n{license_name}\n')
+    for file in dist.files or []:
+        parts=list(file.parts)
+        filename=file.name.lower()
+        if not ('licenses' in parts or filename.startswith(('license','copying','notice'))):continue
+        if any(part=='..' for part in parts):continue
+        source=Path(dist.locate_file(file))
+        if source.is_file():
+            target=destination/name/Path(*parts)
+            target.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copyfile(source,target)
