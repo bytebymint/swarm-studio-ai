@@ -57,3 +57,10 @@ finish without the camera moving. Visible-only assignment and a separate camera
 controller now sequence eased shots through unfinished sections, including nested
 scroll panes, and finish the tour before final validation.
 
+Native layout screenshots and results are in `test-results/focus-layout/`, and
+camera traces are in `test-results/camera/results.json`. Unattended native playback
+tests disable Chromium's occluded-window throttling for their test process.
+The rebuilt executable passed the complete capture / 66-task playback / comparison /
+ZIP export smoke test and exited with code 0. Its report and screenshot are in
+`test-results/canvas-update-package.json` and `test-results/canvas-update-package.png`.
+
