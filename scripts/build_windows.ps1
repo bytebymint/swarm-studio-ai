@@ -4,3 +4,10 @@ $projectRoot = Split-Path -Parent $PSScriptRoot
 Set-Location -LiteralPath $projectRoot
 $pythonPath = Join-Path $projectRoot '.venv\Scripts\python.exe'
 if (-not (Test-Path -LiteralPath $pythonPath)) { throw 'Install requirements into .venv first.' }
+if (-not $SkipTests) {
+    $testRoot = Join-Path $projectRoot 'test-results'
+    New-Item -ItemType Directory -Path $testRoot -Force | Out-Null
+    $testTemp = Join-Path $testRoot ('build-unit-' + [guid]::NewGuid().ToString('N'))
+    & $pythonPath -m pytest -q --basetemp $testTemp
+    if ($LASTEXITCODE -ne 0) { throw 'Tests failed.' }
+}
