@@ -4,3 +4,4 @@ $source = [System.IO.Path]::GetFullPath($PSScriptRoot)
 if (-not (Test-Path -LiteralPath (Join-Path $source 'SwarmStudio.exe'))) {
     throw 'Run this installer from the built SwarmStudio distribution folder.'
 }
+$destinationPath = [System.IO.Path]::GetFullPath($Destination)
