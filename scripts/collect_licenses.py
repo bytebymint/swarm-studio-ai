@@ -25,3 +25,4 @@ for name in names:
             target=destination/name/Path(*parts)
             target.parent.mkdir(parents=True,exist_ok=True)
             shutil.copyfile(source,target)
+python_license=Path(sys.base_prefix)/'LICENSE.txt'
