@@ -21,3 +21,4 @@ asset=root/'remote-css';asset.mkdir(exist_ok=True)
 with (asset/'site.css').open('a') as css:
   css.write('main{background-image:url(image.svg);background-size:40px 40px;background-repeat:no-repeat;background-position:right top}')
 shutil.copyfile(WEB/'demo/field.svg',asset/'image.svg')
+assets_server=PreviewServer(asset)
