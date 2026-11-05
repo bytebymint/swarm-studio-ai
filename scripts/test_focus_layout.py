@@ -12,3 +12,10 @@ app=QApplication([])
 from app.desktop import MainWindow
 root=Path('test-results/focus-layout').resolve();root.mkdir(parents=True,exist_ok=True)
 window=MainWindow(root/'data');window.showMaximized()
+def wait(predicate,timeout=60):
+    end=time.monotonic()+timeout
+    while time.monotonic()<end:
+        app.processEvents()
+        if predicate():return
+        time.sleep(.02)
+    raise AssertionError(window.notice.text())
