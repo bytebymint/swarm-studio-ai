@@ -333,3 +333,19 @@ cookies, browser storage and source scripts are not exported. Website loading
 still makes ordinary network requests, and asset downloads occur locally within
 configured budgets. See [the architecture document](docs/ARCHITECTURE.md).
 
+### Repository layout
+
+```text
+app/                    Native UI, capture orchestration, reconstruction and storage
+web/                    Capture, player, crew, choreography, cameras and offline demo
+assets/                 Original application icons
+scripts/                Build, launch, diagnostics, media and integration checks
+tests/                  Core automated tests
+docs/                   Architecture, provenance, packaging and verification
+docs/media/             The README's ten-second cinematic demonstration
+main.py                 Desktop entry point
+SwarmStudio.spec        Windows packaging specification
+LICENSE                 Personal noncommercial use terms
+THIRD_PARTY_NOTICES.md   Dependency and third-party content boundaries
+```
+
