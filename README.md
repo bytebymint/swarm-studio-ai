@@ -220,3 +220,25 @@ assets and metadata. Exporting does not restore a site's server, proprietary
 scripts, protected content or missing resources. Export warnings identify capture
 and asset limits. Rights in the website remain with their owners.
 
+### Record an automatically edited cinematic video
+
+1. Open a saved project or initialize a new swarm.
+2. Click **Record** in the bottom dock or **Studio → Cinematic recording**.
+3. Choose **1080p · 1920 × 1080** and **60 fps** for the default high-quality
+   output; 720p and 30 fps are also available.
+4. Select a camera cap of **3×**, **2×** or **Wide view**. Choose build speed and
+   whether to include agent sounds.
+5. Click **Save MP4…** and choose the destination.
+6. Wait for the background render to finish, then click **Play video**.
+
+The director chooses active edits, eases into close-ups, briefly gives the
+selected work time to read, pulls back before section travel and finishes wide.
+The saved MP4 contains the canvas, with optional synchronized synthesized audio.
+It does not record the app toolbar, desktop, microphone or unrelated windows.
+
+This is a deterministic movie render rather than a real-time desktop recorder:
+every output frame is rendered individually. A busy desktop therefore does not
+drop movie frames, although rendering can take longer than playback. The camera
+editing is automatic; there is no manual video editor or timeline of editable
+camera cuts in this release. Movies are bounded to ten minutes.
+
