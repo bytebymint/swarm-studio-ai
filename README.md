@@ -2,11 +2,13 @@
 
 <img src="web/studio.svg" alt="SWARM STUDIO" width="72" />
 
-# SWARM STUDIO
+# SWARM STUDIO AI
 
-### Analyze a website. Unleash a local swarm. Watch the rebuild.
+### One website. A whole swarm.
 
-**A cinematic website reconstruction studio by Byte by Mint.**
+**Analyze. Rebuild. Export. Turn the process into cinema.**
+
+*A local website reconstruction studio by Byte by Mint.*
 
 [How it works](#how-it-works) · [Install](#installation) · [Use](#your-first-reconstruction) · [Architecture](#architecture) · [License](#license-and-permissions)
 
@@ -112,13 +114,24 @@ files, follow Option B. There is no public binary download implied by this guide
 
 ### Option B — run from source with Python
 
-1. Obtain an authorized copy of the source and extract it.
-2. Open **PowerShell** in the extracted project folder.
+1. Clone the repository, or use **Code → Download ZIP** on
+   [GitHub](https://github.com/bytebymint/swarm-studio-ai) and extract it:
+
+   ```powershell
+   git clone https://github.com/bytebymint/swarm-studio-ai.git
+   Set-Location swarm-studio-ai
+   ```
+
+2. Open **PowerShell** in the project folder. Review the
+   [personal noncommercial license](LICENSE) before using the software.
 3. Confirm that Python 3.12+ is installed:
 
    ```powershell
    py -3.12 --version
    ```
+
+   These commands target the verified Python 3.12 environment. If you use a newer
+   supported Python version, replace the `-3.12` selector with that version.
 
 4. Create an isolated environment:
 

@@ -12,6 +12,12 @@ those times. Commit descriptions identify the source changes represented by
 each revision; verification results describe checks run against the completed
 project. No earlier Git history was available to preserve or rewrite.
 
-The repository is local. No remote was configured and no commits were pushed
-as part of this work. The repository-local author identity is Byte by Mint
+At the end of the initial reconstruction, the repository was local: no remote
+had been configured and no commits had been pushed. The initial 631 commits
+are preserved. Subsequent publication preparation uses ordinary current commit
+dates rather than assigning additional historical dates.
+
+The owner subsequently requested public GitHub publication as
+[Swarm Studio AI](https://github.com/bytebymint/swarm-studio-ai). The
+repository-local author identity remains Byte by Mint
 <info@bytebymint.space>.
