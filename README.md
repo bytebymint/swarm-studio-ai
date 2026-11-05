@@ -174,3 +174,29 @@ demo and third-party notices. Keep that entire folder together. The executable
 is unsigned; see [packaging notes](docs/PACKAGING.md) for the verified environment
 and the Qt DLL isolation fix.
 
+## Your first reconstruction
+
+1. **Open a website.** Paste an `https://` URL, `http://localhost:PORT` or
+   `http://127.0.0.1:PORT` address into the bottom dock, then click **Open**.
+   Alternatively, choose **Studio → Try offline demo**.
+2. **Prepare the page.** Wait for the layout and images to load. Choose the
+   desired viewport under **Studio → Canvas options** before capturing.
+3. **Initialize the swarm.** Click **Initialize Swarm**. The app analyzes the
+   rendered page, saves its local reconstruction and builds the task graph.
+4. **Watch the crew work.** In **Swarm** mode, agents draw, type, place and
+   duplicate the captured elements. Keep **Tour** enabled to follow unfinished
+   sections automatically.
+5. **Adjust playback.** Use **Pause**, **Replay** and the speed selector. Enable
+   **Sound** for synthesized agent sounds. The Studio menu provides stepping,
+   diagnostics and the optional activity timeline.
+6. **Explore the result.** Select **Reconstruction** to use the saved local DOM.
+   Native accordions, CSS hover effects, anchors and other preserved browser
+   behavior can work; source application scripts and backend services do not.
+7. **Compare if needed.** Choose **Studio → Playback → Run comparison** to write
+   screenshots, a difference heatmap and DOM checks.
+8. **Export or record.** Use **Export** for a portable website ZIP or **Record**
+   for an automatically directed movie.
+
+Only capture content you own, have permission to reproduce, or otherwise have a
+lawful basis to use. Avoid private accounts, personal information and secrets.
+
