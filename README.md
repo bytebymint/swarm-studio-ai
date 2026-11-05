@@ -349,3 +349,37 @@ LICENSE                 Personal noncommercial use terms
 THIRD_PARTY_NOTICES.md   Dependency and third-party content boundaries
 ```
 
+## Limitations
+
+- **A frontend reconstruction, not a universal website compiler.** Source
+  JavaScript, authentication, private APIs, databases and backend behavior are
+  excluded. A visually faithful result is not proof of functional equivalence.
+- **No autonomous LLM code generation.** Agent actions are a locally scheduled
+  visualization of the captured task graph. They do not call an AI model or
+  independently reason about a new product specification.
+- **Capture is bounded.** Element counts, document height, lazy discovery,
+  timeouts and asset budgets can limit the result. Infinite feeds and every
+  possible hidden state are not exhaustively captured.
+- **Some resources cannot be reproduced.** Protected, signed, unavailable,
+  cross-origin or over-budget assets may be skipped. Cross-origin frames become
+  placeholders; canvas may become an image. Closed shadow roots, WebGL, DRM and
+  live video are unsupported; some video posters can survive.
+- **Responsive behavior can differ.** The captured viewport is the primary
+  fidelity target. Computed fallbacks, inaccessible CSS, platform fonts, complex
+  shadow styling and dynamic CSS can change other layouts or states.
+- **Forms and sessions are intentionally restricted.** Existing form values,
+  hidden inputs, inline handlers and session storage are removed. Exported forms
+  cannot submit to the source site's backend.
+- **Comparisons are measurements, not guarantees.** RGB differences and geometry
+  checks cover a viewport. They do not prove semantics, accessibility, behavior
+  or backend equivalence. Occluded native views may retain stale screenshots.
+- **Performance depends on the project.** Large DOMs and backward resimulation
+  can take time. Interactive playback has no universal FPS guarantee. Movie
+  exports have a fixed frame rate but can render slower than real time.
+- **The recorded movie has scope limits.** It uses the first saved page, pauses
+  decorative source animations, requires installed Edge/Chrome and has a
+  ten-minute cap. Its camera is automatically directed rather than manually edited.
+- **Windows is the verified platform.** Other operating systems, a signed
+  installer and clean second-machine validation remain outside the current
+  release verification.
+
