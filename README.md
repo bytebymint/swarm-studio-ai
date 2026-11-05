@@ -60,3 +60,26 @@ the configured limits. Source JavaScript, authentication, server logic and
 unsupported or inaccessible resources are outside that export. See
 [limitations](#limitations) for the boundaries of a reconstruction.
 
+## How it works
+
+1. **Inspect the page you can see.** Chromium renders the source website. The
+   capture engine walks the DOM, records visual geometry, reads accessible style
+   rules, discovers bounded lazy content and identifies text, images and repeated
+   components.
+2. **Build a local blueprint.** Stable element IDs connect the saved document to
+   a dependency graph. A container's frame can unlock its children before every
+   detail finishes; a duplicated component waits for its original to complete.
+3. **Save a portable reconstruction.** HTML is sanitized, CSS and resource URLs
+   are rewritten, and available assets are stored in the project. Source scripts,
+   inline handlers, form values and session storage are excluded.
+4. **Let the crew coordinate.** Workers pick eligible, visible tasks according
+   to their specialties and distance. Cursors follow the same measured paths as
+   the drawing, typing and image work. Unneeded workers fade away.
+5. **Explore, compare, export or record.** The result remains a local HTML/CSS
+   document. Save the website as a ZIP, inspect comparison reports, or render a
+   movie with automatic cinematic camera direction.
+
+All of this runs locally. The local preview server binds to `127.0.0.1`; it is an
+internal file preview, not a cloud service or a separate development server you
+need to start.
+
