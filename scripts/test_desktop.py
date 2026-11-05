@@ -30,3 +30,10 @@ def wait_for(predicate,timeout=40):
         if predicate():return
         time.sleep(.02)  # Release the GIL for HTTP and reconstruction worker threads.
     raise AssertionError('Timed out waiting for desktop state: '+window.notice.text())
+
+
+def js(code,view=None):
+    result=[]
+    (view or window.player).page().runJavaScript(code,lambda value:result.append(value))
+    wait_for(lambda:bool(result),10)
+    return result[0]
