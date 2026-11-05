@@ -478,6 +478,11 @@ other losses arising from the software or its output. Nothing here excludes
 liability that applicable law does not permit to be excluded. The full terms are
 in [LICENSE](LICENSE).
 
+For copyright background in the UAE, see the
+[UAE Government's intellectual property guidance](https://u.ae/en/information-and-services/business/intellectual-property).
+This reference is informational and does not imply government affiliation,
+copyright registration or approval of this project.
+
 For project permissions or concerns, email
 [info@bytebymint.space](mailto:info@bytebymint.space).
 
