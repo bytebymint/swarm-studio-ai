@@ -16,3 +16,4 @@ sections=''.join(f'<section style="height:720px;padding:60px;background:{color}"
 document=f'<html><head><title>Document tour</title><style>body{{margin:0;font:20px Arial}}html{{scroll-behavior:smooth}}</style></head><body><main>{sections}</main></body></html>'
 nested=f'<html><head><title>Nested tour</title><style>html,body{{height:100%;margin:0;overflow:hidden;font:20px Arial}}header{{height:50px;background:#24312a;color:white}}main{{height:calc(100% - 50px);overflow:auto;scroll-behavior:smooth}}</style></head><body><header>App shell</header><main>{sections}</main></body></html>'
 (root/'document.html').write_text(document,'utf-8');(root/'nested.html').write_text(nested,'utf-8')
+server=PreviewServer(root);reports=[]
