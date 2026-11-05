@@ -40,3 +40,23 @@ The animation above is an excerpt of the recording supplied for this project.
 Third-party site content and branding remain their owners' property; no
 affiliation or endorsement is implied. See [third-party notices](THIRD_PARTY_NOTICES.md).
 
+## What you can do
+
+| Capability | What you get |
+| --- | --- |
+| Analyze a rendered website | DOM structure, readable CSS, computed-style fallback, visual geometry, text, fonts and available media. |
+| Rebuild with a coordinated crew | Visible workers assigned real construction tasks, with dependencies and genuine task handoffs. |
+| Follow the whole page | Automatic tours through document scrolling and nested scrolling containers. |
+| Focus on the work | A maximized canvas taking about 90% of the window, with one compact bottom dock. |
+| Control the build | Pause, replay, 0.5×–5× speed, stepping, optional sounds and a collapsible timeline. |
+| Export the reconstructed website | A ZIP containing captured HTML, CSS, saved images, fonts, assets and project metadata. |
+| Compare the result | Original/reconstruction screenshots, an RGB difference heatmap and DOM diagnostics. |
+| Record the process | Canvas-only MP4 export at 1080p or 720p, with 60 or 30 frames per second. |
+| Receive an automatically directed film | Smooth zoom up to 3× on active edits, pullbacks before section travel, and a wide finish. |
+| Reopen work later | A local project library that loads saved reconstructions without recapturing the original site. |
+
+The website export includes the elements and assets successfully captured within
+the configured limits. Source JavaScript, authentication, server logic and
+unsupported or inaccessible resources are outside that export. See
+[limitations](#limitations) for the boundaries of a reconstruction.
+
