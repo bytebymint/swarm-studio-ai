@@ -478,8 +478,6 @@ other losses arising from the software or its output. Nothing here excludes
 liability that applicable law does not permit to be excluded. The full terms are
 in [LICENSE](LICENSE).
 
-For copyright and permissions background, see the
-[U.S. Copyright Office](https://www.copyright.gov/what-is-copyright/).
 For project permissions or concerns, email
 [info@bytebymint.space](mailto:info@bytebymint.space).
 
