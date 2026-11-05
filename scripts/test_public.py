@@ -11,3 +11,4 @@ app=QApplication([])
 from app.desktop import MainWindow
 
 root=Path('test-results/public').resolve();root.mkdir(exist_ok=True)
+window=MainWindow(root/'data');window.show()
