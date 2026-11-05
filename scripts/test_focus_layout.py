@@ -19,3 +19,5 @@ def wait(predicate,timeout=60):
         if predicate():return
         time.sleep(.02)
     raise AssertionError(window.notice.text())
+def js(expression):
+    values=[];window.player.page().runJavaScript(expression,values.append);wait(lambda:bool(values),10);return values[0]
