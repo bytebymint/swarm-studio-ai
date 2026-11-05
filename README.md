@@ -110,3 +110,40 @@ If you have been provided a complete, authorized distribution:
 This repository keeps generated builds out of Git. If you only have source
 files, follow Option B. There is no public binary download implied by this guide.
 
+### Option B — run from source with Python
+
+1. Obtain an authorized copy of the source and extract it.
+2. Open **PowerShell** in the extracted project folder.
+3. Confirm that Python 3.12+ is installed:
+
+   ```powershell
+   py -3.12 --version
+   ```
+
+4. Create an isolated environment:
+
+   ```powershell
+   py -3.12 -m venv .venv
+   ```
+
+5. Install the verified dependency versions:
+
+   ```powershell
+   .\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
+   ```
+
+   To resolve versions within the supported ranges instead, use
+   `-r requirements.txt`. No environment activation is required for these commands.
+
+6. Launch the offline demo:
+
+   ```powershell
+   .\.venv\Scripts\python.exe main.py --demo
+   ```
+
+   Or open the application normally:
+
+   ```powershell
+   .\.venv\Scripts\python.exe main.py
+   ```
+
