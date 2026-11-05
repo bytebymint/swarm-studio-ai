@@ -20,3 +20,4 @@ output=Path('test-results').resolve();output.mkdir(exist_ok=True)
 faulthandler.dump_traceback_later(35, repeat=True)
 window=MainWindow(output/'desktop-data')
 window.show()
+results=[]
