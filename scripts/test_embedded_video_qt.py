@@ -32,6 +32,6 @@ try:
         dialog.grab().save(str(root/'video-sources.png'));dialog.close()
     QTimer.singleShot(150,inspect);window.show_video_sources()
     assert observed and observed[0][1:4]==['third-party','youtube','poster-only'],observed
-    assert observed[0][4]=='https://www.youtube.com/embed/r6upPpiva3I',observed
+    assert observed[0][4]=='https://www.youtube.com/embed/fixture0001',observed
     print('PASS native YouTube source dialog',json.dumps(observed),flush=True)
 finally:window.close();app.processEvents()

@@ -207,8 +207,8 @@ was compared byte-for-byte with the pre-change revision and remains unchanged.
 
 ## YouTube hero detection follow-up
 
-A real browser inspection of `https://dreamcometrue.ai/` found zero HTML5 video
-elements and a YouTube iframe for `r6upPpiva3I`. The previous capture reported
+A real browser inspection of an embedded hero found no HTML5 video element and
+identified a YouTube iframe. The previous capture reported
 only the generic isolated-frame placeholder. The follow-up identifies the
 provider and third-party hosting, extracts clean embed/watch links, downloads
 the public thumbnail and retains the hero's measured placement. It explicitly
@@ -216,8 +216,9 @@ reports `poster-only`; no YouTube media stream was downloaded or reconstructed.
 
 `scripts/test_embedded_video.py` passed known-embed detection, canonical-link
 privacy, thumbnail download, media task assignment, sandbox-preserving export
-and hero sizing. It also reconstructed the actual site's saved capture and
-verified the thumbnail fallback. `scripts/test_embedded_video_qt.py` passed the
+and hero sizing. The committed regression uses a synthetic video identifier and
+an original local thumbnail fixture, with no customer-specific URL or media.
+`scripts/test_embedded_video_qt.py` passed the
 real native source-inspection dialog, including provider, hosting category,
 poster-only status and copyable embed URL. Existing core/media tests (17) and
 the independent browser regression passed. Test fixtures use a borderless hero
