@@ -268,3 +268,30 @@ without loading the original source. To keep a separate local library:
 | `Ctrl+E` | Export the reconstructed website. |
 | `F11` | Toggle fullscreen presentation. |
 
+## Agent skills and coordination
+
+The default roster contains eight named workers. The scheduler activates only
+the workers needed for visible tasks; the roster is not a cloud of idle cursors.
+Specialties guide assignment rather than permanently restricting each worker
+to one operation.
+
+| Agent | Specialty |
+| --- | --- |
+| Ada | Layout and frame construction. |
+| Grace | Typography and text work. |
+| Linus | Repeated components and duplication. |
+| Hedy | Images and asset placement. |
+| Alan | Inspection and verification. |
+| Radia | Navigation and related text/layout work. |
+| Margaret | Larger structural frames. |
+| Ken | Fine details and paths. |
+
+The core skills are drawing, typing, placing, duplicating, stroking and verifying.
+Parent-frame milestones unlock dependent work; completed master components
+unlock duplication. Published events drive the timeline and diagnostics. Cursor
+position and visible work share one trajectory, so the mouse stays attached to
+the job. Text uses browser ranges and Custom Highlights to preserve line layout.
+
+These skills are implemented in the application itself. Running the app does not
+require an agent marketplace, an external coding-agent skill or a paid AI service.
+
