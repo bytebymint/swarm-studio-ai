@@ -9,3 +9,4 @@ from playwright.sync_api import sync_playwright
 from app.config import WEB
 from app.reconstruction import reconstruct
 from app.server import PreviewServer
+root=Path('test-results/site-tour').resolve();root.mkdir(parents=True,exist_ok=True)
