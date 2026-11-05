@@ -23,10 +23,74 @@ class AssetCollector:
         self.mapping = {}
         self.warnings = []
         self.total = 0
+        self.non_media_total = 0
         self.limit = int(settings.get("max_asset_mb", 16)) * 1024 * 1024
         self.total_limit = int(settings.get("max_total_mb", 160)) * 1024 * 1024
         self.semaphore = asyncio.Semaphore(6)
         self.inflight = {}
+        self.media_urls = set()
+        self.media_total = 0
+        self.media_info = {}
+        self.media_failures = {}
+        self.video_limit = int(settings.get('max_video_mb',64))*1024*1024
+        self.media_limit = int(settings.get('max_total_media_mb',256))*1024*1024
+
+    async def fetch_video(self, client, url):
+        """Stream directly to disk; publish a mapping only after container validation."""
+        partial = None
+        used = 0
+        try:
+            if not resource_url(url):raise ValueError('unsafe media address')
+            current=url
+            async with self.semaphore:
+                for _ in range(6):
+                    async with client.stream('GET',current,follow_redirects=False,headers={'Cookie':'','Accept-Encoding':'identity'}) as response:
+                        if response.is_redirect:
+                            target=urljoin(current,response.headers.get('location',''))
+                            if not resource_url(target) or urlsplit(current).scheme=='https' and urlsplit(target).scheme!='https':raise ValueError('unsafe media redirect')
+                            current=target;continue
+                        response.raise_for_status()
+                        mime=response.headers.get('content-type','').split(';')[0].strip().lower()
+                        ext={'video/mp4':'.mp4','video/webm':'.webm'}.get(mime)
+                        if mime=='application/octet-stream' and Path(urlsplit(current).path).suffix.lower() in {'.mp4','.webm'}:
+                            ext=Path(urlsplit(current).path).suffix.lower();mime='video/'+ext[1:]
+                        if not ext:raise ValueError('unsupported video MIME type')
+                        if int(response.headers.get('content-length','0'))>self.video_limit:raise ValueError('per-video size limit exceeded')
+                        relative='assets/media/'+hashlib.sha256(url.encode()).hexdigest()[:24]+ext
+                        path=self.root/relative;path.parent.mkdir(parents=True,exist_ok=True)
+                        partial=path.with_suffix(ext+'.partial')
+                        with partial.open('wb') as output:
+                            async for chunk in response.aiter_bytes(chunk_size=65536):
+                                if self.cancel.is_set():raise InterruptedError('Media download cancelled')
+                                if used+len(chunk)>self.video_limit or self.media_total+len(chunk)>self.media_limit:raise ValueError('media size budget exceeded')
+                                output.write(chunk);used+=len(chunk);self.media_total+=len(chunk)
+                        import av
+                        with partial.open('rb') as header_file:signature=header_file.read(64)
+                        if ext=='.mp4' and b'ftyp' not in signature or ext=='.webm' and not signature.startswith(b'\x1aE\xdf\xa3'):raise ValueError('video container signature mismatch')
+                        with av.open(str(partial),format='mov' if ext=='.mp4' else 'matroska',options={'protocol_whitelist':'file'}) as movie:
+                            if not movie.streams.video:raise ValueError('container has no video stream')
+                            stream=movie.streams.video[0]
+                            if stream.width<1 or stream.height<1 or stream.width*stream.height>16777216:raise ValueError('video dimensions exceed decoder budget')
+                            if stream.codec_context.name not in {'h264','vp8','vp9','av1'}:raise ValueError('unsupported video codec')
+                            next(movie.decode(video=0))
+                            info={'mime':mime,'bytes':used,'codec':stream.codec_context.name,'width':stream.width,'height':stream.height}
+                        partial.replace(path);partial=None
+                        self.mapping[url]=relative;self.media_info[relative]=info;self.total+=used
+                        self.progress('media',relative);return relative
+                raise ValueError('too many media redirects')
+        except InterruptedError:
+            self.media_failures[hashlib.sha256(url.encode()).hexdigest()[:24]]='cancelled'
+            return None
+        except Exception as exc:
+            # Do not place signed URLs, redirects or HTTP exception text in reports.
+            reason=f'HTTP {exc.response.status_code}' if isinstance(exc,httpx.HTTPStatusError) else str(exc) if isinstance(exc,ValueError) and str(exc) in {'unsafe media address','unsafe media redirect','unsupported video MIME type','per-video size limit exceeded','media size budget exceeded','video container signature mismatch','video dimensions exceed decoder budget','container has no video stream','unsupported video codec','too many media redirects'} else 'timeout or transport error' if isinstance(exc,httpx.HTTPError) else 'invalid or undecodable media'
+            asset_id=hashlib.sha256(url.encode()).hexdigest()[:24]
+            self.media_failures[asset_id]=reason
+            self.warnings.append(f'Video {asset_id} skipped: {reason}.')
+            return None
+        finally:
+            if partial is not None:partial.unlink(missing_ok=True)
+            if url not in self.mapping:self.media_total-=used
 
     async def fetch(self, client, url, depth=0):
         url = url.split('#')[0]
@@ -47,6 +111,8 @@ class AssetCollector:
             self.inflight.pop(url, None)
 
     async def _fetch(self, client, url, depth):
+        if url in self.media_urls:
+            return await self.fetch_video(client,url)
         try:
             async with self.semaphore:
                 # Fresh unauthenticated requests: cookies and auth are never forwarded.
@@ -68,10 +134,11 @@ class AssetCollector:
                                 async for chunk in response.aiter_bytes():
                                     if self.cancel.is_set():
                                         return None
-                                    if len(payload) + len(chunk) > self.limit or self.total + len(chunk) > self.total_limit:
+                                    if len(payload) + len(chunk) > self.limit or self.non_media_total + len(chunk) > self.total_limit:
                                         raise ValueError("Asset size budget exceeded")
                                     payload.extend(chunk)
                                     self.total += len(chunk)
+                                    self.non_media_total += len(chunk)
                                 break
                         else:
                             raise ValueError("Too many redirects")
@@ -99,7 +166,7 @@ class AssetCollector:
             return relative
         except (httpx.HTTPError, ValueError, OSError) as exc:
             self.mapping.pop(url, None)
-            self.warnings.append(f"Asset unavailable: {urlsplit(url).hostname}{urlsplit(url).path[:90]} ({type(exc).__name__}: {str(exc)[:100]})")
+            self.warnings.append(f"Asset unavailable ({type(exc).__name__}); unsafe or unavailable resource omitted.")
             return None
 
     async def rewrite_css(self, client, css, base, depth=0, css_file=False):
@@ -118,6 +185,9 @@ class AssetCollector:
         return css
 
     async def collect(self, capture):
+        self.media_urls={url.split('#')[0] for e in capture.get('elements',[])+capture.get('media',[]) for url in e.get('media',{}).get('sources',[]) if resource_url(url)}
+        # Video URLs must never fall through the in-memory image/font path.
+        self.media_urls.update(url.split('#')[0] for url in capture.get('resources',[]) if Path(urlsplit(url).path).suffix.lower() in {'.mp4','.webm'})
         timeout = httpx.Timeout(12, connect=6)
         async with httpx.AsyncClient(timeout=timeout, trust_env=False, headers={"User-Agent": "SwarmStudio/0.1 local-reconstruction"}) as client:
             # Limit task creation as well as network concurrency.

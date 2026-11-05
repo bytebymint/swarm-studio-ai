@@ -56,3 +56,13 @@ The renderer permits only local saved assets and has a ten-minute movie cap.
 One frame and short audio blocks are retained at a time. Output is atomically
 replaced only after full task completion and an end hold; cancellation removes
 the unique partial movie and preserves an existing destination.
+
+Video assets follow the same saved-project pipeline. Capture records safe HTML5
+video candidates/properties, the collector streams validated MP4/WebM files to
+`assets/media/`, and reconstruction writes local video/source/poster references.
+The blueprint's `place_media` operation uses the existing crew, frame dependencies
+and clipping reveal. Unsupported media has explicit poster-only/unavailable states.
+The local preview serves single byte ranges for seeking. During movie rendering,
+`media.js` pauses source videos and awaits seeks/video-frame callbacks at each
+output timestamp before compositor capture; source audio is muted. See
+[video architecture and limits](VIDEO.md).

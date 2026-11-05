@@ -16,7 +16,9 @@ def build_blueprint(capture):
         deps = [parent] if parent in ids else []
         signature = (parent, element["tag"], element.get("class", ""))
         master = repeats.get(signature)
-        if master and (element.get("class") or element['tag'] in {'a','li','article'}):
+        if element['kind']=='media':
+            operation='place_media'
+        elif master and (element.get("class") or element['tag'] in {'a','li','article'}):
             deps.append(master)
             operation = "duplicate"
         else:
@@ -24,7 +26,7 @@ def build_blueprint(capture):
         repeats.setdefault(signature, element["id"])
         element["operation"] = operation
         element["master"] = master if operation == "duplicate" else None
-        duration = {"draw": .75, "type": min(3.5, .65 + len(element.get("text", "")) / 65), "place": 1.2, "stroke": .6, "duplicate": 1.0}[operation]
+        duration = {"draw": .75, "type": min(3.5, .65 + len(element.get("text", "")) / 65), "place": 1.2, "place_media":1.8, "stroke": .6, "duplicate": 1.0}[operation]
         tasks.append({"id": element["id"], "element": element["id"], "dependencies": list(dict.fromkeys(deps)),
                       "dependencyPhases": {dep: ('frame' if dep == parent and dep != element.get('master') and by_id[dep]['kind'] == 'container' else 'complete') for dep in deps},
                       "operation": operation, "duration": duration, "label": f"{operation.title()} {element['tag']} {element.get('text', '')[:42]}".strip(),

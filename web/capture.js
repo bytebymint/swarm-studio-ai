@@ -1,7 +1,7 @@
 /* Independent rendered-DOM capture. Executed only in Qt's isolated ApplicationWorld. */
 (() => {
   const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-  const unsafeURL = value => /^(javascript|vbscript|file):/i.test(value) || /[?&](?:[^=&#]*(?:token|password|secret|session|api_key)[^=&#]*)=/i.test(value);
+  const unsafeURL = value => {try{const u=new URL(value,document.baseURI);return /^(javascript|vbscript|file):/i.test(value)||!!u.username||!!u.password||[...u.searchParams.keys()].some(k=>/token|password|secret|session|api.?key|credential|signature|authorization|jwt|policy|key-pair-id|^sig$/i.test(k));}catch(_){return true;}};
   window.StudioCapture = {
     state: {status: 'idle'}, cancelled: false,
     cancel() { this.cancelled = true; },
@@ -38,6 +38,8 @@
         if (this.cancelled) {this.state = {status:'cancelled'}; return;}
         this.state = {status:'inspecting'};
         const elements = [], styles = [], resources = new Set(), fonts = new Set(), sheets = [];
+        const mediaAssets=[];
+        const mediaURL = raw => {if(!raw)return null;try {const u=new URL(raw,document.baseURI);return /^https?:$/.test(u.protocol)&&!u.username&&!u.password&&!unsafeURL(u.href)?u.href:null;}catch(_){return null;}};
         const scrollState={window:{x:scrollX,y:scrollY},nodes:{}};
         let blockedSheets = false, count = 0, truncated = false;
         for (const sheet of document.styleSheets) {
@@ -82,12 +84,25 @@
             else if (!unsafeURL(source.href) && /^https?:/.test(source.href)) {dest.setAttribute('href',source.href); dest.setAttribute('rel','noreferrer noopener'); dest.setAttribute('target','_blank');}
           }
           for (const attr of ['src', 'poster']) {
+            if(tag==='video'&&attr==='src')continue; // Media policy below decides which candidates are safe.
             let value = tag === 'img' && attr === 'src' ? source.currentSrc || source.src : source[attr];
             if (tag === 'iframe' || tag === 'canvas' || !value || unsafeURL(value)) continue;
             if (/^(https?:|data:image\/|blob:)/i.test(value)) {dest.setAttribute(attr,value); if (/^https?:/.test(value)) resources.add(value);}
           }
           if (tag === 'img') {dest.removeAttribute('srcset'); dest.setAttribute('loading','eager');}
-          if (tag === 'video') {dest.removeAttribute('src'); warnings.push('Video playback excluded; poster retained where available.');}
+          let media;
+          if (tag === 'video') {
+            const candidates=[source.currentSrc,source.getAttribute('src'),source.getAttribute('data-src'),source.getAttribute('data-lazy-src'),...Array.from(source.querySelectorAll('source')).flatMap(n=>[n.src,n.getAttribute('data-src')])].filter(Boolean);
+            const sources=[...new Set(candidates.map(mediaURL).filter(Boolean))];
+            const encrypted=!!source.mediaKeys;
+            media={sources:encrypted?[]:sources,currentSrc:encrypted?null:mediaURL(source.currentSrc),poster:mediaURL(source.poster),autoplay:source.autoplay,muted:source.muted,loop:source.loop,controls:source.controls,preload:source.preload,playsinline:source.playsInline,currentTime:Number.isFinite(source.currentTime)?source.currentTime:0,paused:source.paused,playbackRate:source.playbackRate,width:source.videoWidth,height:source.videoHeight,aspectRatio:cs.aspectRatio,status:encrypted?'protected':sources.length?'discovered':'unsupported'};
+            mediaAssets.push({id,kind:'media',media});
+            dest.removeAttribute('src');
+            if(!encrypted&&sources.length){dest.src=sources[0];for(const url of sources)resources.add(url);}
+            for(const key of ['autoplay','loop','controls','playsinline'])if(media[key])dest.setAttribute(key,'');else dest.removeAttribute(key);
+            if(media.muted)dest.setAttribute('muted','');else dest.removeAttribute('muted');
+            if(!sources.length||encrypted)warnings.push(`Video ${id}: unsupported or protected source; only an available poster can be preserved.`);
+          }
           if (tag === 'svg') dest.removeAttribute('style');
           let computed = '';
           for (const property of cs) {
@@ -104,16 +119,16 @@
           const paintable = !svg && visible && elements.length < max && rect.top + scrollY < maxHeight;
           let nextParent = parentId;
           if (paintable) {
-            let kind = ['img','svg','canvas','video','iframe'].includes(tag) ? 'image' : tag === 'hr' ? 'line' : directText ? 'text' : 'container';
+            let kind = tag==='video'?'media':['img','svg','canvas','iframe'].includes(tag) ? 'image' : tag === 'hr' ? 'line' : directText ? 'text' : 'container';
             const text = ['input','textarea','select'].includes(tag) ? '' : directText;
             elements.push({id, parent:parentId, tag, class:source.className?.baseVal ?? String(source.className || ''), kind, text,
               rect:{x:rect.x+scrollX, y:rect.y+scrollY, w:rect.width, h:rect.height},
               font:cs.fontFamily, fontSize:cs.fontSize, color:cs.color, background:cs.backgroundColor, position:cs.position,
               scrollable:source.scrollHeight > source.clientHeight + 10, order:elements.length,
-              originalBox:{x:rect.x,y:rect.y,w:rect.width,h:rect.height}});
+              originalBox:{x:rect.x,y:rect.y,w:rect.width,h:rect.height},...(media?{media}: {})});
             nextParent = id; fonts.add(cs.fontFamily);
           }
-          if (!['textarea','input','canvas','iframe'].includes(tag)) {
+          if (!['textarea','input','canvas','iframe','video'].includes(tag)) {
             const children = source.shadowRoot ? source.shadowRoot.childNodes : source.childNodes;
             if (source.shadowRoot) warnings.push('Open shadow tree flattened; component scripts are excluded.');
             for (const child of children) {const copy=walk(child,nextParent,isSVG); if (copy) dest.append(copy);}
@@ -130,7 +145,7 @@
         if (document.querySelector('input[type=password]')) warnings.push('Password fields were cleared. No browser session or form values were copied.');
         this.state = {status:'complete', result:{schema:1, title:document.title, url:location.href,
           html:'<!doctype html>\n'+cloneDoc.documentElement.outerHTML, sheets, computedCSS:styles.join('\n'), stylesheets:[...document.styleSheets].map(s=>s.href).filter(Boolean),
-          elements, resources:[...resources], fonts:[...fonts], warnings:[...new Set(warnings)],scrollState,
+          elements, media:mediaAssets, resources:[...resources], fonts:[...fonts], warnings:[...new Set(warnings)],scrollState,
           links:[...document.querySelectorAll('a[href]')].map(a=>a.href).filter(url=>url.startsWith(location.origin+'/')&&!unsafeURL(url)),
           viewport:{width:innerWidth,height:innerHeight,dpr:devicePixelRatio},
           height:Math.min(maxHeight,Math.max(document.documentElement.scrollHeight,innerHeight)),

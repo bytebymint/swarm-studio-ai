@@ -65,8 +65,10 @@ class RecordingDialog(QDialog):
         self.progress.setValue(value);self.message.setText(message)
 
     def complete(self,path,result):
+        warnings=result.get('media',{}).get('warnings',[])
         self.saved=Path(path);self.message.setText(f'Saved {result["duration"]:.1f}s · {result["fps"]} fps · {result["width"]} × {result["height"]}\n{path}')
         self.studio.status('Cinematic recording saved: '+path)
+        if warnings:self.message.setText(self.message.text()+f'\n{len(warnings)} video(s) used a poster or unavailable-media fallback.')
 
     def finished_render(self):
         for control in [self.record,self.resolution,self.fps,self.zoom,self.speed,self.sound]:control.setEnabled(True)

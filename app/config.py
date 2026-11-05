@@ -7,6 +7,7 @@ WEB = ROOT / "web"
 DEFAULTS = {
     "width": 1280, "height": 800, "timeout": 25, "max_elements": 2500,
     "max_height": 30000, "max_asset_mb": 16, "max_total_mb": 160,
+    "max_video_mb": 64, "max_total_media_mb": 256,
     "lazy_load": True, "agents": 8, "speed": 1.0, "intro": True,
     "reduced_motion": False, "auto_tour": True, "names": True,
     "cursor_size": 1.0, "overlay_opacity": 1.0, "smoothness": 1.0,

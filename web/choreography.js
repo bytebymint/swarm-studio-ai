@@ -4,7 +4,7 @@
   const ease=t=>t*t*t*(t*(t*6-15)+10);
   const phase=(p,a,b)=>clamp((p-a)/(b-a),0,1);
   const lerp=(a,b,t)=>a+(b-a)*t;
-  const actions={draw:'Draw',type:'Type',place:'Place image',duplicate:'Duplicate',stroke:'Draw path',verify:'Check'};
+  const actions={draw:'Draw',type:'Type',place:'Place image',place_media:'Place video',duplicate:'Duplicate',stroke:'Draw path',verify:'Check'};
 
   class TaskChoreography {
     constructor(engine) {
@@ -41,13 +41,14 @@
     }
     begin(agent,task) {
       const e=this.engine.elements.get(task.element),anchor=this.anchor(e,task),r=this.workRect(e);
+      if(task.operation==='place_media'&&e.media?.status!=='downloaded')task.label='Place video fallback: '+(e.media?.status||'unsupported');
       task.status='active';task.elapsed=0;task.scaffolded=false;task.owner=agent.id;
       task.travel=Math.max(.24,Math.hypot(anchor.x-agent.x,anchor.y-agent.y)/780)*agent.personality*Math.sqrt(clamp(this.engine.settings.smoothness||1,.4,2));
       const drawDistance=Math.hypot(r.w,r.h);
       task.build=Math.max(task.duration*agent.personality,
-        ['draw','place','type'].includes(task.operation)?drawDistance/950/.65:0,
+        ['draw','place','place_media','type'].includes(task.operation)?drawDistance/950/.65:0,
         task.operation==='type'?drawDistance/1100/.22:0,
-        task.operation==='place'?drawDistance/1100/.28:0,
+        ['place','place_media'].includes(task.operation)?drawDistance/1100/.28:0,
         task.operation==='stroke'?drawDistance/1000/.8:0,
         task.operation==='duplicate'?Math.hypot(r.x-anchor.x,r.y-anchor.y)/700/.44:0);
       task.build=clamp(task.build,.55,5.5);
@@ -159,6 +160,7 @@
         this.engine.sound.play('click',at.x/this.engine.width);
       }
       agent.phase=p<.08?'Select':actions[task.operation];agent.tool='arrow';
+      if(task.operation==='place_media'&&p>=.08&&e.media?.status!=='downloaded')agent.phase=e.media?.status==='poster-only'?'Place poster':'Place placeholder';
       if(task.operation==='verify') {
         const t=ease(phase(p,.12,.8));
         agent.pose={x:r.x+lerp(Math.min(90,r.w*.5),Math.min(190,r.w*.75),t),y:r.y+lerp(8,Math.min(r.h*.5,70),t)};
@@ -185,13 +187,13 @@
         agent.pose={x:r.x+r.w*drag,y:r.y+r.h*drag};
         if(p>=.3&&!task.paint){e.node.setAttribute('data-sw-state','active');task.paint=true;this.engine.restoreClip(e);}
         if(p>=.3)this.type(e,phase(p,.3,.95),agent);
-      } else if(task.operation==='place') {
+      } else if(['place','place_media'].includes(task.operation)) {
         const drag=ease(phase(p,.06,.34)),reveal=ease(phase(p,.4,.92));task.drawProgress=drag;
-        if(p>=.08&&p<.36)agent.phase='Image frame';
+        if(p>=.08&&p<.36)agent.phase=task.operation==='place_media'?'Video frame':'Image frame';
         agent.tool=p<.36?'cross':'arrow';
         agent.pose={x:r.x+r.w*drag,y:r.y+r.h*drag};
         if(p>=.36&&!task.paint){e.node.setAttribute('data-sw-state','active');task.paint=true;}
-        if(task.paint)this.clip(e,1,reveal);
+        if(task.paint){this.clip(e,1,reveal);if(task.operation==='place_media')this.engine.media?.reveal(e);}
       } else if(task.operation==='stroke') {
         const t=ease(phase(p,.08,.88));task.drawProgress=t;agent.tool='pen';
         agent.pose={x:r.x+r.w*t,y:r.y+r.h*t};
@@ -244,7 +246,7 @@
             const master=this.sourceRect(e);box={x:lerp(master.x,r.x,d),y:lerp(master.y,r.y,d),w:lerp(master.w,r.w,d),h:lerp(master.h,r.h,d)};
             ctx.setLineDash([3,3]);ctx.globalAlpha=.24;ctx.strokeRect(master.x,master.y,master.w,master.h);ctx.setLineDash([]);ctx.globalAlpha=.85;
           }
-          if(t.operation==='place'&&p<.4){ctx.fillStyle='#8993a522';ctx.fillRect(box.x,box.y,box.w,box.h);ctx.beginPath();ctx.moveTo(box.x,box.y);ctx.lineTo(box.x+box.w,box.y+box.h);ctx.moveTo(box.x+box.w,box.y);ctx.lineTo(box.x,box.y+box.h);ctx.stroke();}
+          if(['place','place_media'].includes(t.operation)&&p<.4){ctx.fillStyle='#8993a522';ctx.fillRect(box.x,box.y,box.w,box.h);ctx.beginPath();ctx.moveTo(box.x,box.y);ctx.lineTo(box.x+box.w,box.y+box.h);ctx.moveTo(box.x+box.w,box.y);ctx.lineTo(box.x,box.y+box.h);ctx.stroke();}
           ctx.strokeRect(box.x,box.y,box.w,box.h);
           if(p<.75)for(const [x,y] of [[box.x,box.y],[box.x+box.w,box.y],[box.x,box.y+box.h],[box.x+box.w,box.y+box.h]]){ctx.fillStyle='#f2f5fa';ctx.fillRect(x-1.5,y-1.5,3,3);ctx.strokeRect(x-1.5,y-1.5,3,3);}
           if(p<.68&&badges++<2&&box.w>45&&box.h>12) {

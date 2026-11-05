@@ -522,7 +522,7 @@ class MainWindow(QMainWindow):
 
     def update_stats(self):
         if not self.blueprint:return
-        values={'Elements captured':len(self.blueprint['elements']),'Images / media':self.blueprint['counts'].get('image',0),'Fonts detected':len(self.blueprint.get('fonts',[])),'Assets saved':self.metadata['assets'],'Style rules':(self.project/'styles/reconstructed.css').read_text('utf-8').count('{'),'Reconstruction tasks':len(self.blueprint['tasks']),'Capture warnings':len(self.metadata.get('warnings',[]))}
+        values={'Elements captured':len(self.blueprint['elements']),'Images / media':self.blueprint['counts'].get('image',0)+self.blueprint['counts'].get('media',0),'Fonts detected':len(self.blueprint.get('fonts',[])),'Assets saved':self.metadata['assets'],'Style rules':(self.project/'styles/reconstructed.css').read_text('utf-8').count('{'),'Reconstruction tasks':len(self.blueprint['tasks']),'Capture warnings':len(self.metadata.get('warnings',[]))}
         for key,value in values.items():self.stat_items[key].setText(1,str(value))
 
     def player_loaded(self,ok):
@@ -555,6 +555,9 @@ class MainWindow(QMainWindow):
 
     def engine_event(self,data):
         kind=data['type']
+        if kind=='media-warning':
+            self.log('Video fallback: '+data.get('message','Media could not be decoded.'))
+            self.status('A video could not be decoded; a poster or placeholder is shown.')
         self.timeline.record_event(data)
         if kind=='ready':
             self.loading_player=False

@@ -49,6 +49,7 @@ affiliation or endorsement is implied. See [third-party notices](THIRD_PARTY_NOT
 | Analyze a rendered website | DOM structure, readable CSS, computed-style fallback, visual geometry, text, fonts and available media. |
 | Rebuild with a coordinated crew | Visible workers assigned real construction tasks, with dependencies and genuine task handoffs. |
 | Follow the whole page | Automatic tours through document scrolling and nested scrolling containers. |
+| Preserve video assets | Downloadable MP4/WebM videos, local posters and controls, dedicated swarm placement and moving content in cinematic movies. |
 | Focus on the work | A maximized canvas taking about 90% of the window, with one compact bottom dock. |
 | Control the build | Pause, replay, 0.5×–5× speed, stepping, optional sounds and a collapsible timeline. |
 | Export the reconstructed website | A ZIP containing captured HTML, CSS, saved images, fonts, assets and project metadata. |
@@ -255,6 +256,28 @@ drop movie frames, although rendering can take longer than playback. The camera
 editing is automatic; there is no manual video editor or timeline of editable
 camera cuts in this release. Movies are bounded to ten minutes.
 
+### Video assets
+
+Direct, unauthenticated **MP4 and WebM** video sources are captured from video
+elements, nested sources, supported lazy attributes and accessible shadow roots.
+Saved media lives in `assets/media/` and is included in website ZIP exports.
+Videos receive dedicated `place_media` tasks using the existing cursor/reveal
+choreography. Supported videos remain playable when the source site is offline.
+
+**Studio → Settings → Media** controls the per-video limit (64 MB by default)
+and total video budget (256 MB per captured page). Downloads stream to disk,
+validate containers/codecs and honor cancellation and existing capture deadlines.
+
+Cinematic rendering seeks paused source videos on the movie clock, preserving
+looping and playback rate while retaining 720p/1080p and 30/60 fps output. Source
+video audio is not mixed into the synthesized agent sounds. Encoding can be
+slower than real time. Codec support depends on the installed browser.
+
+HLS/DASH, DRM, MSE/blob streams, authenticated or signed sources, embedded players,
+unsupported codecs and over-budget media use an available authorized poster or
+a marked placeholder, with warnings. A preserved poster is not reported as a
+successfully reconstructed playable video. See [video behavior and security](docs/VIDEO.md).
+
 ### Capture more than one page
 
 Under **Studio → Settings → Capture**, increase the same-origin page limit from
@@ -376,7 +399,8 @@ THIRD_PARTY_NOTICES.md   Dependency and third-party content boundaries
 - **Some resources cannot be reproduced.** Protected, signed, unavailable,
   cross-origin or over-budget assets may be skipped. Cross-origin frames become
   placeholders; canvas may become an image. Closed shadow roots, WebGL, DRM and
-  live video are unsupported; some video posters can survive.
+  live streams are unsupported. Direct MP4/WebM videos are supported within
+  media budgets and browser codec capabilities; other videos use explicit fallbacks.
 - **Responsive behavior can differ.** The captured viewport is the primary
   fidelity target. Computed fallbacks, inaccessible CSS, platform fonts, complex
   shadow styling and dynamic CSS can change other layouts or states.

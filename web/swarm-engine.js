@@ -51,7 +51,7 @@
     random(){this.seed^=this.seed<<13;this.seed^=this.seed>>>17;this.seed^=this.seed<<5;return(this.seed>>>0)/4294967296;}
     emit(type,data){const event={type,...data};this.events?.push(event);if(this.events?.length>100)this.events.shift();if(!this.seeking)window.studioBridge?.publish(JSON.stringify(event));}
     async load(project,settings={}){
-      this.settings=settings;this.project=project;this.running=false;this.sound?.close();this.sound=new EventSound(settings);
+      this.settings=settings;this.project=project;this.running=false;this.mediaWarnings=[];this.sound?.close();this.sound=new EventSound(settings);
       const response=await fetch(project+'metadata/blueprint.json');if(!response.ok)throw new Error('Blueprint could not be loaded.');
       this.model=await response.json();
       await new Promise((resolve,reject)=>{const timeout=setTimeout(()=>reject(new Error('Local clone did not load within 15 seconds.')),15000);this.frame.onload=()=>{clearTimeout(timeout);resolve();};this.frame.src=project+'index.html';});
@@ -81,6 +81,7 @@
       this.tasks=this.model.tasks.map(t=>({...t,status:'pending',elapsed:0,scaffolded:false}));this.byId=new Map(this.tasks.map(t=>[t.id,t]));
       this.boundsCache=new Map();
       this.choreography=new TaskChoreography(this);
+      this.media?.dispose();this.media=new StudioMedia(this);
       this.crew=new WorkingCrew(this);this.agents=this.crew.members;
       this.scrollContainers=[this.doc.scrollingElement,...this.doc.querySelectorAll('[data-sw-id]')].filter(n=>n&&n.scrollHeight>n.clientHeight+30&&(/auto|scroll/.test(this.frame.contentWindow.getComputedStyle(n).overflowY)||n===this.doc.scrollingElement));
       for(const node of this.scrollContainers)node.scrollTop=0;
@@ -147,16 +148,16 @@
       return {finished:this.director.finished,completed:this.done,total:this.tasks.length,time:this.time,pose:{...this.director.pose},state:this.director.state};
     }
     endCapture(){this.externalClock=false;this.director=null;this.presentation?.disable();this.freezeStyle?.remove();this.sound.ledger=null;this.prepare();this.draw();}
-    pause(value=true){this.paused=value;this.report();}
+    pause(value=true){this.paused=value;if(value)this.media?.pause();else this.media?.resume();this.report();}
     setSpeed(speed){this.settings.speed=clamp(Number(speed)||1,.5,5);}
     setOptions(options){Object.assign(this.settings,options);}
     step(){this.paused=true;for(let i=0;i<30;i++)this.tick(1/60);this.draw();this.report();}
     back(){const target=Math.max(0,this.time-2);this.seeking=true;this.prepare();for(let i=0;i<Math.floor(target*60);i++)this.tick(1/60);this.seeking=false;this.paused=true;this.draw();this.report();}
     replay(){if(this.frame.contentWindow.location.href!==this.project+'index.html'){this.load(this.project,this.settings).catch(error=>this.emit('error',{message:error.message}));return;}this.prepare();this.emit('replayed',{});}
-    stop(){this.running=false;this.sound?.close();this.ctx.clearRect(0,0,innerWidth,innerHeight);this.restore();this.intro.style.display='none';this.completion.hidden=true;this.emit('cancelled',{});}
+    stop(){this.media?.pause();this.running=false;this.sound?.close();this.ctx.clearRect(0,0,innerWidth,innerHeight);this.restore();this.intro.style.display='none';this.completion.hidden=true;this.emit('cancelled',{});}
     restoreClip(e){if(!e.node)return;if(e.savedClip?.value)e.node.style.setProperty('clip-path',e.savedClip.value,e.savedClip.priority);else e.node.style.removeProperty('clip-path');}
     restore(){this.choreography?.dispose();this.oldMask?.remove();for(const e of this.elements?.values()||[]){e.node?.removeAttribute('data-sw-state');this.restoreClip(e);for(const [node,text] of e.textNodes||[])node.textContent=text;}}
-    showClone(){this.running=false;this.restore();this.boundsCache?.clear();this.canvas.style.display='none';this.intro.style.display='none';this.completion.hidden=true;const state=this.model?.scrollState;if(state){for(const[id,position]of Object.entries(state.nodes||{})){const node=this.frame.contentDocument.querySelector(`[data-sw-id="${id}"]`);if(node)node.scrollTo({top:position.top,left:position.left,behavior:'instant'});}if(state.window)this.frame.contentWindow.scrollTo({left:state.window.x,top:state.window.y,behavior:'instant'});}}
+    showClone(){this.media?.resume();this.running=false;this.restore();this.boundsCache?.clear();this.canvas.style.display='none';this.intro.style.display='none';this.completion.hidden=true;const state=this.model?.scrollState;if(state){for(const[id,position]of Object.entries(state.nodes||{})){const node=this.frame.contentDocument.querySelector(`[data-sw-id="${id}"]`);if(node)node.scrollTo({top:position.top,left:position.left,behavior:'instant'});}if(state.window)this.frame.contentWindow.scrollTo({left:state.window.x,top:state.window.y,behavior:'instant'});}}
   }
   window.Studio=new StudioEngine();
   if(typeof QWebChannel!=='undefined'&&window.qt?.webChannelTransport)new QWebChannel(qt.webChannelTransport,channel=>{window.studioBridge=channel.objects.bridge;window.Studio.emit('bridge-ready',{});});

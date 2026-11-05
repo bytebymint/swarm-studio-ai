@@ -91,6 +91,27 @@ def reconstruct(capture, root, settings, cancel=None, progress=None):
         if url in collector.mapping:
             soup.head.append(soup.new_tag('link', rel='stylesheet', href=collector.mapping[url]))
     soup.head.append(link)
+    media_elements={e['id']:e for e in capture.get('media',[])}
+    media_elements.update({e['id']:e for e in capture['elements'] if e.get('kind')=='media'})
+    for element in media_elements.values():
+        if element.get('kind')!='media':continue
+        media=element['media'];node=soup.find(attrs={'data-sw-id':element['id']})
+        if node is None:continue
+        local=[collector.mapping[u.split('#')[0]] for u in media.get('sources',[]) if u.split('#')[0] in collector.mapping and collector.mapping[u.split('#')[0]].startswith('assets/media/')]
+        node.clear();node.attrs.pop('src',None)
+        media['sources']=local;media['currentSrc']=local[0] if local else None
+        media['poster']=node.get('poster')
+        media['status']='downloaded' if local else 'poster-only' if node.get('poster') else 'unsupported'
+        if local:
+            if len(local)==1:node['src']=local[0]
+            for path in local:node.append(soup.new_tag('source',src=path,type=collector.media_info[path]['mime']))
+        else:
+            node.name='div';node['role']='img';node['aria-label']='Video unavailable — media not reconstructed'
+            rect=element.get('rect',{})
+            if rect:node['style']=node.get('style','')+f";width:{rect.get('w',0)}px;height:{rect.get('h',0)}px;max-width:100%;overflow:hidden;"
+            if media['poster']:node.append(soup.new_tag('img',src=media['poster'],alt='Video poster only — video unavailable',style='width:100%;height:100%;object-fit:contain'))
+            else:node.string='Video unavailable — unsupported or inaccessible media'
+            collector.warnings.append(f"Video {element['id']}: {media['status']}; actual media was not reconstructed.")
     (root / 'index.html').write_text(str(soup), 'utf-8')
     for element in capture['elements']:
         node = soup.find(attrs={'data-sw-id': element['id']})
@@ -109,7 +130,7 @@ def reconstruct(capture, root, settings, cancel=None, progress=None):
                 'limitations': ['Source JavaScript and server behavior are excluded.', 'Form values and session state are not retained.', 'Responsive behavior depends on recovered source CSS.', 'Links to uncaptured pages open the original website.']}
     write_json(root / 'metadata/project.json', metadata)
     write_json(root / 'metadata/blueprint.json', blueprint)
-    write_json(root / 'metadata/capture-report.json', {'warnings': warnings, 'assets': collector.mapping, 'capture_ms': capture.get('duration'), 'status': 'partial' if warnings else 'captured'})
+    write_json(root / 'metadata/capture-report.json', {'warnings': warnings, 'assets': collector.mapping, 'media':collector.media_info, 'media_failures':collector.media_failures, 'capture_ms': capture.get('duration'), 'status': 'partial' if warnings else 'captured'})
     (root / 'README.md').write_text('# Local website reconstruction\n\nOpen index.html in a browser or serve this directory with `python -m http.server 8000`.\n\n'
         'Captured from ' + capture['url'] + '. Reproduce and share only material you have permission to use.\n\n'
         'This is a static rendered-DOM reconstruction. Source scripts, sessions, credentials, backends and form values are excluded. '

@@ -12,6 +12,7 @@ class SettingsDialog(QDialog):
         tabs = QTabWidget()
         layout.addWidget(tabs)
         groups = {
+            'Media': [('max_video_mb','Maximum video size (MB)',1,512),('max_total_media_mb','Total video budget (MB)',1,2048)],
             'Animation': [('agents','Crew limit (appears as work is available)',2,12),('speed','Default speed',.5,5.),('cursor_size','Cursor scale',.5,2.),('smoothness','Movement smoothness',.4,2.),('overlay_opacity','Overlay opacity',.2,1.),('intro','Intro choreography'),('names','Agent names'),('auto_tour','Auto Tour'),('reduced_motion','Reduced motion')],
             'Capture': [('width','Viewport width',320,2560),('height','Viewport height',400,1600),('timeout','Capture timeout (seconds)',5,120),('max_elements','Maximum visual elements',100,5000),('max_height','Maximum document height',1000,40000),('max_asset_mb','Maximum asset size (MB)',1,64),('max_total_mb','Total asset budget (MB)',10,500),('page_limit','Same-origin page limit (1 = single page)',1,8),('crawl_depth','Maximum link depth',0,2),('lazy_load','Discover lazy-loaded content')],
             'Export': [('export_directory','Default export folder'),('include_screenshots','Include screenshots'),('include_blueprint','Include animation blueprint'),('open_export','Open export folder when finished')],

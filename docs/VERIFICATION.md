@@ -158,3 +158,49 @@ dialog defaults (1080p, 60 fps, 3× cap) and retains a 90.14% canvas height.
 Occluded QtWebEngine views on this host throttle RAF and can retain stale widget
 screenshots; native comparison RGB results vary under occlusion. The DOM geometry
 checks pass, and movie export uses a separate browser compositor and fixed clock.
+
+## Video assets upgrade
+
+The video-specific implementation and security review are documented in
+[VIDEO.md](VIDEO.md). The original silent fixtures are generated locally by
+`scripts/media_fixture.py`; no downloaded third-party video fixture is required.
+
+Executed checks:
+
+| Check | Result |
+| --- | --- |
+| Existing core tests plus media/HTTP/security tests | 17 passed, including the six existing core cases and eleven media/security cases. |
+| `scripts/test_browser.py` | Passed: capture, assets, source shutdown, native interactions, multi-page links and scheduler regressions. |
+| `scripts/test_camera.py` | Passed: document and nested tours. |
+| `scripts/test_crew.py` | Passed: worker population, choreography, text stability and legacy blueprints. |
+| `scripts/test_video.py` | Passed in installed Edge: MP4/WebM, nested sources, lazy/runtime sources, open shadow roots, multiple videos, posters, unsupported fallbacks, hidden-video discovery and secret/blob exclusion. |
+| Video ZIP/offline playback | Passed after the source server was stopped and the ZIP was extracted. |
+| Video clock and movie pixels | Passed: repeated seeks/loops produced identical expected pixels; different times changed pixels. The encoded 720p/30 film had 119 frames and 12–13 distinct quantized color samples in the final second across fresh capture runs. |
+| Video 1080p/60 export | Passed: 237 decoded frames, no media fallback warnings. |
+| `scripts/test_video_qt.py` | Passed in real Windows/PySide6 Qt WebEngine: WebM decoded/played, six media jobs completed, maximized native UI retained. |
+| `scripts/test_desktop.py` | Passed. |
+| `scripts/test_focus_layout.py` | Passed. |
+| `scripts/test_public.py` | Passed against example.com. |
+| `scripts/test_site_tour.py` | Passed against the existing public-site fixture. |
+| `scripts/test_recording.py` | Passed: non-video 720p/30 movie, sound, deterministic camera, cancellation and destination preservation. |
+| `scripts/test_recording_hd.py` | Passed: non-video 1080p/60 output. |
+
+Two initial checks failed and were corrected before the successful reruns: reused
+fixture folders retained prior downloaded files, so media tests now create an
+isolated run directory; an encoded-pixel check exposed a poster-only fallback
+losing tag-based video dimensions, which shifted layout. Fallback geometry now
+retains the measured box. These were real failures, not counted as passes.
+
+Local evidence is under `test-results/video-suite/` and the run directory named
+in `test-results/video/latest.json`. Unit results, media reports, native and
+browser screenshots, ZIPs and both movie sizes are local generated artifacts
+and are excluded from Git. Browser codecs differ by platform: the Qt media
+check validates WebM, while the installed Edge check validates MP4 and WebM.
+No claim of universal video, codec, stream or DRM support is made.
+
+The Windows distribution was rebuilt successfully. Its frozen executable passed
+the full `--smoke-report ... --smoke-recording` workflow: native startup, capture,
+66-task non-video playback, comparison, ZIP export and H.264/AAC movie encoding.
+The packaged smoke has no video source fixture; video decoding is covered by the
+separate native Qt and installed Edge checks above. The proprietary `LICENSE`
+was compared byte-for-byte with the pre-change revision and remains unchanged.

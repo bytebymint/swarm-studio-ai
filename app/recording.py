@@ -97,6 +97,7 @@ def render_movie(player_url, project_url, destination, settings, options, cancel
             check()
             progress(0,f'Rendering {total/fps:.1f}s at {fps} fps…')
             session=context.new_cdp_session(page)
+            media_report={'warnings':[]}
             camera_samples=[]
             with av.open(str(tmp),'w',format='mp4',options={'movflags':'+faststart'}) as container:
                 video=container.add_stream('libx264',rate=fps)
@@ -109,6 +110,7 @@ def render_movie(player_url, project_url, destination, settings, options, cancel
                 for index in range(total):
                     check()
                     state=page.evaluate('a=>Studio.advanceCaptureFrame(a.index,a.fps,a.speed)',{'index':index,'fps':fps,'speed':speed})
+                    media_report=page.evaluate('seconds=>Studio.media.sync(seconds)',index/fps)
                     # CDP waits for the compositor surface and captures only the player.
                     encoded=session.send('Page.captureScreenshot',{'format':'jpeg','quality':96,'fromSurface':True,'captureBeyondViewport':False})['data']
                     with Image.open(io.BytesIO(base64.b64decode(encoded))) as image:
@@ -132,7 +134,7 @@ def render_movie(player_url, project_url, destination, settings, options, cancel
                 raise RuntimeError('The movie did not complete every task. The previous video was preserved.')
             os.replace(tmp,destination)
             browser.close()
-            return {'path':str(destination),'frames':total,'fps':fps,'width':width,'height':height,'duration':total/fps,'shots':planned_shots,'camera':camera_samples,'audio_events':len(events),'completed':state['completed'],'total':state['total']}
+            return {'path':str(destination),'frames':total,'fps':fps,'width':width,'height':height,'duration':total/fps,'shots':planned_shots,'camera':camera_samples,'media':media_report,'audio_events':len(events),'completed':state['completed'],'total':state['total']}
     finally:
         tmp.unlink(missing_ok=True)
 
