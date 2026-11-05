@@ -15,3 +15,5 @@ from PySide6.QtWidgets import QApplication
 QCoreApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 app=QApplication([])
 from app.desktop import MainWindow
+
+output=Path('test-results').resolve();output.mkdir(exist_ok=True)
