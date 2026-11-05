@@ -383,3 +383,47 @@ THIRD_PARTY_NOTICES.md   Dependency and third-party content boundaries
   installer and clean second-machine validation remain outside the current
   release verification.
 
+## Verification and development
+
+Run the core tests from PowerShell:
+
+```powershell
+New-Item -ItemType Directory -Path test-results -Force | Out-Null
+.\.venv\Scripts\python.exe -m pytest -q --basetemp=test-results/unit-run
+```
+
+Additional checks exercise actual Chromium pages, native windows and movie files:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/test_browser.py
+.\.venv\Scripts\python.exe scripts/test_camera.py
+.\.venv\Scripts\python.exe scripts/test_crew.py
+.\.venv\Scripts\python.exe scripts/test_focus_layout.py
+.\.venv\Scripts\python.exe scripts/test_recording.py
+.\.venv\Scripts\python.exe scripts/test_recording_hd.py
+```
+
+Run `test_recording.py` before `test_recording_hd.py`; the HD check uses its saved
+fixture. Some checks use installed Chrome, and the recording check uses installed
+Edge. Native checks open real windows. Public-site and isolated-reference checks
+have additional network/reference prerequisites documented in their scripts.
+
+For unattended native checks behind other windows, set the following only for
+the test process to reduce Chromium background throttling:
+
+```powershell
+$env:QTWEBENGINE_CHROMIUM_FLAGS='--disable-background-timer-throttling --disable-renderer-backgrounding --disable-backgrounding-occluded-windows'
+```
+
+The verified demo movie completed all **66 tasks**, produced **1,619 frames at
+1920 × 1080 / 60 fps**, and decoded with the exact expected frame count and
+monotonic timestamps. The Windows executable also completed a real MP4 export.
+Those results describe the tested fixture, not every possible website. Detailed
+evidence is documented in [verification](docs/VERIFICATION.md).
+
+To recreate the README GIF from a recording you are authorized to use:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/make_readme_gif.py --input "C:\path\to\recording.mp4" --start 38 --duration 10 --fps 20 --width 800 --colors 128
+```
+
