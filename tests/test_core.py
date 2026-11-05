@@ -82,3 +82,13 @@ def test_crew_migration_and_frame_handoff(tmp_path):
     assert graph.assign('Linus')['id']=='copy'
     graph.finish('Ada');graph.finish('Linus')
     assert graph.complete
+
+
+def test_pixel_difference(tmp_path):
+    a=tmp_path/'a.png';b=tmp_path/'b.png';diff=tmp_path/'diff.png'
+    Image.new('RGB',(20,20),'white').save(a)
+    Image.new('RGB',(20,20),'white').save(b)
+    assert compare_images(a,b,diff)['mean_absolute_rgb_difference']==0
+    Image.new('RGB',(20,20),'black').save(b)
+    assert compare_images(a,b,diff)['mean_absolute_rgb_difference']==255
+    assert diff.exists()
