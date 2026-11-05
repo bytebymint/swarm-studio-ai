@@ -83,3 +83,16 @@ All of this runs locally. The local preview server binds to `127.0.0.1`; it is a
 internal file preview, not a cloud service or a separate development server you
 need to start.
 
+## Installation
+
+### Requirements
+
+- **Windows 11, 64-bit.** This is the platform currently packaged and verified.
+- **Python 3.12 or newer** to run from source or build an executable.
+- **Microsoft Edge or Google Chrome** installed if you want cinematic recording.
+  Regular capture and playback use the bundled Qt Chromium engine.
+- Enough disk space for the Python/Qt environment, local website assets and
+  recordings. A complete packaged distribution is several hundred megabytes.
+- Internet access for initial dependency installation and online website capture.
+  No AI provider account or API key is required.
+
