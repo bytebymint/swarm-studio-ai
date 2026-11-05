@@ -9,3 +9,5 @@ from PySide6.QtWidgets import QApplication
 QCoreApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 app=QApplication([])
 from app.desktop import MainWindow
+
+root=Path('test-results/public').resolve();root.mkdir(exist_ok=True)
