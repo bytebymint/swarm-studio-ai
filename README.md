@@ -295,3 +295,41 @@ the job. Text uses browser ranges and Custom Highlights to preserve line layout.
 These skills are implemented in the application itself. Running the app does not
 require an agent marketplace, an external coding-agent skill or a paid AI service.
 
+## Architecture
+
+```mermaid
+flowchart TD
+    A[Public or local source website] --> B[Qt Chromium rendered capture]
+    B --> C[Sanitized HTML, CSS and asset collection]
+    B --> D[Stable element IDs and dependency blueprint]
+    C --> E[Saved local project]
+    D --> E
+    E --> F[Trusted local player and coordinated agent crew]
+    F --> G[Task-aware tour and construction choreography]
+    E --> H[Portable website ZIP]
+    E --> I[Headless browser and fixed-step recording clock]
+    I --> J[Smooth recording director]
+    J --> K[PyAV: H.264 video and optional AAC audio]
+    E --> L[SQLite project library and metadata]
+```
+
+| System | Implementation |
+| --- | --- |
+| Desktop application | Python, PySide6 native widgets, Qt WebEngine and WebChannel. |
+| Capture and planning | Isolated JavaScript DOM inspection, stable IDs and a dependency graph. |
+| Local reconstruction | Beautiful Soup/lxml sanitization, HTTPX asset collection and CSS URL rewriting. |
+| Agent motion | Independently implemented JavaScript, Canvas 2D, DOM Range and Custom Highlights. |
+| Scrolling camera | Task-driven document/nested tours with eased motion and section holds. |
+| Project storage | SQLite library, JSON metadata and portable directories. |
+| Local preview | GET/HEAD-only loopback HTTP server. |
+| Cinematic recording | Playwright, installed Edge/Chrome, CDP compositor frames and a deterministic clock. |
+| Media encoding | PyAV/FFmpeg H.264, optional AAC, NumPy audio synthesis and Pillow frame handling. |
+| Verification | pytest, independent browser checks, native UI checks and decoded-movie checks. |
+| Windows packaging | PyInstaller, dependency notices and a current-user installation script. |
+
+The source browser never receives the native WebChannel. Only the trusted local
+player receives its bounded event bridge. The capture profile is memory-only;
+cookies, browser storage and source scripts are not exported. Website loading
+still makes ordinary network requests, and asset downloads occur locally within
+configured budgets. See [the architecture document](docs/ARCHITECTURE.md).
+
