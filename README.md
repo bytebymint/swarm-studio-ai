@@ -160,3 +160,17 @@ uv pip install --python .venv/Scripts/python.exe -r requirements-lock.txt
 Recording uses your installed Edge or Chrome; a separate Playwright browser
 download is not needed. The first launch may take a moment while Chromium starts.
 
+### Build a Windows executable
+
+After installing the dependencies:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/build_windows.ps1
+```
+
+The build runs the core tests and creates
+`dist/SwarmStudio/SwarmStudio.exe`, including WebEngine resources, the offline
+demo and third-party notices. Keep that entire folder together. The executable
+is unsigned; see [packaging notes](docs/PACKAGING.md) for the verified environment
+and the Qt DLL isolation fix.
+
