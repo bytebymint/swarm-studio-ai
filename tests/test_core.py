@@ -92,3 +92,40 @@ def test_pixel_difference(tmp_path):
     Image.new('RGB',(20,20),'black').save(b)
     assert compare_images(a,b,diff)['mean_absolute_rgb_difference']==255
     assert diff.exists()
+
+
+def test_reconstruction_local_assets_privacy_and_css(tmp_path):
+    source=tmp_path/'source';source.mkdir()
+    (source/'image.svg').write_text('<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"><rect width="12" height="12" fill="red"/></svg>')
+    (source/'font.woff2').write_bytes(b'font-fixture')
+    (source/'nested.css').write_text('@font-face{font-family:Fixture;src:url(font.woff2)}')
+    server=PreviewServer(source)
+    try:
+        capture={'title':'Fixture','url':server.origin+'/index.html','viewport':{'width':800,'height':600,'dpr':1},'height':600,'elements':[
+            {'id':'s1','parent':None,'tag':'main','kind':'container','class':'','text':'','rect':{'x':0,'y':0,'w':800,'h':600}},
+            {'id':'s2','parent':'s1','tag':'h1','kind':'text','class':'','text':'Actual text','rect':{'x':0,'y':0,'w':200,'h':50}}],
+            'sheets':[{'text':'@import "nested.css"; .hero{background:url(image.svg)}','base':server.origin+'/'}],
+            'computedCSS':'','resources':[server.origin+'/image.svg'],'fonts':[],'warnings':[],
+            'html':f'<html><head><title>Fixture</title></head><body><main data-sw-id="s1"><h1 data-sw-id="s2">Actual text</h1><img src="{server.origin}/image.svg"><input value="SECRET" name="password"><textarea>SECRET</textarea><input type="hidden" value="TOKEN"><script>alert(1)</script><a href="javascript:alert(1)" onclick="alert(2)">Bad</a><form action="https://bad.test"><button>Submit</button></form></main></body></html>'}
+        metadata,blueprint=reconstruct(capture,tmp_path/'output',{})
+        html=(tmp_path/'output/index.html').read_text('utf-8')
+        assert 'SECRET' not in html and 'TOKEN' not in html and '<script' not in html and 'onclick=' not in html
+        assert 'javascript:' not in html and '<h1 data-sw-id="s2">Actual text</h1>' in html
+        assert 'assets/images/image-' in html
+        assert len(list((tmp_path/'output/assets').rglob('*.*')))==3
+        assert metadata['assets']==3
+        assert blueprint['tasks'][1]['dependencies']==['s1']
+        assert 'http://' not in (tmp_path/'output/styles/reconstructed.css').read_text()
+        from app.assets import URL_PATTERN
+        for stylesheet in (tmp_path/'output').rglob('*.css'):
+            for match in URL_PATTERN.finditer(stylesheet.read_text()):
+                ref=match.group(2)
+                if ref and not ref.startswith(('data:','#')):
+                    assert (stylesheet.parent/ref).is_file(), f'Broken CSS resource: {stylesheet}: {ref}'
+        cancel=threading.Event();cancel.set()
+        with pytest.raises(InterruptedError):reconstruct(capture,tmp_path/'cancelled',{},cancel)
+        with httpx.Client(trust_env=False) as client:
+            assert client.get(server.origin+'/image.svg').status_code==200
+            assert client.get(server.origin+'/.secret').status_code==403
+            assert client.post(server.origin+'/image.svg').status_code==501
+    finally:server.close()
