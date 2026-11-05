@@ -10,3 +10,4 @@ from app.config import WEB
 from app.reconstruction import reconstruct
 from app.server import PreviewServer
 root=Path('test-results/site-tour').resolve();root.mkdir(parents=True,exist_ok=True)
+shutil.copytree(WEB,root/'ui',dirs_exist_ok=True)
