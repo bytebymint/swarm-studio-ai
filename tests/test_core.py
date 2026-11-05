@@ -42,3 +42,22 @@ def test_graph_dependencies_failures_cancellation():
     assert DependencyGraph([]).complete
     with pytest.raises(ValueError):DependencyGraph([{'id':'a','dependencies':['a']}])
     with pytest.raises(ValueError):DependencyGraph([{'id':'a','dependencies':['missing']}])
+
+
+def test_projects_and_settings(tmp_path):
+    settings=Settings(tmp_path/'settings.json')
+    settings.save({'speed':3.0,'names':False})
+    assert Settings(settings.path).values['speed']==3.0
+    store=ProjectStore(tmp_path)
+    project_id,folder=store.allocate()
+    (folder/'metadata').mkdir()
+    (folder/'metadata/project.json').write_text(json.dumps({'name':'Fixture','url':'https://example.com'}))
+    (folder/'metadata/blueprint.json').write_text('{"elements":[]}')
+    (folder/'index.html').write_text('<html></html>')
+    store.register(project_id,{'name':'Fixture','url':'https://example.com'})
+    assert store.load(project_id)[1]['name']=='Fixture'
+    assert store.recent()[0][0]==project_id
+    with pytest.raises(ValueError):store.load('../outside')
+    (folder/'index.html').unlink()
+    with pytest.raises(ValueError):store.load(project_id)
+    store.close()
