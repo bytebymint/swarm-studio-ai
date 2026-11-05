@@ -14,3 +14,5 @@ metadata=json.loads((root/'project/metadata/project.json').read_text('utf-8'))
 shutil.copytree(WEB,root/'ui',dirs_exist_ok=True)
 server=PreviewServer(root)
 last=[-1]
+def progress(value,message):
+    if value//10!=last[0]:last[0]=value//10;print(message,flush=True)
