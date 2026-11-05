@@ -10,3 +10,4 @@ from app.recording import render_movie
 from app.server import PreviewServer
 
 root=Path('test-results/recording').resolve()
+metadata=json.loads((root/'project/metadata/project.json').read_text('utf-8'))
