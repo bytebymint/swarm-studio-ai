@@ -29,3 +29,4 @@ output=root/'output';output.mkdir(exist_ok=True)
 shutil.copytree(WEB,output/'ui',dirs_exist_ok=True)
 output_server=PreviewServer(output)
 results=[]
+def record(name):results.append(name);print('PASS',name,flush=True)
