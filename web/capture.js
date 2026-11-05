@@ -60,11 +60,21 @@
           const tag = source.localName, cs = getComputedStyle(source), rect = source.getBoundingClientRect();
           const isSVG = svg || tag === 'svg';
           const id = 's' + count;
-          let dest;
+          let dest, media;
           if (tag === 'iframe') {
             dest = cloneDoc.createElement('div'); dest.textContent = 'Embedded frame not captured';
             dest.setAttribute('role','img'); dest.setAttribute('aria-label','Unsupported embedded frame');
             warnings.push(`Frame excluded at ${Math.round(rect.x)}, ${Math.round(rect.y)}: browser isolation.`);
+            try {
+              const url=new URL(source.src,document.baseURI),match=url.pathname.match(/^\/embed\/([a-zA-Z0-9_-]{11})$/);
+              if(['https:','http:'].includes(url.protocol)&&!url.username&&!url.password&&['www.youtube.com','youtube.com','www.youtube-nocookie.com','youtube-nocookie.com'].includes(url.hostname)&&match){
+                const videoId=match[1],poster=`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+                media={sources:[],currentSrc:null,provider:'youtube',hosting:'third-party',videoId,embedUrl:`https://www.youtube.com/embed/${videoId}`,externalUrl:`https://www.youtube.com/watch?v=${videoId}`,poster,status:'embedded',autoplay:url.searchParams.get('autoplay')==='1',loop:url.searchParams.get('loop')==='1',muted:true,controls:false,paused:true,currentTime:0,playbackRate:1,width:rect.width,height:rect.height,aspectRatio:cs.aspectRatio};
+                mediaAssets.push({id,kind:'media',media,rect:{x:rect.x+scrollX,y:rect.y+scrollY,w:rect.width,h:rect.height}});
+                dest.setAttribute('poster',poster);resources.add(poster);
+                warnings.push(`YouTube video ${id}: embedded player excluded; thumbnail fallback only, not a downloaded video.`);
+              }
+            }catch(_){ /* Unknown embeds retain the existing isolated placeholder. */ }
           } else if (tag === 'canvas') {
             dest = cloneDoc.createElement('img'); dest.alt = 'Captured canvas image fallback';
             try {dest.src = source.toDataURL('image/png'); warnings.push('Canvas captured as a raster image fallback, without live behavior.');}
@@ -90,12 +100,13 @@
             if (/^(https?:|data:image\/|blob:)/i.test(value)) {dest.setAttribute(attr,value); if (/^https?:/.test(value)) resources.add(value);}
           }
           if (tag === 'img') {dest.removeAttribute('srcset'); dest.setAttribute('loading','eager');}
-          let media;
           if (tag === 'video') {
             const candidates=[source.currentSrc,source.getAttribute('src'),source.getAttribute('data-src'),source.getAttribute('data-lazy-src'),...Array.from(source.querySelectorAll('source')).flatMap(n=>[n.src,n.getAttribute('data-src')])].filter(Boolean);
             const sources=[...new Set(candidates.map(mediaURL).filter(Boolean))];
             const encrypted=!!source.mediaKeys;
             media={sources:encrypted?[]:sources,currentSrc:encrypted?null:mediaURL(source.currentSrc),poster:mediaURL(source.poster),autoplay:source.autoplay,muted:source.muted,loop:source.loop,controls:source.controls,preload:source.preload,playsinline:source.playsInline,currentTime:Number.isFinite(source.currentTime)?source.currentTime:0,paused:source.paused,playbackRate:source.playbackRate,width:source.videoWidth,height:source.videoHeight,aspectRatio:cs.aspectRatio,status:encrypted?'protected':sources.length?'discovered':'unsupported'};
+            media.provider='html5';media.hosting=sources.length?(new URL(sources[0]).origin===location.origin?'same-origin':'third-party'):'unknown';
+            media.sourceUrls=[...media.sources];
             mediaAssets.push({id,kind:'media',media});
             dest.removeAttribute('src');
             if(!encrypted&&sources.length){dest.src=sources[0];for(const url of sources)resources.add(url);}
@@ -113,13 +124,13 @@
               try { const url = new URL(match[1],document.baseURI).href; if (/^https?:/.test(url) && !unsafeURL(url)) resources.add(url); } catch (_) {}
             }
           }
-          if (blockedSheets || source.shadowRoot || tag.includes('-')) styles.push(`[data-sw-id="${id}"]{${computed}}`);
+          if (blockedSheets || source.shadowRoot || tag.includes('-') || tag==='iframe'&&media) styles.push(`[data-sw-id="${id}"]{${computed}}`);
           const visible = cs.display !== 'none' && cs.visibility !== 'hidden' && rect.width > .5 && rect.height > .5;
           const directText = [...source.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();
           const paintable = !svg && visible && elements.length < max && rect.top + scrollY < maxHeight;
           let nextParent = parentId;
           if (paintable) {
-            let kind = tag==='video'?'media':['img','svg','canvas','iframe'].includes(tag) ? 'image' : tag === 'hr' ? 'line' : directText ? 'text' : 'container';
+            let kind = media?'media':['img','svg','canvas','iframe'].includes(tag) ? 'image' : tag === 'hr' ? 'line' : directText ? 'text' : 'container';
             const text = ['input','textarea','select'].includes(tag) ? '' : directText;
             elements.push({id, parent:parentId, tag, class:source.className?.baseVal ?? String(source.className || ''), kind, text,
               rect:{x:rect.x+scrollX, y:rect.y+scrollY, w:rect.width, h:rect.height},

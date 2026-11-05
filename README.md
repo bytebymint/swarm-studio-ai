@@ -278,6 +278,11 @@ unsupported codecs and over-budget media use an available authorized poster or
 a marked placeholder, with warnings. A preserved poster is not reported as a
 successfully reconstructed playable video. See [video behavior and security](docs/VIDEO.md).
 
+**Studio → Video sources** shows whether detected media is same-origin or
+third-party, plus its provider, capture status and source/embed link. YouTube
+heroes retain a clean embed/watch link and an explicitly labeled thumbnail
+fallback; they are not downloaded as offline video files.
+
 ### Capture more than one page
 
 Under **Studio → Settings → Capture**, increase the same-origin page limit from

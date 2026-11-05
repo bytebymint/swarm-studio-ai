@@ -109,8 +109,15 @@ def reconstruct(capture, root, settings, cancel=None, progress=None):
             node.name='div';node['role']='img';node['aria-label']='Video unavailable — media not reconstructed'
             rect=element.get('rect',{})
             if rect:node['style']=node.get('style','')+f";width:{rect.get('w',0)}px;height:{rect.get('h',0)}px;max-width:100%;overflow:hidden;"
-            if media['poster']:node.append(soup.new_tag('img',src=media['poster'],alt='Video poster only — video unavailable',style='width:100%;height:100%;object-fit:contain'))
+            if media['poster']:node.append(soup.new_tag('img',src=media['poster'],alt='Video poster only — video unavailable',style='width:100%;height:100%;object-fit:'+('cover' if media.get('provider')=='youtube' else 'contain')))
             else:node.string='Video unavailable — unsupported or inaccessible media'
+            if media.get('provider')=='youtube':
+                caption=soup.new_tag('span',style='position:absolute;bottom:0;left:0;right:0;padding:6px;background:#111d;color:white;font:12px sans-serif;z-index:1')
+                caption.string='YouTube video — thumbnail only; video not downloaded'
+                link=soup.new_tag('a',href=media['externalUrl'],target='_blank',rel='noopener noreferrer',style='color:white;margin-left:8px;text-decoration:underline')
+                link.string='Open original video on YouTube'
+                caption.append(link)
+                node.append(caption)
             collector.warnings.append(f"Video {element['id']}: {media['status']}; actual media was not reconstructed.")
     (root / 'index.html').write_text(str(soup), 'utf-8')
     for element in capture['elements']:

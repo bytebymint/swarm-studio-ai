@@ -102,6 +102,19 @@ dimensions and unsupported codecs use an available authorized poster or a marked
 placeholder. They are not described as reconstructed playable videos. There is
 no stream resolver, browser-session forwarding or access-control bypass.
 
+Known YouTube iframe embeds are identified as third-party media rather than
+generic frames. Their video ID, clean embed URL and original watch URL are
+preserved; an available public thumbnail is downloaded and animated as an
+explicitly labeled poster-only fallback. The iframe's measured geometry and
+computed styling are retained. No YouTube player scripts or media stream are
+downloaded, and no offline-video success is claimed.
+
+**Studio → Video sources** lists each detected video's host category, provider,
+capture status and source/embed link. Select a row to copy its link or open the
+original video in the default browser. This does not enable third-party scripts
+inside the sandboxed reconstructed page. For actual offline YouTube-hosted hero
+playback, supply an authorized direct MP4/WebM source instead.
+
 Existing CSP (`media-src 'self' data:`), sandbox, bridge isolation and source
 script removal remain unchanged. Only local saved assets are permitted in the
 recording browser. Media requests use a fresh client with no forwarded cookies,

@@ -161,6 +161,7 @@ class MainWindow(QMainWindow):
         navigation.addAction('Reload website', self.reload.click)
         self.studio_menu.addAction('Fullscreen (F11)', self.toggle_presentation)
         self.studio_menu.addAction('Cinematic recording…', self.show_recording)
+        self.studio_menu.addAction('Video sources…', self.show_video_sources)
         row.addWidget(self.studio_button)
         self.url.setMinimumWidth(120)
         row.addWidget(self.url, 1)
@@ -772,6 +773,33 @@ class MainWindow(QMainWindow):
         from app.recording_dialog import RecordingDialog
         self.recording_dialog=RecordingDialog(self)
         self.recording_dialog.show()
+
+    def show_video_sources(self):
+        dialog=QDialog(self);dialog.setWindowTitle('Detected video sources');dialog.resize(900,420)
+        layout=QVBoxLayout(dialog)
+        note=QLabel('Direct media files can be downloaded. YouTube embeds retain their embed/original links and an identified thumbnail fallback; they are not offline videos.')
+        note.setWordWrap(True);layout.addWidget(note)
+        tree=QTreeWidget();tree.setHeaderLabels(['Element','Hosting','Provider','Capture','Video / embed link']);layout.addWidget(tree)
+        address=QLineEdit();address.setReadOnly(True);address.setPlaceholderText('Select a video to inspect or copy its link');layout.addWidget(address)
+        for element in (self.blueprint or {}).get('elements',[]):
+            media=element.get('media')
+            if not media:continue
+            url=media.get('embedUrl') or next(iter(media.get('sourceUrls',[])),'') or media.get('currentSrc') or next(iter(media.get('sources',[])),'')
+            item=QTreeWidgetItem([element['id'],media.get('hosting','unknown'),media.get('provider','html5'),media.get('status','unknown'),url])
+            item.setData(0,Qt.ItemDataRole.UserRole,media.get('externalUrl') or url);tree.addTopLevelItem(item)
+        def selected():
+            item=tree.currentItem();address.setText(item.text(4) if item else '')
+        tree.itemSelectionChanged.connect(selected)
+        def open_original():
+            item=tree.currentItem();raw=item.data(0,Qt.ItemDataRole.UserRole) if item else ''
+            if raw and urlsplit(raw).scheme in {'http','https'}:
+                try:QDesktopServices.openUrl(QUrl(normalize_url(raw)))
+                except ValueError:self.status('Unsafe media link was blocked.')
+        layout.addWidget(button('Open selected original video',open_original))
+        layout.addWidget(button('Close',dialog.close))
+        for column in range(4):tree.resizeColumnToContents(column)
+        if tree.topLevelItemCount():tree.setCurrentItem(tree.topLevelItem(0))
+        dialog.exec()
 
     def export_to(self,destination):
         self.export_button.setEnabled(False)
