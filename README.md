@@ -445,3 +445,28 @@ does not grant rights in websites or content you capture.
 **Commercial licensing, redistribution and permission requests:**
 [info@bytebymint.space](mailto:info@bytebymint.space).
 
+## Responsible use and disclaimer
+
+Use SWARM STUDIO only on material you own, are authorized to reproduce, or have
+another lawful basis to use. A publicly accessible website is not automatically
+free to copy. Designs, code, text, photographs, fonts, trademarks and recordings
+may carry separate rights and restrictions.
+
+You are responsible for obtaining necessary permissions and for the legality of
+your captures, reconstructions, exports, recordings and publication. SWARM STUDIO
+does not grant third-party rights, bypass access controls or establish that a
+use qualifies for a legal exception. Do not use it for impersonation, phishing,
+unauthorized commercial copying or privacy violations.
+
+The software is provided **as is**, without warranties. To the maximum extent
+permitted by applicable law, Byte by Mint and the contributors disclaim liability
+for misuse, unauthorized website reproduction, intellectual-property claims or
+other losses arising from the software or its output. Nothing here excludes
+liability that applicable law does not permit to be excluded. The full terms are
+in [LICENSE](LICENSE).
+
+For copyright and permissions background, see the
+[U.S. Copyright Office](https://www.copyright.gov/what-is-copyright/).
+For project permissions or concerns, email
+[info@bytebymint.space](mailto:info@bytebymint.space).
+
