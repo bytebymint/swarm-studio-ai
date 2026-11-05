@@ -10,3 +10,5 @@ from PIL import Image
 from app.config import WEB
 from app.reconstruction import reconstruct
 from app.server import PreviewServer
+
+root=Path('test-results/crew').resolve();root.mkdir(parents=True,exist_ok=True)
