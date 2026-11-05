@@ -8,3 +8,5 @@ import av
 from app.config import WEB
 from app.recording import render_movie
 from app.server import PreviewServer
+
+root=Path('test-results/recording').resolve()
