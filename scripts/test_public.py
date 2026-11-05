@@ -19,3 +19,23 @@ def wait(predicate,timeout=45):
         if predicate():return
         time.sleep(.02)
     raise AssertionError(window.notice.text())
+try:
+    window.url.setText('https://example.com');window.navigate()
+    wait(lambda:window.browser.ready)
+    window.speed.setCurrentText('5×')
+    window.start_capture()
+    wait(lambda:window.project is not None)
+    html=(window.project/'index.html').read_text('utf-8')
+    assert 'Example Domain' in html
+    assert window.metadata['url'].startswith('https://example.com')
+    assert len(window.blueprint['tasks'])>3
+    window.run_comparison()
+    wait(lambda:(window.project/'metadata/quality-report.json').exists())
+    report=json.loads((window.project/'metadata/quality-report.json').read_text('utf-8'))
+    assert report['dom']['missing_elements']==[]
+    assert report['dom']['selectable_text_characters']>50
+    assert report['mean_absolute_rgb_difference']<5
+    (root/'result.json').write_text(json.dumps({'url':window.metadata['url'],'tasks':len(window.blueprint['tasks']),'quality':report},indent=2))
+    print('PASS Real public https://example.com capture, saved HTML and measured DOM comparison',flush=True)
+finally:
+    window.close();app.processEvents()
