@@ -61,3 +61,24 @@ def test_projects_and_settings(tmp_path):
     (folder/'index.html').unlink()
     with pytest.raises(ValueError):store.load(project_id)
     store.close()
+
+
+def test_crew_migration_and_frame_handoff(tmp_path):
+    path=tmp_path/'settings.json'
+    path.write_text('{"agents":24}',encoding='utf-8')
+    assert Settings(path).values['agents']==8
+    path.write_text('{"agents":4}',encoding='utf-8')
+    assert Settings(path).values['agents']==4
+    tasks=[{'id':'frame','dependencies':[]},
+           {'id':'text','dependencies':['frame'],'dependencyPhases':{'frame':'frame'}},
+           {'id':'copy','dependencies':['frame','text'],'dependencyPhases':{'frame':'frame','text':'complete'}}]
+    graph=DependencyGraph(tasks)
+    assert graph.assign('Ada')['id']=='frame'
+    assert not graph.ready()
+    graph.mark_frame('Ada')
+    assert graph.assign('Grace')['id']=='text'
+    assert graph.assign('Linus') is None
+    graph.finish('Grace')
+    assert graph.assign('Linus')['id']=='copy'
+    graph.finish('Ada');graph.finish('Linus')
+    assert graph.complete
