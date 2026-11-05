@@ -16,3 +16,4 @@ from app.recording import render_movie
 from app.server import PreviewServer
 
 root=Path('test-results/recording').resolve();root.mkdir(parents=True,exist_ok=True)
+shutil.copytree(WEB,root/'ui',dirs_exist_ok=True)
