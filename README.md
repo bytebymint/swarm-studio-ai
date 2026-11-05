@@ -242,3 +242,11 @@ drop movie frames, although rendering can take longer than playback. The camera
 editing is automatic; there is no manual video editor or timeline of editable
 camera cuts in this release. Movies are bounded to ten minutes.
 
+### Capture more than one page
+
+Under **Studio → Settings → Capture**, increase the same-origin page limit from
+the default **1** to **2–8** and choose link depth **0–2**. The crawler follows
+eligible discovered links on the same origin, saves captured pages and rewrites
+their local links. Common login, account, checkout and destructive paths are
+excluded. Animation and cinematic recording cover the first captured page.
+
