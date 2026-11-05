@@ -14,3 +14,4 @@ from app.server import PreviewServer
 root=Path('test-results/crew').resolve();root.mkdir(parents=True,exist_ok=True)
 shutil.copytree(WEB,root/'ui',dirs_exist_ok=True)
 shutil.copytree(WEB/'demo',root/'fixture',dirs_exist_ok=True)
+source=(root/'fixture/index.html').read_text('utf-8')
