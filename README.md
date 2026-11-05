@@ -470,3 +470,10 @@ For copyright and permissions background, see the
 For project permissions or concerns, email
 [info@bytebymint.space](mailto:info@bytebymint.space).
 
+## Provenance
+
+The desktop implementation is independent. Separately supplied reference
+materials are excluded from the repository and packaged application; see
+[reference provenance](docs/REFERENCE.md). The initial local commit history was
+reconstructed from the working project with assigned dates at the owner's
+request; see [history provenance](docs/HISTORY.md).
