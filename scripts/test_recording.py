@@ -14,3 +14,5 @@ from app.config import WEB
 from app.reconstruction import reconstruct
 from app.recording import render_movie
 from app.server import PreviewServer
+
+root=Path('test-results/recording').resolve();root.mkdir(parents=True,exist_ok=True)
