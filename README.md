@@ -96,3 +96,17 @@ need to start.
 - Internet access for initial dependency installation and online website capture.
   No AI provider account or API key is required.
 
+### Option A — run an existing Windows build
+
+If you have been provided a complete, authorized distribution:
+
+1. Extract the entire `SwarmStudio` distribution folder.
+2. Keep `SwarmStudio.exe`, `_internal`, `Notices` and the remaining files together.
+3. Double-click **SwarmStudio.exe**. The app opens maximized.
+4. Optionally run the included `install_windows.ps1` to copy it into your user
+   Programs folder and create a Start menu shortcut. Administrator rights are
+   not required.
+
+This repository keeps generated builds out of Git. If you only have source
+files, follow Option B. There is no public binary download implied by this guide.
+
