@@ -37,3 +37,8 @@ def js(code,view=None):
     (view or window.player).page().runJavaScript(code,lambda value:result.append(value))
     wait_for(lambda:bool(result),10)
     return result[0]
+
+
+def record(name):
+    results.append(name)
+    print('PASS',name,flush=True)
