@@ -147,3 +147,16 @@ files, follow Option B. There is no public binary download implied by this guide
    .\.venv\Scripts\python.exe main.py
    ```
 
+### Alternative — use uv
+
+If you already have `uv` installed, run these commands from the project folder:
+
+```powershell
+uv venv --python 3.12 .venv
+uv pip install --python .venv/Scripts/python.exe -r requirements-lock.txt
+.\.venv\Scripts\python.exe main.py --demo
+```
+
+Recording uses your installed Edge or Chrome; a separate Playwright browser
+download is not needed. The first launch may take a moment while Chromium starts.
+
