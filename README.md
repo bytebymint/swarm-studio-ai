@@ -250,3 +250,21 @@ eligible discovered links on the same origin, saves captured pages and rewrites
 their local links. Common login, account, checkout and destructive paths are
 excluded. Animation and cinematic recording cover the first captured page.
 
+### Saved projects and shortcuts
+
+Projects, settings and the SQLite library live under
+`%LOCALAPPDATA%\SwarmStudio`. Use **Studio → Open saved project** to reopen work
+without loading the original source. To keep a separate local library:
+
+```powershell
+.\.venv\Scripts\python.exe main.py --data-dir "D:\SwarmStudioData"
+```
+
+| Shortcut | Action |
+| --- | --- |
+| `Ctrl+L` | Focus the website address. |
+| `Ctrl+N` | Start a new project. |
+| `Ctrl+O` | Open a saved project. |
+| `Ctrl+E` | Export the reconstructed website. |
+| `F11` | Toggle fullscreen presentation. |
+
