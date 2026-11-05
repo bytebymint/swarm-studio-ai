@@ -427,3 +427,21 @@ To recreate the README GIF from a recording you are authorized to use:
 .\.venv\Scripts\python.exe scripts/make_readme_gif.py --input "C:\path\to\recording.mp4" --start 38 --duration 10 --fps 20 --width 800 --colors 128
 ```
 
+## License and permissions
+
+Copyright © 2026 **Byte by Mint**. All rights reserved.
+
+SWARM STUDIO uses a custom **Personal Noncommercial Use License**. You may
+inspect, run and privately modify it for personal, noncommercial learning and
+evaluation. Only working and backup copies necessary for that permitted use are
+allowed. Redistribution, copying into another distributed project, selling,
+paid client work and other commercial use require **prior written approval**.
+This is restricted source-available software, not an open-source license.
+
+Read [LICENSE](LICENSE) for the actual terms. Third-party libraries retain their
+own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). This license
+does not grant rights in websites or content you capture.
+
+**Commercial licensing, redistribution and permission requests:**
+[info@bytebymint.space](mailto:info@bytebymint.space).
+
