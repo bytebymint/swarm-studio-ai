@@ -12,3 +12,10 @@ from app.desktop import MainWindow
 
 root=Path('test-results/public').resolve();root.mkdir(exist_ok=True)
 window=MainWindow(root/'data');window.show()
+def wait(predicate,timeout=45):
+    until=time.monotonic()+timeout
+    while time.monotonic()<until:
+        app.processEvents()
+        if predicate():return
+        time.sleep(.02)
+    raise AssertionError(window.notice.text())
