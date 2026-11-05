@@ -21,3 +21,12 @@ faulthandler.dump_traceback_later(35, repeat=True)
 window=MainWindow(output/'desktop-data')
 window.show()
 results=[]
+
+
+def wait_for(predicate,timeout=40):
+    deadline=time.monotonic()+timeout
+    while time.monotonic()<deadline:
+        app.processEvents()
+        if predicate():return
+        time.sleep(.02)  # Release the GIL for HTTP and reconstruction worker threads.
+    raise AssertionError('Timed out waiting for desktop state: '+window.notice.text())
