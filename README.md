@@ -200,3 +200,23 @@ and the Qt DLL isolation fix.
 Only capture content you own, have permission to reproduce, or otherwise have a
 lawful basis to use. Avoid private accounts, personal information and secrets.
 
+### Export the rebuilt website
+
+1. Complete a capture or reopen a saved project.
+2. Click **Export** and choose a ZIP destination.
+3. Extract the ZIP into a new folder.
+4. Open `index.html` to inspect the saved frontend. For a browser environment
+   closer to the app's local preview, serve the extracted folder:
+
+   ```powershell
+   py -3.12 -m http.server 8000 --bind 127.0.0.1
+   ```
+
+5. Visit `http://127.0.0.1:8000/` in your browser. Press **Ctrl+C** in PowerShell
+   when you finish the preview.
+
+The project includes the captured document, reconstructed CSS, successfully saved
+assets and metadata. Exporting does not restore a site's server, proprietary
+scripts, protected content or missing resources. Export warnings identify capture
+and asset limits. Rights in the website remain with their owners.
+
