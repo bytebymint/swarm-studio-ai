@@ -55,7 +55,7 @@
         const r=e.choreography.workRect(element),area=r.w*r.h;
         if(area>e.width*e.height*.62)continue;
         if(task.operation==='draw'&&r.w>e.width*.72)continue;
-        const remaining=Math.max(0,task.travel+task.build-task.elapsed);
+        const remaining=Math.max(0,task.travel+(task.inspection||0)+task.build+(task.review||0)-task.elapsed);
         if(remaining<.7)continue;
         let value=({type:6,place_media:6,place:5,duplicate:4,draw:2,stroke:1}[task.operation]||0)+Math.min(3,remaining);
         if(task.operation==='type'&&parseFloat(element.fontSize)>25)value+=2;

@@ -43,6 +43,9 @@ def synthesize(events, start, samples, sample_rate=48000):
 
 
 def render_movie(player_url, project_url, destination, settings, options, cancel=None, progress=None):
+    from app.config import ROOT
+    bundled_browsers=ROOT/'browsers'
+    if bundled_browsers.is_dir():os.environ['PLAYWRIGHT_BROWSERS_PATH']=str(bundled_browsers)
     import av
     from PIL import Image
     from playwright.sync_api import sync_playwright
@@ -62,13 +65,17 @@ def render_movie(player_url, project_url, destination, settings, options, cancel
         with sync_playwright() as pw:
             check()
             browser = None
-            for channel in ('msedge','chrome'):
+            channels=() if os.environ.get('SWARM_STUDIO_RECORDING_BROWSER')=='bundled' else ('msedge','chrome')
+            for channel in channels:
                 try:
                     browser=pw.chromium.launch(channel=channel,headless=True,args=['--disable-background-timer-throttling','--disable-renderer-backgrounding'])
                     break
                 except Exception:
                     check()
-            if browser is None:raise RuntimeError('Recording needs Microsoft Edge or Google Chrome installed. Install either browser and try again.')
+            if browser is None and bundled_browsers.is_dir():
+                try:browser=pw.chromium.launch(headless=True,args=['--disable-background-timer-throttling','--disable-renderer-backgrounding'])
+                except Exception:check()
+            if browser is None:raise RuntimeError('No recording browser could start. Use the portable build with its bundled browser, or install Microsoft Edge or Google Chrome.')
             context=browser.new_context(viewport={'width':width,'height':height},device_scale_factor=1,reduced_motion='reduce')
             # Record only the trusted local player and its saved, local assets.
             from urllib.parse import urlsplit

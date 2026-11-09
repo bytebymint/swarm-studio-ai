@@ -14,9 +14,10 @@ WORLD = QWebEngineScript.ScriptWorldId.ApplicationWorld
 class RestrictedPage(QWebEnginePage):
     blocked = Signal(str)
 
-    def __init__(self, profile, parent, trusted_origin=None):
+    def __init__(self, profile, parent, trusted_origin=None, trusted_entry='player.html'):
         super().__init__(profile, parent)
         self.trusted_origin = trusted_origin
+        self.trusted_entry = trusted_entry
         self.settings().setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessFileUrls, False)
         self.settings().setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls, False)
         self.settings().setAttribute(QWebEngineSettings.WebAttribute.JavascriptCanOpenWindows, False)
@@ -28,7 +29,7 @@ class RestrictedPage(QWebEnginePage):
     def acceptNavigationRequest(self, url, nav_type, is_main):
         if not is_main:
             return True
-        if self.trusted_origin and not url.toString().startswith(self.trusted_origin + '/ui/player.html'):
+        if self.trusted_origin and url.toString().split('#')[0].split('?')[0] != self.trusted_origin + '/ui/' + self.trusted_entry:
             self.blocked.emit('Navigation outside the trusted animation page was blocked.')
             return False
         if url.scheme() not in {'http', 'https', 'about'}:
@@ -159,9 +160,9 @@ class BrowserController(QObject):
         self.page.runJavaScript('window.StudioCapture?.cancel()', WORLD)
 
 
-def make_player(profile, origin, parent=None):
+def make_player(profile, origin, parent=None, entry='player.html'):
     view = QWebEngineView(parent)
-    page = RestrictedPage(profile, view, trusted_origin=origin)
+    page = RestrictedPage(profile, view, trusted_origin=origin, trusted_entry=entry)
     page.settings().setAttribute(QWebEngineSettings.WebAttribute.PlaybackRequiresUserGesture, False)
     view.setPage(page)
     channel = QWebChannel(page)

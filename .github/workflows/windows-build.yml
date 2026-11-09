@@ -1,0 +1,39 @@
+name: Windows portable build
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  portable:
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-lock.txt
+      - name: Prepare isolated environment
+        shell: pwsh
+        run: |
+          python -m venv .venv
+          .\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
+      - name: Build and test portable executable
+        shell: pwsh
+        run: .\scripts\build_windows.ps1 -Portable
+      - name: Verify key-free bundle
+        shell: pwsh
+        run: .\.venv\Scripts\python.exe scripts/verify_public_build.py --exe dist/SwarmStudioAI-Portable.exe
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SwarmStudioAI-Windows-x64
+          path: |
+            dist/SwarmStudioAI-Portable.exe
+            dist/SHA256SUMS.txt
+          if-no-files-found: error

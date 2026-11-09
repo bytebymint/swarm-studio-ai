@@ -11,7 +11,7 @@ QCoreApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 app=QApplication([])
 from app.desktop import MainWindow
 root=Path('test-results/focus-layout').resolve();root.mkdir(parents=True,exist_ok=True)
-window=MainWindow(root/'data');window.showMaximized()
+window=MainWindow(root/'data');window.select_workspace('rebuild');window.showMaximized()
 def wait(predicate,timeout=60):
     end=time.monotonic()+timeout
     while time.monotonic()<end:
@@ -49,7 +49,9 @@ try:
     try:
         # Occluded QtWebEngine views can throttle RAF on the Windows test host.
         # Movie export has its own fixed clock and is tested independently.
-        wait(lambda:js('Studio.finished'),120)
+        # Inspection/review and gentler tool travel lengthen the sequence.
+        # Allow the occluded native renderer to finish the full scene as well.
+        wait(lambda:js('Studio.finished'),180)
     except AssertionError:
         print('CAMERA DEBUG',js('JSON.stringify({time:Studio.time,paused:Studio.paused,running:Studio.running,visibility:document.visibilityState,events:Studio.events.slice(-4),camera:{move:!!Studio.camera.move,atEnd:Studio.camera.atEnd,scroll:Studio.camera.primary?.scrollTop,max:Studio.camera.maximum(Studio.camera.primary)},pending:Studio.tasks.filter(t=>t.status!=="complete").map(t=>({id:t.id,state:t.status,operation:t.operation,deps:t.dependencies,visible:Studio.isVisible(Studio.elements.get(t.element)),box:Studio.box(Studio.elements.get(t.element)),tag:Studio.elements.get(t.element).tag}))})'), 'NATIVE',window.player.isVisible(),window.tabs.currentIndex(),flush=True)
         raise

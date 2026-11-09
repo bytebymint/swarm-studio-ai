@@ -17,9 +17,11 @@ distribution, including those notices and any bundled dependency licenses,
 together. The notice collector is an aid, not a substitute for checking the
 obligations of the specific dependencies and codecs you distribute.
 
-Installed Microsoft Edge and Google Chrome are not bundled in the project.
-Recording launches a fresh browser session through Playwright and uses local
-project files. The installed browser remains governed by its publisher's terms.
+Microsoft Edge and Google Chrome are not bundled. The portable Windows build
+includes Playwright's Chromium headless shell as a recording fallback, with its
+upstream license notices retained in the packaged browser directory. Recording
+uses a fresh session and local project files. Installed browsers remain governed
+by their publishers' terms.
 
 ## Website content and demonstration footage
 
@@ -27,7 +29,7 @@ Captured websites retain their owners' rights in designs, text, images, fonts,
 logos, media and trademarks. Saving a local reconstruction or a recording does
 not transfer those rights or establish permission to republish it.
 
-The README animation is a ten-second excerpt of a user-supplied SWARM STUDIO
+The reconstruction README animation is a ten-second excerpt of a user-supplied SWARM STUDIO
 recording. It depicts a third-party website solely to demonstrate the software's
 operation. Third-party branding and content remain the property of their
 respective owners; inclusion does not imply sponsorship, affiliation,
@@ -50,3 +52,8 @@ SWARM STUDIO's license. See [reference provenance](docs/REFERENCE.md).
 For permission involving Byte by Mint's materials, contact
 [info@bytebymint.space](mailto:info@bytebymint.space). For third-party materials,
 contact the relevant rights holder.
+
+The Create SaaS README animation uses the original fictional Relay website from
+`scripts/make_creation_gif.py`. It shows the real Qt UI and shared swarm renderer
+with a local model-response fixture and accelerated playback. It contains no
+paid model request, customer data, third-party website capture or API credential.

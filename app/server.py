@@ -21,7 +21,9 @@ class PreviewHandler(SimpleHTTPRequestHandler):
         requested = unquote(urlsplit(self.path).path)
         root = Path(self.directory).resolve()
         target = Path(self.translate_path(self.path)).resolve()
-        if ".." in requested.split("/") or any(p.startswith(".") for p in requested.split("/") if p) or not target.is_relative_to(root):
+        outside = not target.is_relative_to(root)
+        hidden_target = not outside and any(p.startswith('.') for p in target.relative_to(root).parts)
+        if ".." in requested.split("/") or any(p.startswith(".") for p in requested.split("/") if p) or outside or hidden_target:
             self.send_error(403)
             return
         if target.is_dir() and not (target / "index.html").is_file():

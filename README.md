@@ -4,13 +4,13 @@
 
 # SWARM STUDIO AI
 
-### One website. A whole swarm.
+### Your website. Your ideas. A whole swarm.
 
-**Analyze. Rebuild. Export. Turn the process into cinema.**
+**Rebuild a website. Create from a prompt. Direct your swarm.**
 
-*A local website reconstruction studio by Byte by Mint.*
+*A desktop website reconstruction and creation studio by Byte by Mint.*
 
-[How it works](#how-it-works) · [Install](#installation) · [Use](#your-first-reconstruction) · [Architecture](#architecture) · [License](#license-and-permissions)
+[Download Windows EXE](https://github.com/bytebymint/swarm-studio-ai/releases/latest) · [How it works](#how-it-works) · [Install](#installation) · [Use](#your-first-reconstruction) · [Architecture](#architecture) · [License](#license-and-permissions)
 
 </div>
 
@@ -20,15 +20,40 @@ of AI-inspired agents brings the page together in front of you: drawing layouts,
 typing text, placing images, duplicating components and handing work to one
 another as the build progresses.
 
-**No expensive AI API subscriptions. No cloud inference. No API keys.** Capture,
-task planning, reconstruction, agent choreography and video rendering run on your
-machine. Export the captured frontend as a website project, or turn the entire
-build into an automatically directed cinematic 1080p video.
+Choose **Rebuild** or **Create a website** when the app opens.
 
-The current agent system is deterministic and rule based: these are coordinated
-software personas driven by a real task graph, not LLMs independently writing
-code. Internet access is needed to load online source websites and download
-available assets; the bundled demo and saved local projects work offline.
+**Rebuild runs locally without an AI API key.** Capture, task planning,
+reconstruction, agent choreography and cinematic video rendering run on your
+machine. Export the captured frontend or record its construction as an
+automatically directed 1080p film.
+
+**Create uses your Qwen account to write real website code.** Describe your idea,
+watch sections appear through the same swarm renderer, then tell it what to add,
+change or remove. The app streams validated component changes into the live
+canvas instead of replaying a prebuilt template. The native preview, storage and
+exports stay local; Qwen inference runs through your configured cloud endpoint
+and incurs provider usage charges.
+
+### From an idea to a working frontend
+
+![Create a four-section SaaS website: prompt close-up, then live swarm construction](docs/media/create-saas-demo.gif)
+
+*12-second walkthrough of the real Windows Create workspace: a quick zoom into
+ the prompt, then the shared swarm building a four-section SaaS frontend. This
+ demo uses an original local response fixture and accelerated playback; no paid
+ model request is represented or billed. Real generation speed depends on your
+ provider, brief and connection.*
+
+Describe your business. Watch the layout, text and visuals arrive. Select a
+headline and ask for a change: only changed elements receive new animation jobs,
+while unchanged content stays in place. Add your own images, switch to an
+interactive mobile preview, undo an edit, and export a self-contained website.
+
+The shared visual agents are coordinated software personas driven by a task
+graph. In Rebuild, those jobs come from the captured DOM. In Create, real model
+operations create and update that DOM. Online capture needs access to the source
+website; prompt generation needs the model connection. Saved projects and
+exported generated websites can be explored offline.
 
 <div align="center">
 
@@ -46,8 +71,11 @@ affiliation or endorsement is implied. See [third-party notices](THIRD_PARTY_NOT
 
 | Capability | What you get |
 | --- | --- |
+| Create from a prompt | Qwen streams original HTML/CSS/JS sections into the same live swarm visualization. |
+| Edit through instructions | Add, remove or change sections; select a precise element, queue instructions and restore earlier revisions. |
+| Bring your own images | Upload original images, let Qwen see and place them, and keep them embedded in the export. |
 | Analyze a rendered website | DOM structure, readable CSS, computed-style fallback, visual geometry, text, fonts and available media. |
-| Rebuild with a coordinated crew | Visible workers assigned real construction tasks, with dependencies and genuine task handoffs. |
+| Rebuild with a coordinated crew | Up to four visible specialists, contextual work cards, inspection/build/review phases and dependency-driven handoffs. |
 | Follow the whole page | Automatic tours through document scrolling and nested scrolling containers. |
 | Preserve video assets | Downloadable MP4/WebM videos, local posters and controls, dedicated swarm placement and moving content in cinematic movies. |
 | Focus on the work | A maximized canvas taking about 90% of the window, with one compact bottom dock. |
@@ -58,7 +86,7 @@ affiliation or endorsement is implied. See [third-party notices](THIRD_PARTY_NOT
 | Receive an automatically directed film | Smooth zoom up to 3× on active edits, pullbacks before section travel, and a wide finish. |
 | Reopen work later | A local project library that loads saved reconstructions without recapturing the original site. |
 
-The website export includes the elements and assets successfully captured within
+The Rebuild export includes the elements and assets successfully captured within
 the configured limits. Source JavaScript, authentication, server logic and
 unsupported or inaccessible resources are outside that export. See
 [limitations](#limitations) for the boundaries of a reconstruction.
@@ -82,7 +110,8 @@ unsupported or inaccessible resources are outside that export. See
    document. Save the website as a ZIP, inspect comparison reports, or render a
    movie with automatic cinematic camera direction.
 
-All of this runs locally. The local preview server binds to `127.0.0.1`; it is an
+The Rebuild workflow above runs locally. Create sends your brief, relevant site
+source and uploaded images to your configured model provider. The local preview server binds to `127.0.0.1`; it is an
 internal file preview, not a cloud service or a separate development server you
 need to start.
 
@@ -92,16 +121,32 @@ need to start.
 
 - **Windows 11, 64-bit.** This is the platform currently packaged and verified.
 - **Python 3.12 or newer** to run from source or build an executable.
-- **Microsoft Edge or Google Chrome** installed if you want cinematic recording.
+- **Microsoft Edge or Google Chrome** for recording from source or the folder
+  build. The single-file portable build includes a recording browser as a fallback.
   Regular capture and playback use the bundled Qt Chromium engine.
 - Enough disk space for the Python/Qt environment, local website assets and
   recordings. A complete packaged distribution is several hundred megabytes.
 - Internet access for initial dependency installation and online website capture.
-  No AI provider account or API key is required.
+  Rebuild needs no AI provider account or key. Create needs your model connection
+  and a provider API key; model usage is billed by the provider.
 
 ### Option A — run an existing Windows build
 
-If you have been provided a complete, authorized distribution:
+Download **SwarmStudioAI-Portable.exe** from the
+[latest GitHub release](https://github.com/bytebymint/swarm-studio-ai/releases/latest).
+The release also includes a SHA-256 checksum. The EXE is a Windows x64 build,
+not a browser-hosted app.
+
+**Single-file portable build:** double-click **SwarmStudioAI-Portable.exe**.
+No installer, Python installation or companion folder is needed. It opens
+maximized and includes a recording browser. Copy the one EXE to another supported
+Windows 11 x64 computer to run it there. On launch, bundled components extract
+automatically into a temporary folder; startup takes longer than the folder build.
+Projects and preferences are saved in `%LOCALAPPDATA%\SwarmStudio`, so allow space
+for both the extracted runtime and your captures. This is a Windows application;
+the EXE does not run natively on macOS, Linux or ARM Windows.
+
+**Folder build:**
 
 1. Extract the entire `SwarmStudio` distribution folder.
 2. Keep `SwarmStudio.exe`, `_internal`, `Notices` and the remaining files together.
@@ -110,8 +155,15 @@ If you have been provided a complete, authorized distribution:
    Programs folder and create a Start menu shortcut. Administrator rights are
    not required.
 
-This repository keeps generated builds out of Git. If you only have source
-files, follow Option B. There is no public binary download implied by this guide.
+Generated executables are attached to GitHub Releases rather than committed to
+Git. Source users can follow Option B. The public build includes **no API key**,
+including encrypted bootstrap credentials. Rebuild works without one; choose
+**Create → Model** to connect your own Qwen account. Keep your key private.
+
+The EXE is unsigned, so Windows may identify it as an unrecognized application.
+Verify its source and the release checksum before deciding whether to run it.
+Existing projects and model settings stay in your Windows user profile when you
+replace the EXE.
 
 ### Option B — run from source with Python
 
@@ -172,7 +224,8 @@ uv pip install --python .venv/Scripts/python.exe -r requirements-lock.txt
 ```
 
 Recording uses your installed Edge or Chrome; a separate Playwright browser
-download is not needed. The first launch may take a moment while Chromium starts.
+download is not needed when running from source. The first launch may take a
+moment while Chromium starts.
 
 ### Build a Windows executable
 
@@ -187,6 +240,59 @@ The build runs the core tests and creates
 demo and third-party notices. Keep that entire folder together. The executable
 is unsigned; see [packaging notes](docs/PACKAGING.md) for the verified environment
 and the Qt DLL isolation fix.
+
+To build the self-contained, single-file variant instead:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/build_windows.ps1 -Portable
+```
+
+This downloads the matching Playwright Chromium headless shell during the build
+and embeds it with the app, documentation and dependency notices in
+`dist/SwarmStudioAI-Portable.exe`. Building requires internet access; using the
+offline demo and recording it do not. Installed Edge/Chrome is preferred for
+codec compatibility, with bundled Chromium used when neither can launch.
+Find the embedded project license and dependency notices under
+**Studio → About and licenses**. The portable EXE is also unsigned.
+
+## Create a website
+
+1. Open the app and choose **Create a website**. **Rebuild** opens the existing
+   reconstruction desk; **Workspaces** switches between the two.
+2. Open **Model / Add API key** and save your Alibaba Cloud Model Studio key.
+   The default model is `qwen3.8-flash` with the international Singapore endpoint.
+   If your key belongs to another region or a private deployment, set its
+   compatible base URL and model. The workspace-specific endpoints documented by
+   Alibaba are supported too. No `.env` file is required.
+3. Describe the website: its purpose, audience, sections, visual direction and
+   interactions. Use **Add image** for a photo, product image or logo you own or
+   have permission to use. Uploaded images are sent to Qwen with the brief.
+4. Click **Build website**, or press `Ctrl+Enter`. The model emits complete small
+   operations as it writes. The same named crew, cursors, typing, placement,
+   dependency handoffs and scrolling camera used by Rebuild visualize those
+   actual operations. The renderer does not wait for the whole site to finish.
+5. Choose **Interactive preview** to try menus, buttons, accordions and other
+   browser behavior. **Swarm canvas** shows the construction; generated scripts
+   are kept out of that trusted canvas. Desktop, tablet and mobile viewports are
+   available. Agent playback can be paused or changed from 1× to 5×.
+6. Use **Select element**, click the part you mean, and type a change. For example:
+   “Make this headline shorter,” “Add pricing before the FAQ,” or “Remove the
+   testimonials.” Unaffected sections remain intact. Up to three instructions can
+   wait in the queue while the current work finishes.
+7. **Undo / Redo** restore saved revisions without making another model request.
+   Changes, chat instructions and prompt drafts save locally. Interrupted work can
+   be recovered when reopening a project. Stop keeps completed changes and
+   cancels queued instructions.
+8. **Export ZIP** produces an offline-capable static website with its CSS,
+   JavaScript, original SVG artwork and embedded uploaded images. It contains no
+   provider credential, chat history or app-native code. **Open** reopens your
+   locally saved created websites.
+
+Smart review checks desktop/mobile geometry, anchors, images and JavaScript
+syntax and asks Qwen for a repair pass. It is not a guarantee of design quality,
+accessibility conformance or correct behavior in every browser. The app reports
+remaining measured issues instead of claiming universal success. See
+[creation architecture and boundaries](docs/CREATION.md).
 
 ## Your first reconstruction
 
@@ -313,8 +419,12 @@ without loading the original source. To keep a separate local library:
 
 The default roster contains eight named workers. The scheduler activates only
 the workers needed for visible tasks; the roster is not a cloud of idle cursors.
-Specialties guide assignment rather than permanently restricting each worker
-to one operation.
+At most four workers build at once. Available specialists own their matching
+operations; smaller rosters fall back to another worker when a specialty is
+absent. Each task has a brief inspection, its actual construction and a review
+hold. Work cards show the worker, specialty, current target and progress, with
+stable placement and a constant readable size during cinematic zooms. These
+labels describe the captured task graph; they are not generated model thoughts.
 
 | Agent | Specialty |
 | --- | --- |
@@ -363,10 +473,10 @@ flowchart TD
 | Scrolling camera | Task-driven document/nested tours with eased motion and section holds. |
 | Project storage | SQLite library, JSON metadata and portable directories. |
 | Local preview | GET/HEAD-only loopback HTTP server. |
-| Cinematic recording | Playwright, installed Edge/Chrome, CDP compositor frames and a deterministic clock. |
+| Cinematic recording | Playwright, Edge/Chrome or portable bundled Chromium, CDP compositor frames and a deterministic clock. |
 | Media encoding | PyAV/FFmpeg H.264, optional AAC, NumPy audio synthesis and Pillow frame handling. |
 | Verification | pytest, independent browser checks, native UI checks and decoded-movie checks. |
-| Windows packaging | PyInstaller, dependency notices and a current-user installation script. |
+| Windows packaging | PyInstaller single-file portable EXE or folder distribution, dependency notices and an optional current-user installation script. |
 
 The source browser never receives the native WebChannel. Only the trusted local
 player receives its bounded event bridge. The capture profile is memory-only;
@@ -419,7 +529,7 @@ THIRD_PARTY_NOTICES.md   Dependency and third-party content boundaries
   can take time. Interactive playback has no universal FPS guarantee. Movie
   exports have a fixed frame rate but can render slower than real time.
 - **The recorded movie has scope limits.** It uses the first saved page, pauses
-  decorative source animations, requires installed Edge/Chrome and has a
+  decorative source animations, uses Edge/Chrome or portable bundled Chromium and has a
   ten-minute cap. Its camera is automatically directed rather than manually edited.
 - **Windows is the verified platform.** Other operating systems, a signed
   installer and clean second-machine validation remain outside the current

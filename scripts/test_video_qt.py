@@ -10,7 +10,7 @@ QCoreApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 app=QApplication([])
 from app.desktop import MainWindow
 root=Path(json.loads(Path('test-results/video/latest.json').read_text('utf-8')))
-window=MainWindow(root);window.showMaximized()
+window=MainWindow(root);window.select_workspace('rebuild');window.showMaximized()
 def wait(predicate,seconds=40):
     deadline=time.monotonic()+seconds
     while time.monotonic()<deadline:

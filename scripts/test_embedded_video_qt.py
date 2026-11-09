@@ -13,7 +13,7 @@ from app.desktop import MainWindow
 root=Path('test-results/embedded-video/native').resolve()
 project=root/'projects/hero'
 shutil.copytree('test-results/embedded-video/fixture',project,dirs_exist_ok=True)
-window=MainWindow(root);window.showMaximized()
+window=MainWindow(root);window.select_workspace('rebuild');window.showMaximized()
 def wait(predicate):
     end=time.monotonic()+30
     while time.monotonic()<end:

@@ -13,3 +13,4 @@ swarm-cursors-main/
 !.env.example
 *.partial.mp4
 *.partial.zip
+app/local_credentials.py

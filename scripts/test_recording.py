@@ -1,5 +1,6 @@
 """Exercise the real director, compositor, MP4/audio encoder and cancellation."""
 import json
+import argparse
 import shutil
 import sys
 import threading
@@ -15,6 +16,9 @@ from app.reconstruction import reconstruct
 from app.recording import render_movie
 from app.server import PreviewServer
 
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--plan-only',action='store_true',help='Check camera smoothness and deterministic replay without encoding a movie.')
+args=parser.parse_args()
 root=Path('test-results/recording').resolve();root.mkdir(parents=True,exist_ok=True)
 shutil.copytree(WEB,root/'ui',dirs_exist_ok=True)
 shutil.copytree(WEB/'demo',root/'fixture',dirs_exist_ok=True)
@@ -55,6 +59,9 @@ try:
         assert repeated['frames']==metrics['frames'] and repeated['shots']==metrics['shots'],(repeated,metrics)
         assert not errors,errors
         browser.close()
+    if args.plan_only:
+        print('PASS deterministic recording director',json.dumps({k:v for k,v in metrics.items() if k not in ('samples','shots')}),flush=True)
+        raise SystemExit(0)
     options=dict(width=1280,height=720,output_width=1280,output_height=720,fps=30,speed=1,zoom=3,sound=True)
     last=[-1]
     def progress(value,message):

@@ -10,12 +10,12 @@ from PySide6.QtGui import QAction, QColor, QDesktopServices, QFont, QIcon, QKeyS
 from PySide6.QtWidgets import (QAbstractItemView, QCheckBox, QComboBox, QDialog,
     QFileDialog, QFrame, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem,
     QMainWindow, QMenu, QMessageBox, QProgressBar, QPushButton, QScrollArea, QSizePolicy, QSplitter,
-    QStackedWidget, QTabBar, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
+    QStackedWidget, QTabBar, QTextBrowser, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from app.blueprint import COLORS, NAMES, ROLES
 from app.browser import BrowserController, make_player
 from app.comparison import ComparisonPanel
-from app.config import Settings, WEB
+from app.config import ROOT, Settings, WEB
 from app.projects import ProjectStore
 from app.server import PreviewServer
 from app.settings_dialog import SettingsDialog
@@ -83,6 +83,7 @@ class MainWindow(QMainWindow):
         self.setMinimumSize(960, 540)
         self.setStyleSheet((WEB / 'application.qss').read_text('utf-8'))
         self.build_ui()
+        self.build_workspaces()
         self.browser.error.connect(self.browser_error)
         self.browser.phase.connect(self.status)
         self.browser.capture_ready.connect(self.captured)
@@ -92,6 +93,56 @@ class MainWindow(QMainWindow):
         self.player.setUrl(QUrl(self.server.url('ui/player.html')))
         self.load_recent()
         self.shortcuts()
+
+    def build_workspaces(self):
+        self.rebuild_workspace = self.takeCentralWidget()
+        self.workspaces = QStackedWidget()
+        self.setCentralWidget(self.workspaces)
+        self.creator = None
+        self.launcher = QWidget();self.launcher.setObjectName('workspaceLauncher')
+        layout = QVBoxLayout(self.launcher);layout.setContentsMargins(48, 30, 48, 30);layout.setSpacing(16)
+        layout.addStretch()
+        brand = QLabel('SWARM STUDIO AI');brand.setObjectName('brand');brand.setAlignment(Qt.AlignmentFlag.AlignCenter);layout.addWidget(brand)
+        heading = QLabel('One studio. Two ways to build.');heading.setObjectName('hero');heading.setAlignment(Qt.AlignmentFlag.AlignCenter);layout.addWidget(heading)
+        note = QLabel('Start with a website you love, or an idea of your own.');note.setObjectName('muted');note.setAlignment(Qt.AlignmentFlag.AlignCenter);layout.addWidget(note)
+        layout.addSpacing(16)
+        cards = QHBoxLayout();cards.setSpacing(20);cards.addStretch()
+        def card(title, caption, detail, mode):
+            choice = QPushButton();choice.setObjectName('workspaceCard');choice.setAccessibleName(title)
+            choice.setCursor(Qt.CursorShape.PointingHandCursor);choice.setFixedSize(360, 200)
+            content = QVBoxLayout(choice);content.setContentsMargins(26, 23, 26, 23);content.setSpacing(12)
+            eyebrow = QLabel(caption);eyebrow.setObjectName('section')
+            name = QLabel(title);name.setObjectName('workspaceCardTitle')
+            description = QLabel(detail);description.setWordWrap(True);description.setObjectName('muted')
+            for label in [eyebrow, name, description]:
+                label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents);content.addWidget(label)
+            content.addStretch()
+            choice.clicked.connect(lambda: self.select_workspace(mode));cards.addWidget(choice)
+            return choice
+        self.rebuild_choice = card('Rebuild', '01 / RECONSTRUCT', 'Analyze an existing website and watch your swarm reconstruct it locally.', 'rebuild')
+        self.create_choice = card('Create a website', '02 / CREATE', 'Describe your idea. Direct the same swarm as it designs, builds and refines your website.', 'create')
+        cards.addStretch();layout.addLayout(cards)
+        footer = QLabel('Your projects stay on this computer. Create connects to your own Qwen account.');footer.setObjectName('muted');footer.setAlignment(Qt.AlignmentFlag.AlignCenter);layout.addWidget(footer)
+        layout.addStretch()
+        self.workspaces.addWidget(self.launcher);self.workspaces.addWidget(self.rebuild_workspace)
+        self.studio_menu.insertAction(self.studio_menu.actions()[0], QAction('Choose workspace…', self, triggered=lambda: self.select_workspace('home')))
+        self.workspaces.setCurrentWidget(self.launcher)
+
+    def select_workspace(self, mode):
+        if not hasattr(self, 'workspaces'):
+            return
+        if mode == 'create':
+            if self.creator is None:
+                from app.create_workspace import CreateWorkspace
+                self.creator = CreateWorkspace(self.root, self.server, self)
+                self.creator.home_requested.connect(lambda: self.select_workspace('home'))
+                self.workspaces.addWidget(self.creator)
+            self.workspaces.setCurrentWidget(self.creator)
+        elif mode == 'rebuild':
+            self.workspaces.setCurrentWidget(self.rebuild_workspace)
+            QTimer.singleShot(0, self.resize_canvases)
+        else:
+            self.workspaces.setCurrentWidget(self.launcher)
 
     def build_ui(self):
         self.build_supporting_widgets()
@@ -162,6 +213,7 @@ class MainWindow(QMainWindow):
         self.studio_menu.addAction('Fullscreen (F11)', self.toggle_presentation)
         self.studio_menu.addAction('Cinematic recording…', self.show_recording)
         self.studio_menu.addAction('Video sources…', self.show_video_sources)
+        self.studio_menu.addAction('About and licenses…', self.show_licenses)
         row.addWidget(self.studio_button)
         self.url.setMinimumWidth(120)
         row.addWidget(self.url, 1)
@@ -381,7 +433,11 @@ class MainWindow(QMainWindow):
         self.agent_summary.setText(f'{count} simulated agents · waiting')
 
     def shortcuts(self):
-        for key,callback in [('Ctrl+L',lambda:self.url.setFocus()),('Ctrl+N',self.new_project),('Ctrl+O',self.open_project),('Ctrl+E',self.export_project),('F11',self.toggle_presentation)]:
+        def route(name, fallback):
+            if self.creator and self.workspaces.currentWidget() is self.creator:
+                getattr(self.creator, name)()
+            else:fallback()
+        for key,callback in [('Ctrl+L',lambda:route('focus_prompt',lambda:self.url.setFocus())),('Ctrl+N',lambda:route('new_project',self.new_project)),('Ctrl+O',lambda:route('open_project',self.open_project)),('Ctrl+E',lambda:route('export_project',self.export_project)),('F11',self.toggle_presentation)]:
             action=QAction(self);action.setShortcut(QKeySequence(key));action.triggered.connect(callback);self.addAction(action)
 
     def status(self,text):
@@ -448,6 +504,7 @@ class MainWindow(QMainWindow):
 
     def open_demo(self):
         if self.busy:return
+        self.select_workspace('rebuild')
         self.url.setText(self.server.url('ui/demo/index.html'))
         self.navigate()
 
@@ -709,6 +766,7 @@ class MainWindow(QMainWindow):
         dialog.exec()
 
     def load_project(self,project_id):
+        self.select_workspace('rebuild')
         try:self.project,self.metadata,self.blueprint=self.store.load(project_id)
         except ValueError as exc:self.fail(str(exc));return
         self.project_id=project_id;self.update_stats();self.export_button.setEnabled(True);self.compare_button.setEnabled(True);self.cancel_button.setEnabled(True)
@@ -717,6 +775,7 @@ class MainWindow(QMainWindow):
 
     def new_project(self):
         if self.busy:return
+        self.select_workspace('rebuild')
         self.js('stop()');self.project=None;self.metadata=None;self.blueprint=None;self.feed.clear();self.timeline.reset();self.progress.setValue(0)
         self.record_button.setEnabled(False)
         self.export_button.setEnabled(False);self.compare_button.setEnabled(False);self.tabs.setCurrentIndex(0);self.stack.setCurrentWidget(self.welcome);self.url.clear();self.url.setFocus();self.populate_agents()
@@ -801,6 +860,16 @@ class MainWindow(QMainWindow):
         if tree.topLevelItemCount():tree.setCurrentItem(tree.topLevelItem(0))
         dialog.exec()
 
+    def show_licenses(self):
+        dialog=QDialog(self);dialog.setWindowTitle('SWARM STUDIO AI — About and licenses');dialog.resize(760,560)
+        layout=QVBoxLayout(dialog)
+        layout.addWidget(QLabel('SWARM STUDIO AI · Byte by Mint · info@bytebymint.space'))
+        license_file=next((p for p in [ROOT/'LICENSE',ROOT.parent/'LICENSE'] if p.is_file()),None)
+        text=QTextBrowser();text.setPlainText(license_file.read_text('utf-8') if license_file else 'See the LICENSE supplied with this application.');layout.addWidget(text)
+        notices=next((p for p in [ROOT/'Notices',ROOT.parent/'Notices'] if p.is_dir()),None)
+        if notices:layout.addWidget(button('Open bundled third-party notices',lambda:QDesktopServices.openUrl(QUrl.fromLocalFile(str(notices)))))
+        layout.addWidget(button('Close',dialog.close));dialog.exec()
+
     def export_to(self,destination):
         self.export_button.setEnabled(False)
         self.export_worker=ExportWorker(self.project,destination,self.settings.values.copy())
@@ -819,12 +888,18 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self,event):
         self.browser.cancel()
-        active=[worker for worker in [self.worker,self.export_worker,self.recording_worker] if worker and worker.isRunning()]
+        if self.creator:
+            self.creator.begin_shutdown()
+        creation_worker=self.creator.worker if getattr(self,'creator',None) else None
+        active=[worker for worker in [self.worker,self.export_worker,self.recording_worker,creation_worker] if worker and worker.isRunning()]
         if active:
             if self.worker:self.worker.cancel_event.set()
             if self.recording_worker:self.recording_worker.cancel_event.set()
+            if creation_worker:creation_worker.cancel()
             self.closing=True;self.status('Finishing background file operations before closing…');event.ignore();QTimer.singleShot(250,self.close);return
         self.js('stop()')
+        if self.creator:
+            self.creator.view.stop()
         self.browser.navigation_timeout.stop()
         self.source.stop();self.player.stop()
         self.server.close();self.store.close()

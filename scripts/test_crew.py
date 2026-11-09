@@ -33,7 +33,7 @@ try:
     page.evaluate('window.recorded=[];window.studioBridge={publish:raw=>recorded.push(JSON.parse(raw))}')
     page.evaluate('(url)=>Studio.load(url,{agents:8,speed:1,intro:true,auto_tour:true,names:true})',server.url('project')+'/')
     page.evaluate('''Studio.pause(true);window.metrics={frames:0,visible:0,busy:0,maxVisible:0,maxIdle:0,maxActive:0,maxStep:0,cursorError:0,textWidthError:0,textMutations:0,typedFrames:0,highlights:!!Studio.choreography.highlight};window.previous=new Map();window.savedFrames=[];
-      window.sampleCrew=()=>{const s=Studio,m=metrics;const visible=s.agents.filter(a=>a.opacity>.18&&a.x>=0&&a.x<=innerWidth&&a.y>=0&&a.y<=innerHeight);const active=s.agents.filter(a=>a.task);if(s.time>s.introDuration+.5&&!s.finished){m.frames++;m.visible+=visible.length;m.busy+=visible.filter(a=>a.task).length;m.maxVisible=Math.max(m.maxVisible,visible.length);m.maxIdle=Math.max(m.maxIdle,visible.filter(a=>!a.task).length);m.maxActive=Math.max(m.maxActive,active.length);}for(const a of visible){const prev=previous.get(a.id);if(prev&&prev.visible){const step=Math.hypot(a.x-prev.x,a.y-prev.y);if(step>m.maxStep){m.maxStep=step;m.maxStepTrace={id:a.id,operation:a.task?.operation,phase:a.phase,progress:a.task?.progress,time:s.time,from:prev,to:{x:a.x,y:a.y}};}}previous.set(a.id,{x:a.x,y:a.y,visible:true,phase:a.phase,task:a.task?.id});if(a.task&&a.pose)m.cursorError=Math.max(m.cursorError,Math.hypot(a.x-a.pose.x,a.y-a.pose.y));}for(const a of s.agents)if(!visible.includes(a))previous.set(a.id,{visible:false});for(const e of s.elements.values()){if(e.typing){m.typedFrames++;for(const [node,text]of e.textNodes)if(node.textContent!==text)m.textMutations++;const r=e.node.getBoundingClientRect();if(e.referenceWidth!==undefined)m.textWidthError=Math.max(m.textWidthError,Math.abs(r.width-e.referenceWidth));}}};
+      window.sampleCrew=()=>{const s=Studio,m=metrics;const visible=s.agents.filter(a=>a.opacity>.18&&a.x>=0&&a.x<=innerWidth&&a.y>=0&&a.y<=innerHeight);const active=s.agents.filter(a=>a.task);if(s.time>s.introDuration+.5&&!s.finished){m.frames++;m.visible+=visible.length;m.busy+=visible.filter(a=>a.task).length;m.maxVisible=Math.max(m.maxVisible,visible.length);m.maxIdle=Math.max(m.maxIdle,visible.filter(a=>!a.task).length);m.maxActive=Math.max(m.maxActive,active.length);}for(const a of visible){const prev=previous.get(a.id);if(prev&&prev.visible){const step=Math.hypot(a.x-prev.x,a.y-prev.y);if(step>m.maxStep){m.maxStep=step;m.maxStepTrace={id:a.id,operation:a.task?.operation,phase:a.phase,progress:a.task?.progress,time:s.time,from:prev,to:{x:a.x,y:a.y}};}}previous.set(a.id,{x:a.x,y:a.y,visible:true,phase:a.phase,task:a.task?.id});if(a.task&&a.pose)m.cursorError=Math.max(m.cursorError,Math.hypot(a.x-a.pose.x,a.y-a.pose.y));}const cards=visible.filter(a=>a.task&&a.labelAlpha>.25&&a.labelBox).map(a=>a.labelBox);m.labelCollisions||=0;for(let i=0;i<cards.length;i++)for(let j=i+1;j<cards.length;j++){const a=cards[i],b=cards[j];if(a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y)m.labelCollisions++;}for(const a of s.agents)if(!visible.includes(a))previous.set(a.id,{visible:false});for(const e of s.elements.values()){if(e.typing){m.typedFrames++;for(const [node,text]of e.textNodes)if(node.textContent!==text)m.textMutations++;const r=e.node.getBoundingClientRect();if(e.referenceWidth!==undefined)m.textWidthError=Math.max(m.textWidthError,Math.abs(r.width-e.referenceWidth));}}};
       for(const e of Studio.elements.values())if(e.node)e.referenceWidth=e.node.getBoundingClientRect().width;''')
     captured=[]
     for batch in range(160):
@@ -48,13 +48,28 @@ try:
     assert result['maxVisible']<=result['capacity']+2 and result['maxIdle']<=2,result
     assert result['workingFraction']>.78,result
     assert result['maxStep']<75 and result['cursorError']<.01,result
+    assert result['labelCollisions']==0,result
     assert result['highlights'] and result['typedFrames']>30 and result['textMutations']==0 and result['textWidthError']<.1,result
     assert result['handoffs']>2 and result['framesPublished']>2,result
+    presentation=page.evaluate('''()=>{
+      const events=recorded,inspected=events.filter(e=>e.type==='inspected'),reviewed=events.filter(e=>e.type==='reviewed');
+      const wrongRole=events.filter(e=>e.type==='assigned'&&e.agent===4&&e.operation!=='verify');
+      return {inspected:inspected.length,reviewed:reviewed.length,context:inspected.every(e=>e.subject&&e.detail),wrongRole};
+    }''')
+    assert presentation['inspected']==result['total'] and presentation['reviewed']==result['total'],presentation
+    assert presentation['context'] and not presentation['wrongRole'],presentation
+    result['presentation']=presentation
     assert {'draw','type','place','duplicate','stroke','verify'}<=set(result['operations']),result
     # The actual milestone events must precede every dependent assignment.
-    events=page.evaluate('recorded');complete=set();frames=set();tasks={t['id']:t for t in blueprint['tasks']}
+    events=page.evaluate('recorded');complete=set();frames=set();inspected=set();reviewed=set();tasks={t['id']:t for t in blueprint['tasks']}
     for event in events:
-      if event['type']=='completed':complete.add(event['task'])
+      if event['type']=='inspected':inspected.add(event['task'])
+      if event['type']=='reviewed':
+        assert event['task'] in inspected
+        reviewed.add(event['task'])
+      if event['type']=='completed':
+        assert event['task'] in reviewed
+        complete.add(event['task'])
       if event['type']=='frame-ready':frames.add(event['task'])
       if event['type']=='assigned':
         task=tasks[event['task']]
@@ -84,6 +99,23 @@ try:
       if page.evaluate('Studio.finished'):break
       page.evaluate('for(let i=0;i<120&&!Studio.finished;i++)Studio.tick(1/60)')
     assert page.evaluate('Studio.finished&&Studio.failed===0')
+    # Drawing the same paused state must not move cards or alter motion state.
+    page.evaluate('Studio.replay();Studio.pause(true);for(let i=0;i<480;i++)Studio.tick(1/60);Studio.draw()')
+    assert page.evaluate('''()=>{const snapshot=()=>JSON.stringify(Studio.agents.map(a=>({box:a.labelBox,alpha:a.labelAlpha,x:a.x,y:a.y,trail:a.trail})));const before=snapshot();Studio.draw();Studio.draw();return before===snapshot()}''')
+    cards=page.evaluate('''()=>Studio.agents.filter(a=>a.task&&a.opacity>.2&&a.labelAlpha>.25&&a.labelBox).map(a=>a.labelBox)''')
+    for i,box in enumerate(cards):
+      assert box['x']>=0 and box['y']>=0 and box['x']+box['w']<=1280 and box['y']+box['h']<=650,box
+      for other in cards[i+1:]:
+        assert not (box['x']<other['x']+other['w'] and box['x']+box['w']>other['x'] and box['y']<other['y']+other['h'] and box['y']+box['h']>other['y']),cards
+    # Zoom changes screen-space density, not card readability or crew size.
+    page.evaluate('Studio.startCapture({width:1280,height:650,zoom:3});Studio.director.pose.zoom=3;for(let i=0;i<480;i++)Studio.tick(1/60)')
+    assert page.evaluate('Studio.crew.uiScale')<=.34
+    assert page.evaluate('Studio.agents.filter(a=>a.labelBox).every(a=>a.labelBox.w*Studio.presentation.matrix().scale<=188.01)')
+    page.evaluate('Studio.endCapture();Studio.setOptions({reduced_motion:true});Studio.replay();Studio.pause(true);for(let i=0;i<300;i++)Studio.tick(1/60)')
+    assert page.evaluate('Studio.agents.every(a=>a.trail.length===0)')
+    page.evaluate('Studio.setOptions({agents:2,names:false});Studio.replay();Studio.pause(true);for(let i=0;i<20000&&!Studio.finished;i++)Studio.tick(1/60)')
+    assert page.evaluate('Studio.finished&&Studio.failed===0&&Studio.agents.length===2'),'Small rosters must complete operations with no dedicated specialist'
+    result['small_roster_fallback']=True
     result['legacy_replay']=True
     assert not errors,errors
     (root/'results.json').write_text(json.dumps(result,indent=2),'utf-8')

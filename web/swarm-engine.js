@@ -50,8 +50,9 @@
     resize(){const dpr=devicePixelRatio||1;this.canvas.width=innerWidth*dpr;this.canvas.height=innerHeight*dpr;this.ctx.setTransform(dpr,0,0,dpr,0,0);}
     random(){this.seed^=this.seed<<13;this.seed^=this.seed>>>17;this.seed^=this.seed<<5;return(this.seed>>>0)/4294967296;}
     emit(type,data){const event={type,...data};this.events?.push(event);if(this.events?.length>100)this.events.shift();if(!this.seeking)window.studioBridge?.publish(JSON.stringify(event));}
+    configure(settings){this.settings=settings;this.sound?.close();this.sound=new EventSound(settings);}
     async load(project,settings={}){
-      this.settings=settings;this.project=project;this.running=false;this.mediaWarnings=[];this.sound?.close();this.sound=new EventSound(settings);
+      this.configure(settings);this.project=project;this.running=false;this.mediaWarnings=[];
       const response=await fetch(project+'metadata/blueprint.json');if(!response.ok)throw new Error('Blueprint could not be loaded.');
       this.model=await response.json();
       await new Promise((resolve,reject)=>{const timeout=setTimeout(()=>reject(new Error('Local clone did not load within 15 seconds.')),15000);this.frame.onload=()=>{clearTimeout(timeout);resolve();};this.frame.src=project+'index.html';});
@@ -88,7 +89,7 @@
       this.frame.contentWindow.scrollTo(0,0);this.intro.hidden=false;this.intro.style.display='flex';this.intro.style.opacity='1';this.completion.hidden=true;this.canvas.style.display='block';
       this.canvas.style.opacity=this.settings.overlay_opacity??1;this.running=true;this.introDuration=(this.settings.intro===false||this.settings.reduced_motion) ? .15 : 1.1;
       this.camera=new CinematicTour(this);
-      if(!this.tasks.length)this.finish();
+      if(!this.tasks.length&&!this.liveOpen)this.finish();
     }
     box(element){if(this.boundsCache?.has(element.id))return this.boundsCache.get(element.id);const rect=element.node?.getBoundingClientRect();const box=rect?{x:rect.x,y:rect.y,w:rect.width,h:rect.height}:element.rect;this.boundsCache?.set(element.id,box);return box;}
     isVisible(e){if(!e.node)return false;const r=this.box(e);if(r.y+r.h<0||r.y>this.height||r.x+r.w<0||r.x>this.width)return false;let parent=e.node.parentElement;while(parent&&parent!==this.doc.body){const cs=this.frame.contentWindow.getComputedStyle(parent);if(/auto|scroll|hidden|clip/.test(cs.overflowY)){const p=parent.getBoundingClientRect();if(r.y>p.bottom||r.y+r.h<p.top)return false;}parent=parent.parentElement;}return true;}
@@ -103,6 +104,7 @@
       this.camera.update(dt);
     }
     tick(dt){
+      this.liveQueue?.flush();
       this.time+=dt;
       this.boundsCache?.clear();
       const introP=clamp(this.time/this.introDuration,0,1);this.intro.style.opacity=String(1-ease(clamp((introP-.55)/.45,0,1)));
@@ -114,7 +116,7 @@
         this.boundsCache.clear();
         this.crew.dispatch();
         for(const agent of this.agents)if(agent.task)this.choreography.update(agent,this.director?this.director.taskDelta(agent,dt):dt);
-        if(this.done+this.failed===this.tasks.length&&!this.agents.some(a=>a.task))this.finish();
+        if(!this.liveOpen&&!this.liveQueue?.pending.length&&this.done+this.failed===this.tasks.length&&!this.agents.some(a=>a.task))this.finish();
       }
       this.crew.animate(dt);
     }

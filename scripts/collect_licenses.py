@@ -2,10 +2,13 @@
 import importlib.metadata
 import shutil
 import sys
+import argparse
 from pathlib import Path
 
 root=Path(__file__).resolve().parent.parent
-destination=root/'dist/SwarmStudio/Notices'
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--output',type=Path,default=root/'dist/SwarmStudio/Notices')
+destination=parser.parse_args().output
 destination.mkdir(parents=True,exist_ok=True)
 names=['PySide6','PySide6_Essentials','PySide6_Addons','PySide6_WebEngine','shiboken6',
        'httpx','httpcore','anyio','h11','idna','certifi','beautifulsoup4','soupsieve',

@@ -11,6 +11,7 @@ def main():
     parser.add_argument("--demo", action="store_true")
     parser.add_argument("--smoke-report", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--smoke-recording", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--smoke-create-report", type=Path, help=argparse.SUPPRESS)
     args = parser.parse_args()
     from PySide6.QtCore import QCoreApplication, Qt
     from PySide6.QtWidgets import QApplication
@@ -25,6 +26,9 @@ def main():
     from app.desktop import MainWindow
     window = MainWindow(root)
     window.showMaximized()
+    if args.smoke_create_report:
+        from app.creation_smoke import run_creation_smoke
+        run_creation_smoke(window,args.smoke_create_report)
     if args.demo or args.smoke_report:
         window.open_demo()
     if args.smoke_report:
@@ -56,10 +60,13 @@ def main():
                 dialog.worker.error.connect(lambda message:state.update(movie_error=message))
                 state['stage']='recording';complete=False
             if state['stage']=='recording':complete=bool(state.get('movie')) and not window.recording_worker.isRunning()
-            if complete or state['elapsed'] >= (180 if args.smoke_recording else 90) or state.get('movie_error'):
+            # The full inspect/build/review sequence needs more time on native
+            # renderers throttled by Windows occlusion during automated checks.
+            if complete or state['elapsed'] >= (300 if args.smoke_recording else 180) or state.get('movie_error'):
                 args.smoke_report.parent.mkdir(parents=True, exist_ok=True)
                 args.smoke_report.write_text(json.dumps({'native_window': window.isVisible(), 'demo_loaded': window.browser.ready,
                     'player_loaded': window.player_ready, 'frozen': bool(getattr(sys, 'frozen', False)),
+                    'bundle_root': str(getattr(sys, '_MEIPASS', '')), 'bundled_browser': (Path(getattr(sys, '_MEIPASS', '.'))/'browsers').is_dir(),
                     'workflow_complete': bool(complete), 'stage': state['stage'], 'tasks': len(window.blueprint['tasks']) if window.blueprint else 0,
                     'export_exists': args.smoke_report.with_suffix('.zip').is_file(),
                     'recording': state.get('movie'), 'recording_error': state.get('movie_error'),
