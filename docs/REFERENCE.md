@@ -1,31 +1,32 @@
-# Reference investigation and provenance
+# Implementation notes
 
-The supplied `swarm-cursors-main/` directory is an isolated, unmodified reference.
-Source: https://github.com/DhvanilPatel/swarm-cursors . Its README credits
-Joel Califa's https://github.com/califa/swarm-site and explicitly states that
-neither source grants a published license. No reference JavaScript, demo HTML,
-icons or recordings are bundled in the desktop distribution. Obtain permission
-from the relevant authors before distributing their material.
+The desktop implementation is independent. Separately supplied reference
+materials are excluded from the repository and packaged application. Their
+presence in a local development workspace does not grant permission to copy or
+redistribute them.
 
-`swarm.js` is a single injected closure. `captureModel` walks styled DOM and open
-shadow roots, detects repeated siblings and emits visual layers and dependencies.
-`detectEnv` selects document scrolling or a large inner scroller. `View` isolates
-the build scene in a shadow tree. `Engine` assigns generator-based drawing scripts
-to lightweight cursor objects, unlocks tasks at the viewport frontier and applies
-flocking. `Sound` synthesizes per-event clicks, keyboard noise, spatial notes and
-transition chords. `App` coordinates preparation, capture, playback and teardown.
-`window.__swarmRebuild` exposes start/stop/restart and debugging.
+## Desktop architecture
 
-`background.js` uses chrome.scripting to inject, chrome.tabs.captureVisibleTab for
-otherwise inaccessible media pixels, and chrome.runtime to restore hidden media.
-Those APIs cannot run in Qt. The new app uses QWebEnginePage.runJavaScript in
-ApplicationWorld for read-only inspection, a private local playback document with
-QWebChannel, and widget screenshots for comparison. Remote documents never get
-the native bridge. The engine here was written separately; no extension adapter
-silently loads the reference engine.
+The application uses Qt WebEngine for rendered website inspection, a local
+playback document for reconstruction, and a native bridge restricted to the
+trusted application UI. Remote websites never receive access to that bridge.
+Browser-extension APIs are not required by the desktop implementation.
 
-The reference demo stresses inner scrolling, floats, rich inline text, masks,
-repeated cards, native controls, a 2D canvas and an iframe. Tests exercise that
-page locally without copying it into the application. The supplied GIF and MP4
-files remain reference-only. Their visual language informs crosshair drags,
-measurement tags, selection boxes, text carets, duplication guides and flocking.
+The shared animation engine turns captured or generated DOM elements into
+layout, text, image, media and component tasks. Cursor movement, typing carets,
+selection boxes, measurement guides and task handoffs follow the application's
+own task graph and choreography.
+
+## Verification
+
+Local fixtures cover document and nested scrolling, inline text, repeated
+components, native controls, media, responsive layouts and isolated previews.
+See [architecture](ARCHITECTURE.md) and [website creation](CREATION.md) for the
+current implementation and its boundaries.
+
+## Rights and distribution
+
+The project license covers the original application materials. Third-party
+runtime components retain their applicable notices and license terms. Website
+content and separately supplied media remain subject to their owners' rights;
+obtain permission where required before copying or redistributing them.
